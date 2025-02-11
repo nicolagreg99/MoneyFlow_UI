@@ -117,6 +117,23 @@ const LoginStyles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontFamily: 'Roboto',
   },
+  banner: {
+    padding: 10,
+    marginBottom: 20,
+    width: '100%',
+    textAlign: 'center',
+    borderRadius: 5,
+  },
+  successBanner: {
+    backgroundColor: 'green',
+  },
+  errorBanner: {
+    backgroundColor: 'red',
+  },
+  bannerText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
 export default LoginStyles;

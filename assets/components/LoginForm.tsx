@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { View, TextInput, Text, Button, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import LoginStyles from './Login_style';
+import LoginStyles from '../styles/Login_style';
 
 type RootStackParamList = {
   Login: undefined;
   Main: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
@@ -25,6 +28,7 @@ const LoginForm = () => {
   const [formValues, setFormValues] = useState<FormValues>({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<any>({});
+  const [loginStatus, setLoginStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null); // Stato per il banner di successo/errore
   const navigation = useNavigation<NavigationProp>();
 
   const handleChange = (name: string, value: string) => {
@@ -39,17 +43,36 @@ const LoginForm = () => {
     try {
       const response = await axios.post("http://192.168.1.5:5000/login", formValues);
       if (response.data.token) {
+        await AsyncStorage.setItem('authToken', response.data.token);
+  
+        const userResponse = await axios.get('http://192.168.1.5:5000/me', {
+          headers: { 'x-access-token': response.data.token }, // Passa il token con 'x-access-token'
+        });
+  
+        await AsyncStorage.setItem('userData', JSON.stringify(userResponse.data));
+  
         navigation.navigate('Main');
+  
+        setLoginStatus({ type: 'success', message: 'Token valido! Accesso riuscito.' });
       } else {
         setFormErrors({ general: response.data.message });
+        setLoginStatus({ type: 'error', message: 'Token non valido. Riprova.' });
       }
     } catch (error) {
       setFormErrors({ general: "Errore di connessione o credenziali non valide" });
+      setLoginStatus({ type: 'error', message: "Errore di connessione o credenziali non valide" });
     }
-  };
+  };  
 
   return (
     <View style={LoginStyles.container}>
+      {/* Banner di stato login */}
+      {loginStatus && (
+        <View style={[LoginStyles.banner, loginStatus.type === 'success' ? LoginStyles.successBanner : LoginStyles.errorBanner]}>
+          <Text style={LoginStyles.bannerText}>{loginStatus.message}</Text>
+        </View>
+      )}
+      
       <Image 
         source={require('../logo_money.png')} 
         style={[LoginStyles.logo, { width: width * 0.3, height: width * 0.3 }]} 
