@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import LoginForm from './assets/components/LoginForm';
+import CreateForm from './assets/components/CreateForm';
 import ForgotPasswordScreen from './assets/components/ForgotPassword';
 import MainPage from './assets/components/MainPage';
 import ExpensesScreen from './assets/components/ExpensesScreen';
@@ -61,7 +62,7 @@ const App = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = await AsyncStorage.getItem('authToken');
-      setIsAuthenticated(!!token);
+      setIsAuthenticated(!!token); // Se c'è un token, l'utente è autenticato
     };
     checkAuth();
   }, []);
@@ -70,13 +71,17 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName={isAuthenticated ? 'Main' : 'Login'}>
         <Stack.Screen name="Login" component={LoginForm} options={{ headerShown: false }} />
+        <Stack.Screen name="Register" component={CreateForm} options={{ headerShown: false }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Menu" component={MenuScreen} />
         <Stack.Screen
           name="UpdatePassword"
           component={UpdatePasswordScreen}
-          options={{ headerShown: true, title: 'Reset Password' }}
+          options={({ route }) => ({
+            headerShown: true,
+            title: 'Reset Password',
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

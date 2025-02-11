@@ -134,6 +134,25 @@ const LoginStyles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  successBorder: {
+    borderColor: '#2ECC71', // Verde quando le password combaciano
+    borderWidth: 2,
+    borderRadius: 5,
+  },
+  
+  errorBorder: {
+    borderColor: '#E74C3C', // Rosso se le password non combaciano
+    borderWidth: 2,
+    borderRadius: 5,
+  },
+  
+  successText: {
+    color: '#2ECC71',
+    fontSize: 14,
+    marginTop: 5,
+    textAlign: 'center',
+  },  
+
 });
 
 export default LoginStyles;
