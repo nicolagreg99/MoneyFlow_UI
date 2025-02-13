@@ -3,58 +3,64 @@ import { StyleSheet } from 'react-native';
 const ExpensesStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#f5f5f5',
     padding: 20,
+    borderRadius: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
+    textAlign: 'center',
   },
   datePickerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 20,
   },
-  datePicker: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    textAlign: 'center',
+  datePickerLabel: {
     fontSize: 16,
-    color: '#2C3E50',
+    color: '#333',
+    marginBottom: 5,
+  },
+  datePickerBox: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 15,
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#333',
   },
   filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 20,
   },
-  filterButton: {
-    flex: 1,
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 20,
-    alignItems: 'center',
-    backgroundColor: '#D0D3D4',
+  filterBox: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
   },
-  filterButtonActive: {
+  filterBoxActive: {
     backgroundColor: '#3498DB',
   },
   filterText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#2C3E50',
+    fontSize: 16,
+    color: '#333',
   },
-  filterTextActive: {
-    color: '#fff',
+  filterOption: {
+    padding: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  filterOptionText: {
+    fontSize: 16,
+    color: '#333',
   },
   totalContainer: {
     backgroundColor: '#2ECC71',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Platform, FlatList } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import ExpensesStyles from '../styles/Expenses_style';
@@ -17,8 +17,8 @@ const ExpensesScreen = () => {
   const [showToPicker, setShowToPicker] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [totalExpenses, setTotalExpenses] = useState<string | null>(null);
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
 
-  // Funzione per recuperare il token salvato
   const getToken = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -29,13 +29,12 @@ const ExpensesScreen = () => {
     }
   };
 
-  // Funzione per effettuare la richiesta delle spese totali
   const fetchTotalExpenses = async () => {
     const fromDateString = fromDate.toISOString().split('T')[0];
     const toDateString = toDate.toISOString().split('T')[0];
 
     try {
-      const token = await getToken(); // Recupera il token
+      const token = await getToken(); 
 
       if (!token) {
         console.log("Token non trovato, impossibile effettuare la richiesta.");
@@ -50,7 +49,7 @@ const ExpensesScreen = () => {
           tipo: selectedFilter || '',
         },
         headers: {
-          "x-access-token": token, // Usa il token qui
+          "x-access-token": token, 
         },
       });
 
@@ -71,13 +70,11 @@ const ExpensesScreen = () => {
 
       {/* Date Picker */}
       <View style={ExpensesStyles.datePickerContainer}>
-        {/* Selezione Data Inizio */}
-        <TouchableOpacity onPress={() => setShowFromPicker(true)}>
-          <TextInput
-            style={ExpensesStyles.datePicker}
-            value={fromDate.toISOString().split('T')[0]}
-            editable={false}
-          />
+        <Text style={ExpensesStyles.datePickerLabel}>Seleziona Data Inizio</Text>
+        <TouchableOpacity 
+          style={ExpensesStyles.datePickerBox} 
+          onPress={() => setShowFromPicker(true)}>
+          <Text style={ExpensesStyles.dateText}>{fromDate.toISOString().split('T')[0]}</Text>
         </TouchableOpacity>
 
         {showFromPicker && (
@@ -94,13 +91,11 @@ const ExpensesScreen = () => {
           />
         )}
 
-        {/* Selezione Data Fine */}
-        <TouchableOpacity onPress={() => setShowToPicker(true)}>
-          <TextInput
-            style={ExpensesStyles.datePicker}
-            value={toDate.toISOString().split('T')[0]}
-            editable={false}
-          />
+        <Text style={ExpensesStyles.datePickerLabel}>Seleziona Data Fine</Text>
+        <TouchableOpacity 
+          style={ExpensesStyles.datePickerBox} 
+          onPress={() => setShowToPicker(true)}>
+          <Text style={ExpensesStyles.dateText}>{toDate.toISOString().split('T')[0]}</Text>
         </TouchableOpacity>
 
         {showToPicker && (
@@ -118,27 +113,33 @@ const ExpensesScreen = () => {
         )}
       </View>
 
-      {/* Filtri per categoria */}
+      {/* Filtro per categoria */}
       <View style={ExpensesStyles.filterContainer}>
-        {filterOptions.map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={[
-              ExpensesStyles.filterButton,
-              selectedFilter === option && ExpensesStyles.filterButtonActive,
-            ]}
-            onPress={() => setSelectedFilter(selectedFilter === option ? null : option)}
-          >
-            <Text
-              style={[
-                ExpensesStyles.filterText,
-                selectedFilter === option && ExpensesStyles.filterTextActive,
-              ]}
-            >
-              {option}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity 
+          style={[ExpensesStyles.filterBox, selectedFilter && ExpensesStyles.filterBoxActive]} 
+          onPress={() => setShowFilterOptions(!showFilterOptions)}>
+          <Text style={ExpensesStyles.filterText}>
+            {selectedFilter ? selectedFilter : "Seleziona Categoria"}
+          </Text>
+        </TouchableOpacity>
+
+        {showFilterOptions && (
+          <FlatList
+            data={filterOptions}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={ExpensesStyles.filterOption}
+                onPress={() => {
+                  setSelectedFilter(item);
+                  setShowFilterOptions(false);
+                }}
+              >
+                <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item}
+          />
+        )}
       </View>
 
       {/* Totale delle spese */}
