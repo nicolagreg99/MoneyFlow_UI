@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const InsertExpensesScreen = () => {
+const InsertIncomesScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Schermata di Inserimento Spese</Text>
+      <Text style={styles.text}>Schermata di Inserimento Entrate</Text>
     </View>
   );
 };
@@ -23,4 +23,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InsertExpensesScreen;
+export default InsertIncomesScreen;
