@@ -26,7 +26,7 @@ const ExpensesStyles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  /** 📅 Accordion Date Picker **/
+  /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -78,7 +78,7 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
   },
 
-  /** 🎛️ Filter Selector **/
+  /** 🎛️ Filtro Spese **/
   filterContainer: {
     marginBottom: 20,
   },
@@ -97,35 +97,26 @@ const ExpensesStyles = StyleSheet.create({
     elevation: 2,
   },
   filterBoxActive: {
-    backgroundColor: '#2C3E50', // Grigio scuro elegante
+    backgroundColor: '#2C3E50',
     borderColor: '#1C2833',
   },
   filterText: {
     fontSize: 16,
     color: '#333',
   },
-  filterOption: {
-    paddingVertical: 14,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  filterOptionText: {
-    fontSize: 16,
-    color: '#333',
-  },
 
   /** 🏆 Totale Spese **/
   totalContainer: {
-    backgroundColor: '#16A085', // Verde elegante
+    backgroundColor: '#16A085',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.1, // Ombra leggera per un effetto professionale
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20, // 🟢 Distanza tra il totale e il grafico
   },  
   totalText: {
     fontSize: 20,
@@ -139,48 +130,66 @@ const ExpensesStyles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  /** 📊 Placeholder per il Grafico **/
-  chartPlaceholder: {
-    marginTop: 30,
-    justifyContent: 'center',
+  /** 📊 Contenitore del Grafico **/
+  chartWrapper: {
+    width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+  },  
+  chartScrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
   },
-  chartText: {
-    fontSize: 18,
-    color: '#7f8c8d',
+  chartContainer: {
+    width: "100%",
+    minHeight: 250,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center", // 🔹 Centra il grafico orizzontalmente
+    alignItems: "center", // 🔹 Centra verticalmente
+    marginBottom: 10,
+  },   
+  chartPlaceholder: {
+    width: "100%",
+    minHeight: 300, // 📏 Più spazio per evitare sovrapposizioni
+    flexDirection: "column", 
+    alignItems: "center",  // ✅ Centra ORIZZONTALMENTE
+    justifyContent: "center", // ✅ Centra VERTICALMENTE
+  },
+  
+  /** 🔹 Legenda (Adattabile) **/
+  legendContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingBottom: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  colorBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  legendText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
   },
 
-  /** 🔽 Lista dei filtri migliorata **/
-  filterList: {
-    position: 'absolute',
-    top: 50,
-    left: 0,
-    right: 0,
-    maxHeight: 250, // Evita che il filtro si espanda troppo
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-    zIndex: 10, // Assicura che sia in primo piano
-  },
-
-  /** 📌 Nuova icona per il Date Picker **/
-  dateIcon: {
-    marginLeft: 10,
-    tintColor: '#7f8c8d', // Colore più neutro per maggiore leggibilità
-  },
+  /** 📌 Modale per la selezione **/
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
   modalContainer: {
     width: '80%',
     backgroundColor: '#fff',
@@ -191,7 +200,6 @@ const ExpensesStyles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
   },
-  
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -199,7 +207,6 @@ const ExpensesStyles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  
   filterOptionRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -208,7 +215,6 @@ const ExpensesStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
-  
   modalCloseButton: {
     marginTop: 15,
     backgroundColor: '#16A085',
@@ -216,7 +222,6 @@ const ExpensesStyles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-  
 });
 
 export default ExpensesStyles;

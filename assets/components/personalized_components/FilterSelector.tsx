@@ -10,15 +10,14 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters }) => {
 
   const toggleFilter = (filter) => {
     if (selectedFilters.includes(filter)) {
-      setSelectedFilters(selectedFilters.filter(f => f !== filter)); // Rimuove il filtro se già selezionato
+      setSelectedFilters(selectedFilters.filter(f => f !== filter)); 
     } else {
-      setSelectedFilters([...selectedFilters, filter]); // Aggiunge il filtro
+      setSelectedFilters([...selectedFilters, filter]); 
     }
   };
 
   return (
     <View style={ExpensesStyles.filterContainer}>
-      {/* Bottone per aprire il popup */}
       <TouchableOpacity 
         style={ExpensesStyles.filterBox} 
         onPress={() => setModalVisible(true)}
@@ -28,7 +27,6 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters }) => {
         </Text>
       </TouchableOpacity>
 
-      {/* Popup Modal */}
       <Modal 
         visible={modalVisible} 
         animationType="slide" 
@@ -57,7 +55,6 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters }) => {
               )}
             />
 
-            {/* Pulsante Chiudi */}
             <TouchableOpacity 
               style={ExpensesStyles.modalCloseButton} 
               onPress={() => setModalVisible(false)}
