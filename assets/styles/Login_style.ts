@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 const LoginStyles = StyleSheet.create({
   container: {
@@ -6,32 +6,39 @@ const LoginStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#f7f7f7',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30, // Abbassiamo tutto per evitare la barra di stato
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 20, // Spazio extra in basso
   },
   logo: {
-    width: 150,   // Imposta la larghezza del logo
-    height: 150,  // Imposta l'altezza del logo
-    alignSelf: 'center', // Centra l'immagine orizzontalmente
-    marginBottom: 10,    // Spazio tra il logo e il testo
+    width: 130, // Leggermente più piccolo per bilanciare lo spazio
+    height: 130,
+    alignSelf: 'center',
+    marginBottom: 20, // Abbassato per evitare che sia troppo vicino ai testi
+    marginTop: 30, // Sposta il logo più in basso
   },
   header: {
-    fontSize: 32,
+    fontSize: 28, // Leggermente più piccolo per ridurre il blocco di testo
     fontWeight: 'bold',
     color: '#2C3E50',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 15, // Spazio ridotto sotto il titolo
     fontFamily: 'Roboto',
   },
   subHeader: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#7F8C8D',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 25,
     fontFamily: 'Roboto',
   },
   input: {
     borderBottomWidth: 2,
     borderColor: '#3498DB',
-    marginBottom: 20,
+    marginBottom: 15, // Leggermente ridotto per compattezza
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
@@ -62,11 +69,11 @@ const LoginStyles = StyleSheet.create({
     elevation: 2,
     height: 50,
     width: '100%',
-    paddingRight: 40,  // Spazio per l'icona
+    paddingRight: 40, // Spazio per l'icona
   },
   eyeIconContainer: {
     position: 'absolute',
-    right: 12,  // Posizione a destra
+    right: 12,
     top: '50%',
     transform: [{ translateY: -12 }],
   },
@@ -81,27 +88,28 @@ const LoginStyles = StyleSheet.create({
     transform: [{ translateY: -12 }],
   },
   footer: {
-    marginTop: 40,
+    marginTop: 30, // Spostato un po' più in alto
     alignItems: 'center',
     justifyContent: 'center',
   },
   footerText: {
     fontSize: 14,
     color: '#BDC3C7',
-    marginBottom: 10,
+    marginBottom: 8,
     fontFamily: 'Roboto',
   },
   formError: {
     color: '#E74C3C',
-    marginTop: 10,
+    marginTop: 5,
     fontSize: 14,
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#3498DB',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15, // Ridotto lo spazio sopra il pulsante
     elevation: 4,
   },
   buttonText: {
@@ -113,13 +121,13 @@ const LoginStyles = StyleSheet.create({
   link: {
     color: '#3498DB',
     fontSize: 14,
-    marginTop: 15,
+    marginTop: 12,
     textDecorationLine: 'underline',
     fontFamily: 'Roboto',
   },
   banner: {
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 15, // Ridotto per non occupare troppo spazio
     width: '100%',
     textAlign: 'center',
     borderRadius: 5,
@@ -133,26 +141,24 @@ const LoginStyles = StyleSheet.create({
   bannerText: {
     color: 'white',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   successBorder: {
-    borderColor: '#2ECC71', // Verde quando le password combaciano
+    borderColor: '#2ECC71',
     borderWidth: 2,
     borderRadius: 5,
   },
-  
   errorBorder: {
-    borderColor: '#E74C3C', // Rosso se le password non combaciano
+    borderColor: '#E74C3C',
     borderWidth: 2,
     borderRadius: 5,
   },
-  
   successText: {
     color: '#2ECC71',
     fontSize: 14,
     marginTop: 5,
     textAlign: 'center',
   },  
-
 });
 
 export default LoginStyles;

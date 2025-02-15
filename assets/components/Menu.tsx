@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MenuStyles from "../styles/Menu_style";
+import appJson from '../../app.json';
 
 type RootStackParamList = {
   Menu: undefined;
@@ -160,7 +161,7 @@ const MenuScreen = () => {
             <Text style={MenuStyles.menuText}>🚪 Logout</Text>
           </TouchableOpacity>
 
-          <Text style={MenuStyles.versionText}>Versione 1.0.0</Text>
+          <Text style={MenuStyles.versionText}>Versione {appJson.expo.version}</Text>
         </ScrollView>
       ) : (
         <Text>Errore nel caricamento dei dati utente</Text>

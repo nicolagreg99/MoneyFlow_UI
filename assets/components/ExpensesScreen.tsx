@@ -6,7 +6,7 @@ import ExpensesStyles from "../styles/Expenses_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
 import PieChartGraph from "./personalized_components/PieChart";
-import { Ionicons } from "@expo/vector-icons"; // Icona di refresh
+import { Ionicons } from "@expo/vector-icons";
 
 const ExpensesScreen = () => {
   // 📆 Imposta date iniziali

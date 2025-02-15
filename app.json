@@ -2,7 +2,7 @@
   "expo": {
     "name": "MoneyMobile",
     "slug": "MoneyMobile",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,11 +19,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.nicolagreg99.MoneyMobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "moneyapp"  
+    "scheme": "moneyapp",
+    "extra": {
+      "eas": {
+        "projectId": "ecc3b058-022a-43e9-ab3d-affb8e238078"
+      }
+    }
   }
 }
