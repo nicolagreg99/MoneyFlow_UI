@@ -17,6 +17,12 @@ const ExpensesStyles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center", 
+    marginBottom: 20,
+  },
   title: {
     fontSize: 26,
     fontWeight: '700',
@@ -107,7 +113,7 @@ const ExpensesStyles = StyleSheet.create({
 
   /** 🏆 Totale Spese **/
   totalContainer: {
-    backgroundColor: '#16A085',
+    backgroundColor: '#ff0000',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -116,7 +122,7 @@ const ExpensesStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 20, // 🟢 Distanza tra il totale e il grafico
+    marginBottom: 20,
   },  
   totalText: {
     fontSize: 20,
@@ -222,6 +228,18 @@ const ExpensesStyles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  filterOptionText: {
+    fontSize: 16,
+    color: "#333", // Colore testo
+    marginLeft: 10, // Spazio tra l'icona e il testo
+  },  
+  // Refresh Button
+  refreshButton: {
+    padding: 10,
+    color: '#555', // Grigio scuro
+    alignSelf: "flex-end",
+  }
+  
 });
 
 export default ExpensesStyles;

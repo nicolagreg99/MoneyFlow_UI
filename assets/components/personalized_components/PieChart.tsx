@@ -24,7 +24,7 @@ const PieChartGraph = ({ data, total }) => {
             accessor="value"
             backgroundColor="transparent"
             hasLegend={false}
-            center={[screenWidth * 0.1, 0]}
+            center={[screenWidth * 0.2, 0]}
           />
         </View>
 
