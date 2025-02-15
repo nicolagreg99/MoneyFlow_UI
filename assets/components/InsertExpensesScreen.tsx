@@ -12,6 +12,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 import ExpensesStyles from "../styles/ExpensesInsert_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
@@ -19,6 +20,7 @@ const API_URL = "http://192.168.1.5:5000/spese";
 const ME_URL = "http://192.168.1.5:5000/me";
 
 const InsertExpensesScreen = () => {
+  const navigation = useNavigation(); // Hook per la navigazione
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState([]);
@@ -34,6 +36,7 @@ const InsertExpensesScreen = () => {
   });
 
   const successBannerOpacity = useRef(new Animated.Value(0)).current;
+  const errorBannerOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadUserData();
@@ -68,16 +71,16 @@ const InsertExpensesScreen = () => {
     }
   };
 
-  const showSuccessBanner = () => {
+  const showBanner = (bannerOpacity: Animated.Value) => {
     Animated.sequence([
-      Animated.timing(successBannerOpacity, {
+      Animated.timing(bannerOpacity, {
         toValue: 1,
         duration: 500,
         easing: Easing.ease,
         useNativeDriver: true,
       }),
-      Animated.delay(2000),
-      Animated.timing(successBannerOpacity, {
+      Animated.delay(1500),
+      Animated.timing(bannerOpacity, {
         toValue: 0,
         duration: 500,
         easing: Easing.ease,
@@ -117,7 +120,7 @@ const InsertExpensesScreen = () => {
         },
       });
 
-      showSuccessBanner();
+      showBanner(successBannerOpacity);
 
       setAmount("");
       setDescription("");
@@ -125,6 +128,7 @@ const InsertExpensesScreen = () => {
       setDate(new Date());
     } catch (error) {
       console.error("Errore nell'invio:", error);
+      showBanner(errorBannerOpacity);
     } finally {
       setLoading(false);
     }
@@ -196,7 +200,15 @@ const InsertExpensesScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Banner di Successo Animato */}
+          {/* 🔹 Link per visualizzare le spese */}
+          <TouchableOpacity
+            style={ExpensesStyles.linkButton}
+            onPress={() => navigation.navigate("ExpensesView")}
+            >
+            <Text style={ExpensesStyles.linkButtonText}>📊 Visualizza le Spese</Text>
+          </TouchableOpacity>
+
+          {/* Banner di Successo */}
           <Animated.View
             style={[
               ExpensesStyles.successBanner,
@@ -204,6 +216,16 @@ const InsertExpensesScreen = () => {
             ]}
           >
             <Text style={ExpensesStyles.successText}>✅ Spesa registrata con successo!</Text>
+          </Animated.View>
+
+          {/* Banner di Errore */}
+          <Animated.View
+            style={[
+              ExpensesStyles.errorBanner,
+              { opacity: errorBannerOpacity },
+            ]}
+          >
+            <Text style={ExpensesStyles.errorText}> Errore! Riprova più tardi.</Text>
           </Animated.View>
         </>
       )}

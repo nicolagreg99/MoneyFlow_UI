@@ -26,6 +26,8 @@ type RootStackParamList = {
   UpdatePassword: { token: string };
   InsertExpenses: undefined;
   InsertIncomes: undefined;
+  ExpensesView: undefined;
+  IncomesView: undefined;
 };
 
 type BottomTabParamList = {
@@ -37,24 +39,24 @@ type BottomTabParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-// Navigatore per i tab
+// Funzione per il pulsante Menu
+const MenuButton = ({ navigation }: any) => (
+  <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate("Menu")}>
+    <Icon name="menu" size={28} color="#3498DB" />
+  </TouchableOpacity>
+);
+
+// Navigatore per i tab principali
 const MainTabs = ({ navigation }: any) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
-        let iconName: string = "home";
+        let iconName = "home";
         if (route.name === "Expenses") iconName = "money-off";
         if (route.name === "Incomes") iconName = "attach-money";
         return <MaterialIcons name={iconName} size={size} color={color} />;
       },
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 15 }}
-          onPress={() => navigation.navigate("Menu")}
-        >
-          <Icon name="menu" size={28} color="#3498DB" />
-        </TouchableOpacity>
-      ),
+      headerRight: () => <MenuButton navigation={navigation} />,
     })}
   >
     <Tab.Screen name="Home" component={MainPage} />
@@ -82,15 +84,30 @@ const App = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Menu" component={MenuScreen} />
-        <Stack.Screen name="InsertExpenses" component={InsertExpensesScreen} options={{ title: "Inserisci Spesa" }} />
-        <Stack.Screen name="InsertIncomes" component={InsertIncomesScreen} options={{ title: "Inserisci Entrata" }} />
-        <Stack.Screen
-          name="UpdatePassword"
-          component={UpdatePasswordScreen}
-          options={({ route }) => ({
-            headerShown: true,
-            title: "Reset Password",
-          })}
+        <Stack.Screen 
+          name="InsertExpenses" 
+          component={InsertExpensesScreen} 
+          options={({ navigation }) => ({ title: "Inserisci Spesa", headerRight: () => <MenuButton navigation={navigation} /> })}
+        />
+        <Stack.Screen 
+          name="InsertIncomes" 
+          component={InsertIncomesScreen} 
+          options={({ navigation }) => ({ title: "Inserisci Entrata", headerRight: () => <MenuButton navigation={navigation} /> })}
+        />
+        <Stack.Screen 
+          name="UpdatePassword" 
+          component={UpdatePasswordScreen} 
+          options={({ route }) => ({ headerShown: true, title: "Reset Password" })}
+        />
+        <Stack.Screen 
+          name="ExpensesView" 
+          component={ExpensesScreen} 
+          options={({ navigation }) => ({ title: "Expenses", headerRight: () => <MenuButton navigation={navigation} /> })}
+        />
+        <Stack.Screen 
+          name="IncomesView" 
+          component={IncomesScreen} 
+          options={({ navigation }) => ({ title: "Incomes", headerRight: () => <MenuButton navigation={navigation} /> })}
         />
       </Stack.Navigator>
     </NavigationContainer>

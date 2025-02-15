@@ -40,6 +40,11 @@ const ExpensesStyles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 15,
   },
+  datePickerText: {
+    fontSize: 16,
+    color: "#2C3E50",
+    fontWeight: "bold",
+  },
   button: {
     backgroundColor: "#2ECC71",
     paddingVertical: 14,
@@ -52,29 +57,71 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  // ✅ BANNER SUCCESSO
   successBanner: {
     position: "absolute",
     top: 10,
     left: "10%",
     right: "10%",
-    backgroundColor: "#2ECC71",
+    backgroundColor: "#2ECC71", // Verde di successo
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
+    zIndex: 10,
+    elevation: 5, // Ombra su Android
+    shadowColor: "#000", // Ombra su iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   successText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-  errorInput: {
-    borderColor: "red",
+
+  // ❌ BANNER ERRORE
+  errorBanner: {
+    position: "absolute",
+    top: 10,
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#E74C3C", // Rosso per errore
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    zIndex: 10,
+    elevation: 5, // Ombra su Android
+    shadowColor: "#000", // Ombra su iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   errorText: {
-    color: "red",
-    fontSize: 14,
-    marginBottom: 10,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
+
+  // ⚠️ Stile per campi errati
+  errorInput: {
+    borderColor: "#E74C3C",
+  },
+
+  linkButton: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#3498DB",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  linkButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  
 });
 
 export default ExpensesStyles;
