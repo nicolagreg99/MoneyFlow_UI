@@ -8,7 +8,7 @@ const ExpensesStyles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 12,
     marginHorizontal: 10,
@@ -27,7 +27,6 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#333',
-    marginBottom: 30,
     textAlign: 'center',
     letterSpacing: 0.5,
   },
@@ -71,9 +70,9 @@ const ExpensesStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     marginBottom: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -113,8 +112,9 @@ const ExpensesStyles = StyleSheet.create({
 
   /** 🏆 Totale Spese **/
   totalContainer: {
-    backgroundColor: '#ff0000',
-    padding: 20,
+    backgroundColor: '#FF6347',
+    paddingVertical: 12, 
+    paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -123,7 +123,8 @@ const ExpensesStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 20,
-  },  
+  },
+   
   totalText: {
     fontSize: 20,
     color: '#fff',
@@ -141,7 +142,6 @@ const ExpensesStyles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    display: 'flex',
   },  
   chartScrollContainer: {
     flexGrow: 1,
@@ -151,21 +151,20 @@ const ExpensesStyles = StyleSheet.create({
   chartContainer: {
     width: "100%",
     minHeight: 250,
-    display: "flex",
     flexDirection: "row",
-    justifyContent: "center", // 🔹 Centra il grafico orizzontalmente
-    alignItems: "center", // 🔹 Centra verticalmente
+    justifyContent: "center", 
+    alignItems: "center",
     marginBottom: 10,
   },   
   chartPlaceholder: {
     width: "100%",
-    minHeight: 300, // 📏 Più spazio per evitare sovrapposizioni
+    minHeight: 300,
     flexDirection: "column", 
-    alignItems: "center",  // ✅ Centra ORIZZONTALMENTE
-    justifyContent: "center", // ✅ Centra VERTICALMENTE
+    alignItems: "center",
+    justifyContent: "center",
   },
   
-  /** 🔹 Legenda (Adattabile) **/
+  /** 🔹 Legenda **/
   legendContainer: {
     width: '100%',
     alignItems: 'center',
@@ -230,16 +229,46 @@ const ExpensesStyles = StyleSheet.create({
   },
   filterOptionText: {
     fontSize: 16,
-    color: "#333", // Colore testo
-    marginLeft: 10, // Spazio tra l'icona e il testo
+    color: "#333",
+    marginLeft: 10,
   },  
-  // Refresh Button
+
+  /** 🔄 Pulsante di Refresh **/
   refreshButton: {
     padding: 10,
-    color: '#555', // Grigio scuro
+    color: '#555',
     alignSelf: "flex-end",
-  }
-  
+  },
+
+  /** ➕ Pulsante di Inserimento Spese **/
+  addExpenseButton: {
+    backgroundColor: "#3498DB",
+    padding: 12,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+  },
+  addExpenseText: {
+    color: "#fff",
+    fontSize: 18,
+    marginLeft: 10,
+  },
+
+  /** ❌ Testo di Errore **/
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+  },
+  noDataText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#555",
+  },
 });
 
 export default ExpensesStyles;

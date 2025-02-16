@@ -3,10 +3,14 @@ import { View, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { CheckSquare, Square } from 'lucide-react-native';
 import ExpensesStyles from '../../styles/Expenses_style';
 
-const filterOptions = ["Vestiti", "Cibo", "Extra", "Trasporto", "Regalo"];
+const expenseFilterOptions = ["Vestiti", "Cibo", "Extra", "Trasporto", "Regalo"];
+const incomeFilterOptions = ["Stipendio", "Regalo", "Extra"];
 
-const FilterSelector = ({ selectedFilters, setSelectedFilters }) => {
+const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => {
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Determina le opzioni in base al tipo di filtro (spese o entrate)
+  const filterOptions = filterType === "entrate" ? incomeFilterOptions : expenseFilterOptions;
 
   const toggleFilter = (filter) => {
     if (selectedFilters.includes(filter)) {
@@ -35,7 +39,9 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters }) => {
       >
         <View style={ExpensesStyles.modalOverlay}>
           <View style={ExpensesStyles.modalContainer}>
-            <Text style={ExpensesStyles.modalTitle}>Seleziona Categorie</Text>
+            <Text style={ExpensesStyles.modalTitle}>
+              {filterType === "entrate" ? "Seleziona Categoria di Entrata" : "Seleziona Categoria di Spesa"}
+            </Text>
 
             <FlatList
               data={filterOptions}

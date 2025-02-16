@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { 
+  View, Text, ScrollView, ActivityIndicator, TouchableOpacity 
+} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import ExpensesStyles from "../styles/Expenses_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
@@ -9,7 +12,9 @@ import PieChartGraph from "./personalized_components/PieChart";
 import { Ionicons } from "@expo/vector-icons";
 
 const ExpensesScreen = () => {
-  // 📆 Imposta date iniziali
+  const navigation = useNavigation();
+
+  // 📆 Date iniziali
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
@@ -22,7 +27,7 @@ const ExpensesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔹 Colori fissi per il grafico
+  // 🔹 Colori grafico
   const fixedColors = {
     Cibo: "#FF6384",
     Trasporto: "#36A2EB",
@@ -96,7 +101,7 @@ const ExpensesScreen = () => {
     setLoading(false);
   };
 
-  // 📌 Reset filtri ai valori predefiniti
+  // 📌 Reset filtri
   const resetFilters = () => {
     setFromDate(firstDayOfMonth);
     setToDate(today);
@@ -111,23 +116,29 @@ const ExpensesScreen = () => {
   return (
     <ScrollView contentContainerStyle={ExpensesStyles.scrollContainer}>
       <View style={ExpensesStyles.container}>
+        
         {/* 🔹 Titolo + Refresh */}
         <View style={ExpensesStyles.titleContainer}>
           <Text style={ExpensesStyles.title}>Le tue spese</Text>
-
-          {/* 🔄 Icona di refresh avvolta in un <View> */}
           <TouchableOpacity style={ExpensesStyles.refreshButton} onPress={resetFilters}>
-            <View>
-              <Ionicons name="refresh" size={30} color="#555" />
-            </View>
+            <Ionicons name="refresh" size={30} color="#555" />
           </TouchableOpacity>
         </View>
+
+        {/* 🔹 Pulsante per inserire spesa */}
+        <TouchableOpacity 
+          style={ExpensesStyles.addExpenseButton}
+          onPress={() => navigation.navigate("InsertExpenses")}
+        >
+          <Ionicons name="add-circle-outline" size={30} color="#fff" />
+          <Text style={ExpensesStyles.addExpenseText}>Inserisci Spesa</Text>
+        </TouchableOpacity>
 
         {/* 📅 Selettori date */}
         <DateRangePicker fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />
 
         {/* 🔹 Filtri */}
-        <FilterSelector selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+        <FilterSelector selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters}  filterType="spese"         />
 
         {/* 💰 Totale Spese */}
         <View style={ExpensesStyles.totalContainer}>
@@ -141,11 +152,11 @@ const ExpensesScreen = () => {
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : error ? (
-          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>{error}</Text>
+          <Text style={ExpensesStyles.errorText}>{error}</Text>
         ) : chartData.length > 0 ? (
           <PieChartGraph data={chartData} total={totalExpenses} />
         ) : (
-          <Text style={{ textAlign: "center", marginTop: 20 }}>Nessun dato disponibile</Text>
+          <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
         )}
       </View>
     </ScrollView>
