@@ -166,12 +166,7 @@ const InsertExpensesScreen = () => {
           {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}
 
           <Text style={ExpensesStyles.label}>Seleziona il tipo: *</Text>
-          <FilterSelector
-            selectedFilters={selectedType}
-            setSelectedFilters={(filters) =>
-              setSelectedType([filters[filters.length - 1]])
-            }
-          />
+          <FilterSelector selectedFilters={selectedType} setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])} filterType="spese"/>
           {errorFields.selectedType && <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>}
 
           <Text style={ExpensesStyles.label}>Seleziona la data:</Text>

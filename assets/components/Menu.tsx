@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { 
+  View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert 
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -72,6 +74,18 @@ const MenuScreen = () => {
     } catch (error) {
       console.error("Errore nel logout:", error);
     }
+  };
+
+  // 🔹 Mostra popup di conferma prima del logout
+  const confirmLogout = () => {
+    Alert.alert(
+      "Conferma Logout", 
+      "Sei sicuro di voler uscire?", 
+      [
+        { text: "Annulla", style: "cancel" },
+        { text: "Esci", style: "destructive", onPress: handleLogout }
+      ]
+    );
   };
 
   return (
@@ -156,8 +170,8 @@ const MenuScreen = () => {
             )}
           </View>
 
-          {/* Logout */}
-          <TouchableOpacity style={MenuStyles.logoutButton} onPress={handleLogout}>
+          {/* Logout con popup di conferma */}
+          <TouchableOpacity style={MenuStyles.logoutButton} onPress={confirmLogout}>
             <Text style={MenuStyles.menuText}>🚪 Logout</Text>
           </TouchableOpacity>
 
