@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
 
 interface Props {
   labels: string[];
@@ -10,14 +9,17 @@ interface Props {
 }
 
 const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
+  // Riduci il numero di etichette mostrate (es. una ogni 2 mesi)
+  const filteredLabels = labels.map((label, index) => (index % 2 === 0 ? label : ''));
+
   return (
-    <View>
+    <View style={{ marginBottom: 30 }}>
       <Text style={{ textAlign: 'center', marginBottom: 10, fontSize: 18, fontWeight: 'bold' }}>
         Entrate vs Spese (Ultimi 12 mesi)
       </Text>
       <LineChart
         data={{
-          labels: labels,
+          labels: filteredLabels, // Usa le etichette filtrate
           datasets: [
             {
               data: entrate,
@@ -30,10 +32,10 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
               strokeWidth: 2,
             },
           ],
-          legend: ["Entrate", "Spese"],
+          legend: [], // Rimuovi la legenda predefinita
         }}
         width={Dimensions.get("window").width - 40}
-        height={250}
+        height={350} // Riduci l'altezza del grafico
         yAxisLabel="€"
         yAxisInterval={1}
         chartConfig={{
@@ -42,6 +44,12 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
           decimalPlaces: 0,
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          propsForLabels: {
+            fontSize: 8, // Riduci ulteriormente la dimensione del font
+            rotation: -45, // Ruota le etichette di 45°
+            dx: -10, // Sposta le etichette lungo l'asse X
+            dy: 20, // Sposta le etichette lungo l'asse Y
+          },
           propsForDots: {
             r: "4",
             strokeWidth: "1",
@@ -52,8 +60,20 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
         style={{
           borderRadius: 10,
           alignSelf: "center",
+          marginTop: 10, // Ripristina il margine superiore
         }}
       />
+      {/* Legenda personalizzata */}
+      <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
+          <View style={{ width: 10, height: 10, backgroundColor: '#2ecc71', marginRight: 5 }} />
+          <Text style={{ color: '#2C3E50', fontSize: 14 }}>Entrate</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ width: 10, height: 10, backgroundColor: '#e74c3c', marginRight: 5 }} />
+          <Text style={{ color: '#2C3E50', fontSize: 14 }}>Spese</Text>
+        </View>
+      </View>
     </View>
   );
 };

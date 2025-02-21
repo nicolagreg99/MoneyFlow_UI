@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import MainStyles from '../styles/Main_style'; 
+import MainStyles from '../styles/Main_style';
 import LineChartComponent from './personalized_components/LineChartComponent';
 import StatsWidget from './personalized_components/StatsWidget';
 
@@ -17,7 +17,7 @@ const MainPage = () => {
   const navigation = useNavigation();
 
   const getLast12Months = () => {
-    const mesi = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+    const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
     const oggi = new Date();
     let mesiDinamici: string[] = [];
 
@@ -92,14 +92,11 @@ const MainPage = () => {
 
   return (
     <ScrollView contentContainerStyle={MainStyles.container}>
-      <Text style={MainStyles.header}>Benvenuto nella tua Dashboard!</Text>
-      <View style={MainStyles.chartContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#3498DB" />
-        ) : (
-          <LineChartComponent labels={labels} entrate={entrate} spese={spese} />
-        )}
-      </View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#3498DB" />
+      ) : (
+        <LineChartComponent labels={labels} entrate={entrate} spese={spese} />
+      )}
       <View style={MainStyles.widgetsContainer}>
         <StatsWidget title="Totale Spese Mensili" value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`} icon="💰" />
         <StatsWidget title="Totale Entrate Mensili" value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`} icon="📊" />
