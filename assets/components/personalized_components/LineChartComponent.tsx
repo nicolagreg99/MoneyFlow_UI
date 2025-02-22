@@ -32,10 +32,10 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
               strokeWidth: 2,
             },
           ],
-          legend: [], // Rimuovi la legenda predefinita
+          legend: [], 
         }}
         width={Dimensions.get("window").width - 40}
-        height={350} // Riduci l'altezza del grafico
+        height={350} 
         yAxisLabel="€"
         yAxisInterval={1}
         chartConfig={{
@@ -60,10 +60,9 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
         style={{
           borderRadius: 10,
           alignSelf: "center",
-          marginTop: 10, // Ripristina il margine superiore
+          marginTop: 10, 
         }}
       />
-      {/* Legenda personalizzata */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
           <View style={{ width: 10, height: 10, backgroundColor: '#2ecc71', marginRight: 5 }} />

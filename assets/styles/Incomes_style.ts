@@ -17,20 +17,19 @@ const IncomesStyle = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  // Titolo in alto (su un livello)
   titleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center", 
     marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#333',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#2C3E50',
     textAlign: 'center',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
-
   /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
@@ -82,8 +81,7 @@ const IncomesStyle = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-
-  /** 🎛️ Filtro Spese **/
+  /** 🎛️ Filtro Entrate **/
   filterContainer: {
     marginBottom: 20,
   },
@@ -109,11 +107,10 @@ const IncomesStyle = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-
-  /** 🏆 Totale Spese **/
+  /** 🏆 Totale Entrate **/
   totalContainer: {
     backgroundColor: '#4CAF50',
-    paddingVertical: 12, 
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -124,7 +121,6 @@ const IncomesStyle = StyleSheet.create({
     elevation: 3,
     marginBottom: 20,
   },
-   
   totalText: {
     fontSize: 20,
     color: '#fff',
@@ -136,13 +132,12 @@ const IncomesStyle = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
   },
-
   /** 📊 Contenitore del Grafico **/
   chartWrapper: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-  },  
+  },
   chartScrollContainer: {
     flexGrow: 1,
     alignItems: 'center',
@@ -155,15 +150,14 @@ const IncomesStyle = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center",
     marginBottom: 10,
-  },   
+  },
   chartPlaceholder: {
     width: "100%",
     minHeight: 300,
-    flexDirection: "column", 
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
-  
   /** 🔹 Legenda **/
   legendContainer: {
     width: '100%',
@@ -187,7 +181,6 @@ const IncomesStyle = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
-
   /** 📌 Modale per la selezione **/
   modalOverlay: {
     flex: 1,
@@ -231,44 +224,43 @@ const IncomesStyle = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginLeft: 10,
-  },  
-
+  },
   /** 🔄 Pulsante di Refresh **/
   refreshButton: {
-    padding: 10,
-    color: '#555',
-    alignSelf: "flex-end",
-  },
-
-  /** ➕ Pulsante di Inserimento Spese **/
-  addIncomesButton: {
-    backgroundColor: "#3498DB",
+    backgroundColor: "#EAEAEA",
     padding: 12,
     borderRadius: 8,
+  },
+  /** 🔝 Top Bar (Azioni) **/
+  actionsContainer: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    marginBottom: 15,
+    alignItems: "center",
+    marginVertical: 20, // Spazio verticale per separare le icone dal titolo e dal DateRangePicker
+    gap: 20,
   },
-  addIncomesText: {
-    color: "#fff",
-    fontSize: 18,
-    marginLeft: 10,
+  /** Pulsante icona (stile per entrate, con sfondo verde) **/
+  iconButton: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#4CAF50", // Sfondo verde
   },
-
-  /** ❌ Testo di Errore **/
+  /** ⚠️ Messaggi di Errore e Nessun Dato **/
   errorText: {
-    color: "red",
-    textAlign: "center",
-    marginTop: 20,
+    color: '#E74C3C', // Rosso acceso per gli errori
     fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 10,
+    fontWeight: '600',
   },
   noDataText: {
-    textAlign: "center",
-    marginTop: 20,
+    color: '#95A5A6', // Grigio chiaro per nessun dato
     fontSize: 16,
-    color: "#555",
+    textAlign: 'center',
+    marginVertical: 10,
+    fontStyle: 'italic',
   },
+
 });
 
 export default IncomesStyle;

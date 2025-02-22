@@ -18,19 +18,17 @@ const ExpensesStyles = StyleSheet.create({
     elevation: 3,
   },
   titleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center", 
     marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#333',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#2C3E50',
     textAlign: 'center',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
-
   /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
@@ -82,7 +80,6 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-
   /** 🎛️ Filtro Spese **/
   filterContainer: {
     marginBottom: 20,
@@ -109,11 +106,10 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-
   /** 🏆 Totale Spese **/
   totalContainer: {
     backgroundColor: '#FF6347',
-    paddingVertical: 12, 
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -124,7 +120,6 @@ const ExpensesStyles = StyleSheet.create({
     elevation: 3,
     marginBottom: 20,
   },
-   
   totalText: {
     fontSize: 20,
     color: '#fff',
@@ -136,13 +131,12 @@ const ExpensesStyles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
   },
-
   /** 📊 Contenitore del Grafico **/
   chartWrapper: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-  },  
+  },
   chartScrollContainer: {
     flexGrow: 1,
     alignItems: 'center',
@@ -152,18 +146,17 @@ const ExpensesStyles = StyleSheet.create({
     width: "100%",
     minHeight: 250,
     flexDirection: "row",
-    justifyContent: "center", 
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-  },   
+  },
   chartPlaceholder: {
     width: "100%",
     minHeight: 300,
-    flexDirection: "column", 
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
-  
   /** 🔹 Legenda **/
   legendContainer: {
     width: '100%',
@@ -187,7 +180,6 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
-
   /** 📌 Modale per la selezione **/
   modalOverlay: {
     flex: 1,
@@ -231,15 +223,13 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginLeft: 10,
-  },  
-
+  },
   /** 🔄 Pulsante di Refresh **/
   refreshButton: {
     padding: 10,
     color: '#555',
     alignSelf: "flex-end",
   },
-
   /** ➕ Pulsante di Inserimento Spese **/
   addExpenseButton: {
     backgroundColor: "#3498DB",
@@ -255,7 +245,6 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
   },
-
   /** ❌ Testo di Errore **/
   errorText: {
     color: "red",
@@ -268,6 +257,51 @@ const ExpensesStyles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: "#555",
+  },
+  /** 🟠 Modale **/
+  modalButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: "80%",
+  },
+  closeModalButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "red",
+    borderRadius: 5,
+  },
+  closeModalText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  /** 🔝 Top Bar (Icone) **/
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20, // Spazio verticale per separare le icone dal titolo e dagli altri elementi
+    gap: 20,
+  },
+  iconButton: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#EAEAEA",
   },
 });
 
