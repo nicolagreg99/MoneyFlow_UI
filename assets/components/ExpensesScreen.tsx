@@ -161,16 +161,16 @@ const ExpensesScreen = () => {
             style={ExpensesStyles.iconButton}
             onPress={() => navigation.navigate("InsertExpenses")}
           >
-            <Ionicons name="add-circle-outline" size={30} color="#3498DB" />
+            <Ionicons name="add-circle-outline" size={30} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity 
             style={ExpensesStyles.iconButton}
             onPress={fetchTransactionList}
           >
-            <Ionicons name="list-outline" size={30} color="#007AFF" />
+            <Ionicons name="list-outline" size={30} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity 
-            style={ExpensesStyles.iconButton}
+            style={ExpensesStyles.refreshButton}
             onPress={resetFilters}
           >
             <Ionicons name="refresh" size={30} color="#555" />

@@ -226,13 +226,13 @@ const ExpensesStyles = StyleSheet.create({
   },
   /** 🔄 Pulsante di Refresh **/
   refreshButton: {
-    padding: 10,
-    color: '#555',
-    alignSelf: "flex-end",
+    backgroundColor: "#EAEAEA",
+    padding: 12,
+    borderRadius: 8,
   },
   /** ➕ Pulsante di Inserimento Spese **/
   addExpenseButton: {
-    backgroundColor: "#3498DB",
+    backgroundColor: "#FF6347", // Rosso di Totale Spese
     padding: 12,
     borderRadius: 8,
     flexDirection: "row",
@@ -241,7 +241,7 @@ const ExpensesStyles = StyleSheet.create({
     marginBottom: 15,
   },
   addExpenseText: {
-    color: "#fff",
+    color: "#fff", // Testo bianco
     fontSize: 18,
     marginLeft: 10,
   },
@@ -295,13 +295,17 @@ const ExpensesStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 20, // Spazio verticale per separare le icone dal titolo e dagli altri elementi
+    marginVertical: 20,
     gap: 20,
   },
   iconButton: {
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#FF6347", // Rosso di Totale Spese
+  },
+  iconButtonText: {
+    color: "#fff", // Testo bianco per le icone
+    fontSize: 16,
   },
 });
 

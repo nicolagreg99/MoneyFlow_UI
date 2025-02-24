@@ -8,18 +8,21 @@ import {
   Animated,
   Easing,
   Platform,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-import IncomesStyles from "../styles/IncomesInsert_style";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ExpensesStyles from "../styles/ExpensesInsert_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
-const API_URL = "http://192.168.1.5:5000/entrate"; // API per le entrate
+const API_URL = "http://192.168.1.5:5000/entrate";
 const ME_URL = "http://192.168.1.5:5000/me";
 
-const InsertIncomesScreen = () => {
+const InsertExpensesScreen = () => {
   const navigation = useNavigation();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -45,9 +48,7 @@ const InsertIncomesScreen = () => {
   const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
-      if (!token) {
-        return;
-      }
+      if (!token) return;
       setAuthToken(token);
 
       const response = await axios.get(ME_URL, {
@@ -101,7 +102,7 @@ const InsertIncomesScreen = () => {
       return;
     }
 
-    const incomeData = {
+    const expenseData = {
       tipo: selectedType[0],
       valore: parseFloat(amount),
       giorno: date.toISOString().split("T")[0],
@@ -112,7 +113,7 @@ const InsertIncomesScreen = () => {
     setLoading(true);
 
     try {
-      await axios.post(API_URL, incomeData, {
+      await axios.post(API_URL, expenseData, {
         headers: {
           Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json",
@@ -135,97 +136,80 @@ const InsertIncomesScreen = () => {
   };
 
   return (
-    <View style={IncomesStyles.container}>
-      <Text style={IncomesStyles.header}>Inserisci una nuova entrata</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView keyboardShouldPersistTaps="handled">
+          <View style={ExpensesStyles.container}>
+            <Text style={ExpensesStyles.header}>Inserisci una nuova entrata</Text>
 
-      {userId === null ? (
-        <ActivityIndicator size="large" color="#4CAF50" />
-      ) : (
-        <>
-          <TextInput
-            style={[
-              IncomesStyles.input,
-              errorFields.amount && IncomesStyles.errorInput,
-            ]}
-            placeholder="Importo (€) *"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
-          {errorFields.amount && <Text style={IncomesStyles.errorText}>Inserisci un importo!</Text>}
+            {userId === null ? (
+              <ActivityIndicator size="large" color="#3498DB" />
+            ) : (
+              <>
+                {/* Banner di successo */}
+                <Animated.View style={[ExpensesStyles.successBanner, { opacity: successBannerOpacity }]}>
+                  <Text style={ExpensesStyles.successText}>Entrata inserita con successo!</Text>
+                </Animated.View>
 
-          <TextInput
-            style={[
-              IncomesStyles.input,
-              errorFields.description && IncomesStyles.errorInput,
-            ]}
-            placeholder="Descrizione *"
-            value={description}
-            onChangeText={setDescription}
-          />
-          {errorFields.description && <Text style={IncomesStyles.errorText}>Inserisci una descrizione!</Text>}
+                {/* Banner di errore */}
+                <Animated.View style={[ExpensesStyles.errorBanner, { opacity: errorBannerOpacity }]}>
+                  <Text style={ExpensesStyles.errorText}>Errore nell'inserimento!</Text>
+                </Animated.View>
 
-          <Text style={IncomesStyles.label}>Seleziona il tipo: *</Text>
-          <FilterSelector selectedFilters={selectedType} setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])} filterType="entrate"/>
-          {errorFields.selectedType && <Text style={IncomesStyles.errorText}>Seleziona un tipo!</Text>}
+                <TextInput
+                  style={[
+                    ExpensesStyles.input,
+                    errorFields.amount && ExpensesStyles.errorInput,
+                  ]}
+                  placeholder="Importo (€) *"
+                  keyboardType="numeric"
+                  value={amount}
+                  onChangeText={setAmount}
+                />
+                {errorFields.amount && <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>}
 
-          <Text style={IncomesStyles.label}>Seleziona la data:</Text>
-          <TouchableOpacity onPress={openDatePicker} style={IncomesStyles.datePickerButton}>
-            <Text style={IncomesStyles.datePickerText}>
-              {date.toLocaleDateString()}
-            </Text>
-          </TouchableOpacity>
+                <TextInput
+                  style={[
+                    ExpensesStyles.input,
+                    errorFields.description && ExpensesStyles.errorInput,
+                  ]}
+                  placeholder="Descrizione *"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+                {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}
 
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-            />
-          )}
+                <Text style={ExpensesStyles.label}>Seleziona il tipo: *</Text>
+                <FilterSelector selectedFilters={selectedType} setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])} filterType="entrate"/>
+                {errorFields.selectedType && <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>}
 
-          <TouchableOpacity
-            style={[IncomesStyles.button, loading && { opacity: 0.6 }]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={IncomesStyles.buttonText}>
-              {loading ? "Invio..." : "Inserisci Entrata"}
-            </Text>
-          </TouchableOpacity>
+                <Text style={ExpensesStyles.label}>Seleziona la data:</Text>
+                <TouchableOpacity onPress={openDatePicker} style={ExpensesStyles.datePickerButton}>
+                  <Text style={ExpensesStyles.datePickerText}>
+                    {date.toLocaleDateString()}
+                  </Text>
+                </TouchableOpacity>
 
-          {/* 🔹 Link per visualizzare le entrate */}
-          <TouchableOpacity
-            style={IncomesStyles.linkButton}
-            onPress={() => navigation.navigate("IncomesView")}
-            >
-            <Text style={IncomesStyles.linkButtonText}>📊 Visualizza le Entrate</Text>
-          </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker value={date} mode="date" display="default" onChange={handleDateChange} />
+                )}
 
-          {/* Banner di Successo */}
-          <Animated.View
-            style={[
-              IncomesStyles.successBanner,
-              { opacity: successBannerOpacity },
-            ]}
-          >
-            <Text style={IncomesStyles.successText}>✅ Entrata registrata con successo!</Text>
-          </Animated.View>
-
-          {/* Banner di Errore */}
-          <Animated.View
-            style={[
-              IncomesStyles.errorBanner,
-              { opacity: errorBannerOpacity },
-            ]}
-          >
-            <Text style={IncomesStyles.errorText}> Errore! Riprova più tardi.</Text>
-          </Animated.View>
-        </>
-      )}
-    </View>
+                <TouchableOpacity style={[ExpensesStyles.button, loading && { opacity: 0.6 }]} onPress={handleSubmit} disabled={loading}>
+                  <Text style={ExpensesStyles.buttonText}>{loading ? "Invio..." : "Inserisci Entrata"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={ExpensesStyles.linkButton}
+                  onPress={() => navigation.navigate("IncomesView")}
+                  >
+                  <Text style={ExpensesStyles.linkButtonText}>📊 Visualizza le Entrate</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAwareScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-export default InsertIncomesScreen;
+export default InsertExpensesScreen;

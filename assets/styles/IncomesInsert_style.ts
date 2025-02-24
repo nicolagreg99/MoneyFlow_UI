@@ -125,3 +125,4 @@ const IncomesStyles = StyleSheet.create({
 });
 
 export default IncomesStyles;
+ 
