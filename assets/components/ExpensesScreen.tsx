@@ -25,7 +25,6 @@ const ExpensesScreen = () => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [isModalVisible, setModalVisible] = useState(false);
   const [transactions, setTransactions] = useState([]);
 
@@ -101,6 +100,7 @@ const ExpensesScreen = () => {
 
   const fetchTransactionList = async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const token = await getToken();
@@ -117,7 +117,6 @@ const ExpensesScreen = () => {
 
       if (response.data && Array.isArray(response.data)) {
         setTransactions(response.data);
-        setModalVisible(true);
       } else {
         setTransactions([]);
         setError("Nessuna transazione trovata per il periodo selezionato.");
@@ -138,6 +137,7 @@ const ExpensesScreen = () => {
 
   useEffect(() => {
     fetchExpensesData();
+    fetchTransactionList();
   }, [fromDate, toDate, selectedFilters]);
 
   return (
@@ -157,7 +157,7 @@ const ExpensesScreen = () => {
           </TouchableOpacity>
           <TouchableOpacity 
             style={ExpensesStyles.iconButton}
-            onPress={fetchTransactionList}
+            onPress={() => setModalVisible(true)}
           >
             <Ionicons name="list-outline" size={30} color="#fff" />
           </TouchableOpacity>

@@ -66,15 +66,12 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
+      const [totalResponse, chartResponse] = await Promise.all([
+        axios.get(`http://192.168.1.5:5000/entrate/totale?${params}`, { headers: { "x-access-token": token } }),
+        axios.get(`http://192.168.1.5:5000/entrate/totale_per_tipo?${params}`, { headers: { "x-access-token": token } })
+      ]);
 
-      const totalResponse = await axios.get(`http://192.168.1.5:5000/entrate/totale?${params}`, {
-        headers: { "x-access-token": token },
-      });
       setTotalIncomes(parseFloat(totalResponse.data.total) || 0);
-
-      const chartResponse = await axios.get(`http://192.168.1.5:5000/entrate/totale_per_tipo?${params}`, {
-        headers: { "x-access-token": token },
-      });
 
       if (chartResponse.data && Array.isArray(chartResponse.data) && chartResponse.data.length > 0) {
         const formattedData = chartResponse.data.map((item) => ({
@@ -108,10 +105,9 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(
-        `http://192.168.1.5:5000/entrate/lista_entrate?${params}`,
-        { headers: { "x-access-token": token } }
-      );
+      const response = await axios.get(`http://192.168.1.5:5000/entrate/lista_entrate?${params}`, {
+        headers: { "x-access-token": token },
+      });
 
       if (response.data && Array.isArray(response.data)) {
         setIncomesList(response.data);
