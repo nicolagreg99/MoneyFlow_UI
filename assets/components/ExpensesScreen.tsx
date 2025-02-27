@@ -38,7 +38,6 @@ const ExpensesScreen = () => {
     Altro: "#AAAAAA",
   };
 
-  // 📌 Recupera il token utente
   const getToken = async () => {
     try {
       return await AsyncStorage.getItem("authToken");
@@ -48,7 +47,6 @@ const ExpensesScreen = () => {
     }
   };
 
-  // 📌 Costruisce la query string per i filtri
   const buildQueryParams = () => {
     let params = new URLSearchParams();
     params.append("from_date", fromDate.toISOString().split("T")[0]);
@@ -57,7 +55,6 @@ const ExpensesScreen = () => {
     return params.toString();
   };
 
-  // 📊 Recupera i dati delle spese e del grafico
   const fetchExpensesData = async () => {
     setLoading(true);
     setError(null);
@@ -102,7 +99,6 @@ const ExpensesScreen = () => {
     }
   };
 
-  // 🧾 Recupera la lista delle transazioni
   const fetchTransactionList = async () => {
     setLoading(true);
 
@@ -134,14 +130,12 @@ const ExpensesScreen = () => {
     }
   };
 
-  // 📌 Reset filtri
   const resetFilters = () => {
     setFromDate(firstDayOfMonth);
     setToDate(today);
     setSelectedFilters([]);
   };
 
-  // 📌 Effettua la chiamata API quando cambiano le date o i filtri
   useEffect(() => {
     fetchExpensesData();
   }, [fromDate, toDate, selectedFilters]);
@@ -150,12 +144,10 @@ const ExpensesScreen = () => {
     <ScrollView contentContainerStyle={ExpensesStyles.scrollContainer}>
       <View style={ExpensesStyles.container}>
         
-        {/* 🔝 Titolo */}
         <View style={ExpensesStyles.titleContainer}>
           <Text style={ExpensesStyles.title}>Gestione Spese</Text>
         </View>
         
-        {/* 🔹 Icone delle azioni */}
         <View style={ExpensesStyles.actionsContainer}>
           <TouchableOpacity 
             style={ExpensesStyles.iconButton}
@@ -177,7 +169,6 @@ const ExpensesScreen = () => {
           </TouchableOpacity>
         </View>
   
-        {/* 📅 Selettori date */}
         <DateRangePicker 
           fromDate={fromDate} 
           setFromDate={setFromDate} 
@@ -185,14 +176,12 @@ const ExpensesScreen = () => {
           setToDate={setToDate} 
         />
   
-        {/* 🔹 Filtri */}
         <FilterSelector 
           selectedFilters={selectedFilters} 
           setSelectedFilters={setSelectedFilters} 
           filterType="spese" 
         />
   
-        {/* 💰 Totale Spese */}
         <View style={ExpensesStyles.totalContainer}>
           <Text style={ExpensesStyles.totalText}>Totale spese</Text>
           <Text style={ExpensesStyles.totalAmount}>
@@ -200,7 +189,6 @@ const ExpensesScreen = () => {
           </Text>
         </View>
   
-        {/* 📊 Stato del caricamento o dati */}
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : error ? (
@@ -211,7 +199,6 @@ const ExpensesScreen = () => {
           <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
         )}
   
-        {/* 🟠 Modale con la lista delle transazioni */}
         <Modal visible={isModalVisible} animationType="slide" transparent={false}>
           <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} />
         </Modal>

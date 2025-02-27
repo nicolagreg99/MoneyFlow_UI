@@ -13,7 +13,7 @@ const TransactionList = ({ transactions, onClose }) => {
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
   
-      // Se la chiave è 'valore', convertiamo in numero per un ordinamento corretto
+      // Se la chiave è 'valore', si converte in numero per un ordinamento corretto
       if (key === "valore") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
@@ -100,13 +100,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: {
-    fontSize: 24, // Più grande
+    fontSize: 24, 
     fontWeight: "bold",
-    color: "#1E3A8A", // Blu professionale
+    color: "#1E3A8A",
     textAlign: "center",
-    marginBottom: 15, // Più distanziato dagli elementi sotto
-    marginTop: 15, // Non attaccato sopra
-    paddingBottom: 8, // Spazio sotto
+    marginBottom: 15, 
+    marginTop: 15, 
+    paddingBottom: 8, 
   },
   headerRow: {
     flexDirection: "row",

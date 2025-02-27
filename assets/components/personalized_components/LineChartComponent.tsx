@@ -9,7 +9,6 @@ interface Props {
 }
 
 const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
-  // Riduci il numero di etichette mostrate (es. una ogni 2 mesi)
   const filteredLabels = labels.map((label, index) => (index % 2 === 0 ? label : ''));
 
   return (
@@ -19,7 +18,7 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
       </Text>
       <LineChart
         data={{
-          labels: filteredLabels, // Usa le etichette filtrate
+          labels: filteredLabels,
           datasets: [
             {
               data: entrate,
@@ -45,10 +44,10 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           propsForLabels: {
-            fontSize: 8, // Riduci ulteriormente la dimensione del font
-            rotation: -45, // Ruota le etichette di 45°
-            dx: -10, // Sposta le etichette lungo l'asse X
-            dy: 20, // Sposta le etichette lungo l'asse Y
+            fontSize: 8, 
+            rotation: -45,
+            dx: -10,
+            dy: 20, 
           },
           propsForDots: {
             r: "4",

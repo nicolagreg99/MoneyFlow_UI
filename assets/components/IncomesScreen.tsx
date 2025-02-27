@@ -15,11 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 const IncomesScreen = () => {
   const navigation = useNavigation();
 
-  // 📆 Date iniziali
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  // 🔹 Stati
   const [fromDate, setFromDate] = useState(firstDayOfMonth);
   const [toDate, setToDate] = useState(today);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -30,7 +28,6 @@ const IncomesScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [incomesList, setIncomesList] = useState([]);
 
-  // 🔹 Colori grafico
   const fixedColors = {
     Stipendio: "#FFCE56",
     Investimenti: "#4BC0C0",
@@ -39,7 +36,6 @@ const IncomesScreen = () => {
     Altro: "#AAAAAA",
   };
 
-  // 📌 Recupera il token utente
   const getToken = async () => {
     try {
       return await AsyncStorage.getItem("authToken");
@@ -49,7 +45,6 @@ const IncomesScreen = () => {
     }
   };
 
-  // 📌 Costruisce la query string per i filtri
   const buildQueryParams = () => {
     let params = new URLSearchParams();
     params.append("from_date", fromDate.toISOString().split("T")[0]);
@@ -58,7 +53,6 @@ const IncomesScreen = () => {
     return params.toString();
   };
 
-  // 📌 Fetch API per entrate totali e grafico
   const fetchIncomesData = async () => {
     setLoading(true);
     setError(null);
@@ -73,13 +67,11 @@ const IncomesScreen = () => {
 
       const params = buildQueryParams();
 
-      // 🔹 Richiesta per il totale entrate
       const totalResponse = await axios.get(`http://192.168.1.5:5000/entrate/totale?${params}`, {
         headers: { "x-access-token": token },
       });
       setTotalIncomes(parseFloat(totalResponse.data.total) || 0);
 
-      // 🔹 Richiesta per i dati del grafico
       const chartResponse = await axios.get(`http://192.168.1.5:5000/entrate/totale_per_tipo?${params}`, {
         headers: { "x-access-token": token },
       });
@@ -103,7 +95,6 @@ const IncomesScreen = () => {
     setLoading(false);
   };
 
-  // 📌 Fetch lista entrate (Visualizza Entrate)
   const fetchIncomesList = async () => {
     setLoading(true);
     setError(null);
@@ -117,7 +108,6 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      // Utilizzo dell'API indicata
       const response = await axios.get(
         `http://192.168.1.5:5000/entrate/lista_entrate?${params}`,
         { headers: { "x-access-token": token } }
@@ -138,14 +128,12 @@ const IncomesScreen = () => {
     setLoading(false);
   };
 
-  // 📌 Reset filtri
   const resetFilters = () => {
     setFromDate(firstDayOfMonth);
     setToDate(today);
     setSelectedFilters([]);
   };
 
-  // 📌 Effettua la chiamata API quando cambiano le date o i filtri
   useEffect(() => {
     fetchIncomesData();
   }, [fromDate, toDate, selectedFilters]);
@@ -154,28 +142,23 @@ const IncomesScreen = () => {
     <ScrollView contentContainerStyle={IncomesStyle.scrollContainer}>
       <View style={IncomesStyle.container}>
         
-        {/* 🔝 Titolo */}
         <View style={IncomesStyle.titleContainer}>
           <Text style={IncomesStyle.title}>Gestione Entrate</Text>
         </View>
         
-        {/* 🔹 Azioni (su due livelli separati) */}
         <View style={IncomesStyle.actionsContainer}>
-          {/* Pulsante per inserire entrata (solo icona) */}
           <TouchableOpacity 
             style={IncomesStyle.iconButton}
             onPress={() => navigation.navigate("InsertIncomes")}
           >
             <Ionicons name="add-circle-outline" size={30} color="#fff" />
           </TouchableOpacity>
-          {/* Pulsante per visualizzare le entrate (solo icona) */}
           <TouchableOpacity 
             style={IncomesStyle.iconButton}
             onPress={fetchIncomesList}
           >
             <Ionicons name="list-outline" size={30} color="#fff" />
           </TouchableOpacity>
-          {/* Pulsante di refresh */}
           <TouchableOpacity 
             style={IncomesStyle.refreshButton}
             onPress={resetFilters}
@@ -184,7 +167,6 @@ const IncomesScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* 📅 Selettori date */}
         <DateRangePicker 
           fromDate={fromDate} 
           setFromDate={setFromDate} 
@@ -192,14 +174,12 @@ const IncomesScreen = () => {
           setToDate={setToDate} 
         />
 
-        {/* 🔹 Filtri */}
         <FilterSelector 
           selectedFilters={selectedFilters} 
           setSelectedFilters={setSelectedFilters} 
           filterType="entrate" 
         />
 
-        {/* 🏆 Totale Entrate */}
         <View style={IncomesStyle.totalContainer}>
           <Text style={IncomesStyle.totalText}>Totale entrate</Text>
           <Text style={IncomesStyle.totalAmount}>
@@ -207,7 +187,6 @@ const IncomesScreen = () => {
           </Text>
         </View>
 
-        {/* 📊 Stato del caricamento o dati */}
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : error ? (
@@ -218,7 +197,6 @@ const IncomesScreen = () => {
           <Text style={IncomesStyle.noDataText}>Nessun dato disponibile</Text>
         )}
 
-        {/* 🟠 Modale per la lista delle entrate */}
         <Modal visible={isModalVisible} animationType="slide" transparent={false}>
           <TransactionList transactions={incomesList} onClose={() => setModalVisible(false)} />
         </Modal>

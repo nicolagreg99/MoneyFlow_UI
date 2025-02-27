@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import LoginStyles from '../styles/Login_style'; // Same style as Login screen
+import LoginStyles from '../styles/Login_style'; 
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
@@ -21,7 +21,7 @@ const ForgotPasswordScreen = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ identifier: email }),  // Usa 'identifier' direttamente
+        body: JSON.stringify({ identifier: email }),  
       });
   
       const data = await response.json();

@@ -195,7 +195,6 @@ const InsertExpensesScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* 🔹 Link per visualizzare le spese */}
           <TouchableOpacity
             style={ExpensesStyles.linkButton}
             onPress={() => navigation.navigate("ExpensesView")}
@@ -203,7 +202,6 @@ const InsertExpensesScreen = () => {
             <Text style={ExpensesStyles.linkButtonText}>📊 Visualizza le Spese</Text>
           </TouchableOpacity>
 
-          {/* Banner di Successo */}
           <Animated.View
             style={[
               ExpensesStyles.successBanner,
@@ -213,7 +211,6 @@ const InsertExpensesScreen = () => {
             <Text style={ExpensesStyles.successText}>✅ Spesa registrata con successo!</Text>
           </Animated.View>
 
-          {/* Banner di Errore */}
           <Animated.View
             style={[
               ExpensesStyles.errorBanner,

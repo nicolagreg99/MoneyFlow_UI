@@ -7,26 +7,24 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
-  // Deep link handling
   const { getInitialURL } = useLinking();
   
   useEffect(() => {
-    // Check if the screen was opened via deep link
     const checkDeepLink = async () => {
       const url = await getInitialURL();
       if (url) {
         const tokenFromUrl = new URL(url).searchParams.get('token');
         if (tokenFromUrl) {
-          setToken(tokenFromUrl); // Set the token from the deep link
+          setToken(tokenFromUrl);
         } else {
           Alert.alert('Errore', 'Token non valido nel link profondo.');
           navigation.navigate('Login');
         }
       } else if (route.params?.token) {
-        setToken(route.params.token); // Ottieni il token dal deep link
+        setToken(route.params.token); 
       } else {
         Alert.alert('Errore', 'Token non trovato.');
-        navigation.navigate('Login'); // Se il token non è presente, naviga al login
+        navigation.navigate('Login'); 
       }
     };
 
@@ -50,7 +48,7 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
       const response = await fetch('http://192.168.1.5:5000/reset_password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }), // Invia il token e la nuova password
+        body: JSON.stringify({ token, password }), 
       });
 
       const data = await response.json();

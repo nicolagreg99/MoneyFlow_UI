@@ -76,7 +76,6 @@ const MenuScreen = () => {
     }
   };
 
-  // 🔹 Mostra popup di conferma prima del logout
   const confirmLogout = () => {
     Alert.alert(
       "Conferma Logout", 
@@ -111,13 +110,11 @@ const MenuScreen = () => {
             </View>
           </View>
 
-          {/* Menu principale */}
           <View style={MenuStyles.menuContainer}>
             <TouchableOpacity style={MenuStyles.menuItem} onPress={() => navigation.navigate("Main")}>
               <Text style={MenuStyles.menuText}>🏠 Home</Text>
             </TouchableOpacity>
 
-            {/* 💰 Sezione Spese con sottomenù */}
             <TouchableOpacity
               style={MenuStyles.menuItem}
               onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
@@ -143,7 +140,6 @@ const MenuScreen = () => {
               </View>
             )}
 
-            {/* 📈 Sezione Entrate con sottomenù */}
             <TouchableOpacity
               style={MenuStyles.menuItem}
               onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
@@ -170,7 +166,6 @@ const MenuScreen = () => {
             )}
           </View>
 
-          {/* Logout con popup di conferma */}
           <TouchableOpacity style={MenuStyles.logoutButton} onPress={confirmLogout}>
             <Text style={MenuStyles.menuText}>🚪 Logout</Text>
           </TouchableOpacity>
