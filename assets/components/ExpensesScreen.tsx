@@ -69,10 +69,10 @@ const ExpensesScreen = () => {
       const params = buildQueryParams();
 
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`http://192.168.1.5:5000/spese/totale?${params}`, {
+        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total?${params}`, {
           headers: { "x-access-token": token },
         }),
-        axios.get(`http://192.168.1.5:5000/spese/totale_per_tipo?${params}`, {
+        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total_by_category?${params}`, {
           headers: { "x-access-token": token },
         }),
       ]);
@@ -111,7 +111,7 @@ const ExpensesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`http://192.168.1.5:5000/spese/lista_spese?${params}`, {
+      const response = await axios.get(`http://192.168.1.5:5000/api/v1/expenses/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
