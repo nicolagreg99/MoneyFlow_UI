@@ -69,10 +69,10 @@ const ExpensesScreen = () => {
       const params = buildQueryParams();
 
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total?${params}`, {
+        axios.get(`http://192.168.1.159:5000/api/v1/expenses/total?${params}`, {
           headers: { "x-access-token": token },
         }),
-        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total_by_category?${params}`, {
+        axios.get(`http://192.168.1.159:5000/api/v1/expenses/total_by_category?${params}`, {
           headers: { "x-access-token": token },
         }),
       ]);
@@ -111,7 +111,7 @@ const ExpensesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`http://192.168.1.5:5000/api/v1/expenses/list?${params}`, {
+      const response = await axios.get(`http://192.168.1.159:5000/api/v1/expenses/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
@@ -128,6 +128,29 @@ const ExpensesScreen = () => {
       setLoading(false);
     }
   };
+
+  const deleteExpense = async (expenseId) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setError("Token non trovato. Effettua nuovamente il login.");
+        return;
+      }
+  
+      await axios.delete(`http://192.168.1.159:5000/api/v1/expenses/${expenseId}`, {
+        headers: { "x-access-token": token },
+      });
+  
+      // Aggiorna la lista dopo la cancellazione
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((transaction) => transaction.id !== expenseId)
+      );
+    } catch (error) {
+      console.error("Errore durante l'eliminazione della spesa:", error.response?.data || error.message);
+      setError("Errore durante la cancellazione della spesa.");
+    }
+  };
+  
 
   const resetFilters = () => {
     setFromDate(firstDayOfMonth);
@@ -200,8 +223,9 @@ const ExpensesScreen = () => {
         )}
   
         <Modal visible={isModalVisible} animationType="slide" transparent={false}>
-          <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} />
+          <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} onDelete={deleteExpense} />
         </Modal>
+
         
       </View>
     </ScrollView>

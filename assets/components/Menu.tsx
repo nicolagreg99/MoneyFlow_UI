@@ -51,7 +51,7 @@ const MenuScreen = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch("http://192.168.1.5:5000/api/v1/logout", {
+        const response = await fetch("http://192.168.1.159:5000/api/v1/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

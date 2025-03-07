@@ -67,7 +67,7 @@ const CreateForm = () => {
     }
 
     try {
-      const response = await axios.post("http://192.168.1.5:5000/api/v1/register", {
+      const response = await axios.post("http://192.168.1.159:5000/api/v1/register", {
         username: formValues.username,
         email: formValues.email,
         password: formValues.password,

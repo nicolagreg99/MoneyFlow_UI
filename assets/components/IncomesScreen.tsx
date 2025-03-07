@@ -26,7 +26,7 @@ const IncomesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [incomesList, setIncomesList] = useState([]);
+  const [transactions, setTransactions] = useState([]);
 
   const fixedColors = {
     Stipendio: "#FFCE56",
@@ -67,8 +67,8 @@ const IncomesScreen = () => {
 
       const params = buildQueryParams();
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total?${params}`, { headers: { "x-access-token": token } }),
-        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total_by_category?${params}`, { headers: { "x-access-token": token } })
+        axios.get(`http://192.168.1.159:5000/api/v1/incomes/total?${params}`, { headers: { "x-access-token": token } }),
+        axios.get(`http://192.168.1.159:5000/api/v1/incomes/total_by_category?${params}`, { headers: { "x-access-token": token } })
       ]);
 
       setTotalIncomes(parseFloat(totalResponse.data.total) || 0);
@@ -105,15 +105,15 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`http://192.168.1.5:5000/api/v1/incomes/list?${params}`, {
+      const response = await axios.get(`http://192.168.1.159:5000/api/v1/incomes/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
       if (response.data && Array.isArray(response.data)) {
-        setIncomesList(response.data);
+        setTransactions(response.data);
         setModalVisible(true);
       } else {
-        setIncomesList([]);
+        setTransactions([]);
         setError("Nessuna entrata trovata per il periodo selezionato.");
       }
     } catch (error) {
@@ -122,6 +122,27 @@ const IncomesScreen = () => {
     }
 
     setLoading(false);
+  };
+
+  const deleteIncome = async (incomeId) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setError("Token non trovato. Effettua nuovamente il login.");
+        return;
+      }
+  
+      await axios.delete(`http://192.168.1.159:5000/api/v1/incomes/${incomeId}`, {
+        headers: { "x-access-token": token },
+      });
+  
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((transaction) => transaction.id !== incomeId)
+      );
+    } catch (error) {
+      console.error("Errore durante l'eliminazione dell'entrata:", error.response?.data || error.message);
+      setError("Errore durante la cancellazione dell'entrata");
+    }
   };
 
   const resetFilters = () => {
@@ -194,8 +215,9 @@ const IncomesScreen = () => {
         )}
 
         <Modal visible={isModalVisible} animationType="slide" transparent={false}>
-          <TransactionList transactions={incomesList} onClose={() => setModalVisible(false)} />
+          <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} onDelete={deleteIncome} />
         </Modal>
+
       </View>
     </ScrollView>
   );

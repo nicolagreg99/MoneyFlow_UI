@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const TransactionList = ({ transactions, onClose }) => {
+const TransactionList = ({ transactions, onClose, onDelete }) => {
   const [sortedTransactions, setSortedTransactions] = useState([]);
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
@@ -13,24 +13,24 @@ const TransactionList = ({ transactions, onClose }) => {
 
   const sortTransactions = (data, key, order) => {
     if (!key) return data;
-
+  
     return [...data].sort((a, b) => {
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
-
+  
       if (key === "valore") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
-      } else {
-        if (typeof valueA === "string") valueA = valueA.toLowerCase();
-        if (typeof valueB === "string") valueB = valueB.toLowerCase();
+        return order === "asc" ? valueA - valueB : valueB - valueA;
       }
-
-      if (valueA < valueB) return order === "asc" ? -1 : 1;
-      if (valueA > valueB) return order === "asc" ? 1 : -1;
-      return 0;
+  
+      valueA = valueA.toString().toLowerCase();
+      valueB = valueB.toString().toLowerCase();
+      
+      return order === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
   };
+  
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -41,18 +41,26 @@ const TransactionList = ({ transactions, onClose }) => {
     }
   };
 
+  const handleDelete = (id) => {
+    Alert.alert(
+      "Conferma Eliminazione",
+      "Sei sicuro di voler eliminare questa transazione?",
+      [
+        { text: "Annulla", style: "cancel" },
+        { text: "Elimina", onPress: () => onDelete(id), style: "destructive" },
+      ]
+    );
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/D";
     const date = new Date(dateString);
     return isNaN(date) ? "N/D" : date.toLocaleDateString("it-IT");
   };
 
-  const renderSortIcon = (key) => {
-    if (sortKey === key) {
-      return <Icon name={sortOrder === "asc" ? "sort-up" : "sort-down"} size={12} color="#007bff" style={{ marginLeft: 5 }} />;
-    }
-    return <Icon name="sort" size={12} color="#aaa" style={{ marginLeft: 5 }} />;
-  };
+  const renderSortIcon = (key) => (
+    <Icon name={sortKey === key ? (sortOrder === "asc" ? "sort-up" : "sort-down") : "sort"} size={12} color={sortKey === key ? "#007bff" : "#aaa"} style={{ marginLeft: 5 }} />
+  );
 
   return (
     <View style={styles.modalContent}>
@@ -66,18 +74,16 @@ const TransactionList = ({ transactions, onClose }) => {
           keyExtractor={(item) => item.id?.toString()}
           ListHeaderComponent={() => (
             <View style={styles.headerRow}>
-              <TouchableOpacity style={[styles.headerCell, { flex: 2 }]} onPress={() => handleSort("descrizione")}>
-                <Text style={styles.headerText}>Descrizione {renderSortIcon("descrizione")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.headerCell, { flex: 2 }]} onPress={() => handleSort("tipo")}>
-                <Text style={styles.headerText}>Tipo {renderSortIcon("tipo")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.headerCell, { flex: 1.5 }]} onPress={() => handleSort("valore")}>
-                <Text style={styles.headerText}>Valore {renderSortIcon("valore")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.headerCell, { flex: 2 }]} onPress={() => handleSort("giorno")}>
-                <Text style={styles.headerText}>Data {renderSortIcon("giorno")}</Text>
-              </TouchableOpacity>
+              {["descrizione", "tipo", "valore", "giorno"].map((key, index) => (
+                <TouchableOpacity key={index} style={[styles.headerCell, { flex: key === "valore" ? 1.5 : 2 }]} onPress={() => handleSort(key)}>
+                  <Text style={styles.headerText}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)} {renderSortIcon(key)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <View style={[styles.headerCell, { flex: 1 }]}>
+                <Text style={styles.headerText}>Azioni</Text>
+              </View>
             </View>
           )}
           renderItem={({ item }) => (
@@ -86,6 +92,9 @@ const TransactionList = ({ transactions, onClose }) => {
               <Text style={[styles.cell, { flex: 2 }]}>{item.tipo || "N/D"}</Text>
               <Text style={[styles.cell, { flex: 1.5 }]}>€{parseFloat(item.valore).toFixed(2)}</Text>
               <Text style={[styles.cell, { flex: 2 }]}>{formatDate(item.giorno)}</Text>
+              <TouchableOpacity style={styles.iconButton} onPress={() => handleDelete(item.id)}>
+                <Icon name="trash" size={16} color="red" />
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -101,64 +110,70 @@ const TransactionList = ({ transactions, onClose }) => {
 const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
+    backgroundColor: "#f9f9f9",
+    paddingHorizontal: 10, // Ridotto il padding ai bordi
+    paddingVertical: 12,
+    borderRadius: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20, // Ridotta per recuperare spazio
     fontWeight: "bold",
     color: "#1E3A8A",
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   noTransactionsText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#888",
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 12,
   },
   headerRow: {
     flexDirection: "row",
-    paddingVertical: 12,
-    backgroundColor: "#e8e8e8",
-    borderBottomWidth: 2,
+    paddingVertical: 6, // Compattato
+    backgroundColor: "#e3e3e3",
+    borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     alignItems: "center",
   },
   headerCell: {
-    flex: 1,
     alignItems: "center",
-    paddingVertical: 8,
     flexDirection: "row",
     justifyContent: "center",
   },
   headerText: {
-    fontSize: 14,
+    fontSize: 12, // Ridotto leggermente
     fontWeight: "bold",
     color: "#007bff",
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 12,
+    paddingVertical: 8, // Ridotto per recuperare spazio
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     alignItems: "center",
   },
   cell: {
-    fontSize: 16,
+    fontSize: 13, // Compattato leggermente
     color: "#444",
     textAlign: "center",
   },
+  iconButton: {
+    flex: 1,
+    alignItems: "center",
+    padding: 4, // Meno ingombrante
+  },
   closeButton: {
-    marginTop: 20,
-    padding: 12,
+    marginTop: 12,
+    padding: 8, // Ridotto
     backgroundColor: "#007bff",
     borderRadius: 8,
     alignItems: "center",
   },
   closeButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 14, // Più compatto
     fontWeight: "bold",
   },
 });
