@@ -8,7 +8,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import LoginForm from "./assets/components/LoginForm";
-import CreateForm from "./assets/components/CreateForm";
+import RegisterPersonalInfo from "./assets/components/RegisterPersonalInfo";
+import RegisterPreferences from "./assets/components/RegisterPreferences";
 import ForgotPasswordScreen from "./assets/components/ForgotPassword";
 import MainPage from "./assets/components/MainPage";
 import ExpensesScreen from "./assets/components/ExpensesScreen";
@@ -18,8 +19,11 @@ import InsertIncomesScreen from "./assets/components/InsertIncomesScreen";
 import MenuScreen from "./assets/components/Menu";
 import UpdatePasswordScreen from "./assets/components/UpdatePassword";
 
-type RootStackParamList = {
+// Definizione dei tipi di parametri per le schermate
+export type RootStackParamList = {
   Login: undefined;
+  RegisterPersonalInfo: undefined;
+  RegisterPreferences: { userData: any };
   ForgotPassword: undefined;
   Main: undefined;
   Menu: undefined;
@@ -30,7 +34,7 @@ type RootStackParamList = {
   IncomesView: undefined;
 };
 
-type BottomTabParamList = {
+export type BottomTabParamList = {
   Home: undefined;
   Expenses: undefined;
   Incomes: undefined;
@@ -39,7 +43,7 @@ type BottomTabParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-// Funzione per il pulsante Menu
+// Pulsante Menu
 const MenuButton = ({ navigation }: any) => (
   <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate("Menu")}>
     <Icon name="menu" size={28} color="#3498DB" />
@@ -70,8 +74,12 @@ const App = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      setIsAuthenticated(!!token);
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error("Errore nel recupero del token:", error);
+      }
     };
     checkAuth();
   }, []);
@@ -80,7 +88,8 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName={isAuthenticated ? "Main" : "Login"}>
         <Stack.Screen name="Login" component={LoginForm} options={{ headerShown: false }} />
-        <Stack.Screen name="Register" component={CreateForm} options={{ headerShown: false }} />
+        <Stack.Screen name="RegisterPersonalInfo" component={RegisterPersonalInfo} options={{ headerShown: false }} />
+        <Stack.Screen name="RegisterPreferences" component={RegisterPreferences} options={{ headerShown: false }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Menu" component={MenuScreen} />

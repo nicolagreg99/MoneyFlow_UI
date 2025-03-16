@@ -6,8 +6,8 @@ import MainStyles from '../styles/Main_style';
 import LineChartComponent from './personalized_components/LineChartComponent';
 import StatsWidget from './personalized_components/StatsWidget';
 
-const API_SPESA = "http://192.168.1.159:5000/api/v1/expenses/total_by_month";
-const API_ENTRATE = "http://192.168.1.159:5000/api/v1/incomes/total_by_month";
+const API_SPESA = "http://192.168.1.5:5000/api/v1/expenses/total_by_month";
+const API_ENTRATE = "http://192.168.1.5:5000/api/v1/incomes/total_by_month";
 
 const MainPage = () => {
   const [spese, setSpese] = useState<number[]>([]);

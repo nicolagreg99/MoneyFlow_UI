@@ -67,8 +67,8 @@ const IncomesScreen = () => {
 
       const params = buildQueryParams();
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`http://192.168.1.159:5000/api/v1/incomes/total?${params}`, { headers: { "x-access-token": token } }),
-        axios.get(`http://192.168.1.159:5000/api/v1/incomes/total_by_category?${params}`, { headers: { "x-access-token": token } })
+        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total?${params}`, { headers: { "x-access-token": token } }),
+        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total_by_category?${params}`, { headers: { "x-access-token": token } })
       ]);
 
       setTotalIncomes(parseFloat(totalResponse.data.total) || 0);
@@ -105,7 +105,7 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`http://192.168.1.159:5000/api/v1/incomes/list?${params}`, {
+      const response = await axios.get(`http://192.168.1.5:5000/api/v1/incomes/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
@@ -132,7 +132,7 @@ const IncomesScreen = () => {
         return;
       }
   
-      await axios.delete(`http://192.168.1.159:5000/api/v1/incomes/${incomeId}`, {
+      await axios.delete(`http://192.168.1.5:5000/api/v1/incomes/${incomeId}`, {
         headers: { "x-access-token": token },
       });
   

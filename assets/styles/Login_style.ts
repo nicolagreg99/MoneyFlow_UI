@@ -6,48 +6,48 @@ const LoginStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#f7f7f7',
-    paddingTop: Platform.OS === 'ios' ? 50 : 30, // Abbassiamo tutto per evitare la barra di stato
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingBottom: 20, // Spazio extra in basso
+    paddingBottom: 20,
   },
   logo: {
-    width: 130, // Leggermente più piccolo per bilanciare lo spazio
+    width: 130,
     height: 130,
     alignSelf: 'center',
-    marginBottom: 20, // Abbassato per evitare che sia troppo vicino ai testi
-    marginTop: 30, // Sposta il logo più in basso
+    marginBottom: 20,
+    marginTop: 30,
   },
   header: {
-    fontSize: 28, // Leggermente più piccolo per ridurre il blocco di testo
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2C3E50',
     textAlign: 'center',
-    marginBottom: 15, // Spazio ridotto sotto il titolo
+    // marginBottom: 10,
     fontFamily: 'Roboto',
   },
   subHeader: {
     fontSize: 16,
     color: '#7F8C8D',
     textAlign: 'center',
-    marginBottom: 25,
+    marginBottom: 5,
     fontFamily: 'Roboto',
   },
   input: {
-    borderBottomWidth: 2,
-    borderColor: '#3498DB',
-    marginBottom: 15, // Leggermente ridotto per compattezza
-    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#BDC3C7',
+    marginBottom: 15,
+    paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 5,
+    elevation: 3,
     height: 50,
     width: '100%',
   },
@@ -56,30 +56,26 @@ const LoginStyles = StyleSheet.create({
     width: '100%',
   },
   inputPassword: {
-    borderBottomWidth: 2,
-    borderColor: '#3498DB',
-    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#BDC3C7',
+    paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 5,
+    elevation: 3,
     height: 50,
     width: '100%',
-    paddingRight: 40, // Spazio per l'icona
+    paddingRight: 40,
   },
   eyeIconContainer: {
     position: 'absolute',
     right: 12,
     top: '50%',
     transform: [{ translateY: -12 }],
-  },
-  eyeIcon: {
-    fontSize: 24,
-    color: '#3498DB',
   },
   iconContainer: {
     position: 'absolute',
@@ -88,7 +84,7 @@ const LoginStyles = StyleSheet.create({
     transform: [{ translateY: -12 }],
   },
   footer: {
-    marginTop: 30, // Spostato un po' più in alto
+    marginTop: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -107,10 +103,20 @@ const LoginStyles = StyleSheet.create({
   button: {
     backgroundColor: '#3498DB',
     paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 15,
+    elevation: 4,
+  },
+  buttonSmall: {
+    backgroundColor: '#2ECC71',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 15, // Ridotto lo spazio sopra il pulsante
-    elevation: 4,
+    alignSelf: 'center',
+    marginTop: 8,
+    elevation: 2,
   },
   buttonText: {
     color: '#fff',
@@ -126,17 +132,17 @@ const LoginStyles = StyleSheet.create({
     fontFamily: 'Roboto',
   },
   banner: {
-    padding: 10,
-    marginBottom: 15, // Ridotto per non occupare troppo spazio
+    padding: 12,
+    marginBottom: 15,
     width: '100%',
     textAlign: 'center',
-    borderRadius: 5,
+    borderRadius: 8,
   },
   successBanner: {
-    backgroundColor: 'green',
+    backgroundColor: '#2ECC71',
   },
   errorBanner: {
-    backgroundColor: 'red',
+    backgroundColor: '#E74C3C',
   },
   bannerText: {
     color: 'white',
@@ -146,19 +152,95 @@ const LoginStyles = StyleSheet.create({
   successBorder: {
     borderColor: '#2ECC71',
     borderWidth: 2,
-    borderRadius: 5,
+    borderRadius: 8,
   },
   errorBorder: {
     borderColor: '#E74C3C',
     borderWidth: 2,
-    borderRadius: 5,
+    borderRadius: 8,
   },
   successText: {
     color: '#2ECC71',
     fontSize: 14,
     marginTop: 5,
     textAlign: 'center',
-  },  
+  },
+  // Miglioramento grafico della gestione preferenze
+  listContainer: {
+    marginVertical: 10,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  listItem: {
+    fontSize: 16,
+    color: '#2C3E50',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  removeButton: {
+    backgroundColor: '#E74C3C',
+    padding: 8,
+    borderRadius: 8,
+    marginLeft: 10,
+    elevation: 2,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  addButton: {
+    backgroundColor: '#3498DB',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 15,
+    elevation: 3,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  defaultPreference: {
+    opacity: 0.6, // Per indicare che non può essere rimossa
+  },
+  inputContainer: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  sectionContainer: {
+    marginVertical: 10,
+    // padding: 15,
+    // backgroundColor: '#ecf0f1',
+    borderRadius: 10,
+  },
+  listItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    marginBottom: 10,
+  },
 });
 
 export default LoginStyles;

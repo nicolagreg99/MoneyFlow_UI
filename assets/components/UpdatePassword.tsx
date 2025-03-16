@@ -45,7 +45,7 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.159:5000/reset_password', {
+      const response = await fetch('http://192.168.1.5:5000/reset_password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }), 

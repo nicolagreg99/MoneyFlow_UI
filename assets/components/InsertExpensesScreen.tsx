@@ -16,8 +16,8 @@ import { useNavigation } from "@react-navigation/native";
 import ExpensesStyles from "../styles/ExpensesInsert_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
-const API_URL = "http://192.168.1.159:5000/api/v1/expenses/insert";
-const ME_URL = "http://192.168.1.159:5000/api/v1/me";
+const API_URL = "http://192.168.1.5:5000/api/v1/expenses/insert";
+const ME_URL = "http://192.168.1.5:5000/api/v1/me";
 
 const InsertExpensesScreen = () => {
   const navigation = useNavigation(); // Hook per la navigazione
