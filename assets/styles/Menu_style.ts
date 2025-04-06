@@ -111,6 +111,16 @@ const MenuStyles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
   },
+  settingsButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#3498DB",
+    alignItems: "center",
+    justifyContent: "center",
+  },  
 });
 
 export default MenuStyles;

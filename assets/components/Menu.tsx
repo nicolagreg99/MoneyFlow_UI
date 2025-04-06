@@ -5,17 +5,19 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MenuStyles from "../styles/Menu_style";
-import appJson from '../../app.json';
+import appJson from "../../app.json";
 
 type RootStackParamList = {
   Menu: undefined;
   Login: undefined;
   Main: undefined;
-  InsertExpense: undefined;
+  InsertExpenses: undefined;
   Expenses: undefined;
-  InsertIncome: undefined;
+  InsertIncomes: undefined;
   Incomes: undefined;
+  EditUser: undefined; // 👈 Aggiunto per navigare alla schermata di modifica profilo
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Menu">;
@@ -51,7 +53,7 @@ const MenuScreen = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch("http://192.168.1.5:5000/api/v1/logout", {
+        const response = await fetch("https://backend.money-app-api.com/api/v1/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -97,6 +99,7 @@ const MenuScreen = () => {
           contentContainerStyle={{ flexGrow: 1, alignItems: "center", paddingBottom: 20 }} 
           keyboardShouldPersistTaps="handled"
         >
+          {/* Profilo Utente */}
           <View style={MenuStyles.profileContainer}>
             <View style={MenuStyles.profileIcon}>
               <Text style={MenuStyles.profileIconText}>
@@ -108,8 +111,17 @@ const MenuScreen = () => {
               <Text style={MenuStyles.username}>{userData.username}</Text>
               <Text style={MenuStyles.email}>{userData.email}</Text>
             </View>
+
+            {/* Bottone impostazioni */}
+            <TouchableOpacity 
+              style={MenuStyles.settingsButton} 
+              onPress={() => navigation.navigate("EditUser")}
+            >
+              <MaterialIcons name="settings" size={24} color="#FFF" />
+            </TouchableOpacity>
           </View>
 
+          {/* Menu Navigazione */}
           <View style={MenuStyles.menuContainer}>
             <TouchableOpacity style={MenuStyles.menuItem} onPress={() => navigation.navigate("Main")}>
               <Text style={MenuStyles.menuText}>🏠 Home</Text>
@@ -126,7 +138,7 @@ const MenuScreen = () => {
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
+                  onPress={() => navigation.navigate("ExpensesView")}
                 >
                   <Text style={MenuStyles.subMenuText}>📜 Visualizza Spese</Text>
                 </TouchableOpacity>
@@ -151,7 +163,7 @@ const MenuScreen = () => {
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
+                  onPress={() => navigation.navigate("IncomesView")}
                 >
                   <Text style={MenuStyles.subMenuText}>📜 Visualizza Entrate</Text>
                 </TouchableOpacity>
@@ -166,10 +178,12 @@ const MenuScreen = () => {
             )}
           </View>
 
+          {/* Logout */}
           <TouchableOpacity style={MenuStyles.logoutButton} onPress={confirmLogout}>
             <Text style={MenuStyles.menuText}>🚪 Logout</Text>
           </TouchableOpacity>
 
+          {/* Versione app */}
           <Text style={MenuStyles.versionText}>Versione {appJson.expo.version}</Text>
         </ScrollView>
       ) : (

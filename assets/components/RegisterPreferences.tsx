@@ -22,7 +22,7 @@ const RegisterPreferences = () => {
       setExpenses([...expenses, newExpense]);
       setNewExpense("");
     } else {
-      Alert.alert("Errore", "Spesa già presente o campo vuoto.");
+      Alert.alert("Errore", "Preferenza già presente o campo vuoto.");
     }
   };
 
@@ -31,7 +31,7 @@ const RegisterPreferences = () => {
       setIncomes([...incomes, newIncome]);
       setNewIncome("");
     } else {
-      Alert.alert("Errore", "Reddito già presente o campo vuoto.");
+      Alert.alert("Errore", "Preferenza già presente o campo vuoto.");
     }
   };
 
@@ -39,7 +39,7 @@ const RegisterPreferences = () => {
     if (expenses.length > 1) {
       setExpenses(expenses.filter((_, i) => i !== index));
     } else {
-      Alert.alert("Errore", "Devi avere almeno una categoria di spesa.");
+      Alert.alert("Errore", "Devi avere almeno una preferenza.");
     }
   };
 
@@ -47,7 +47,7 @@ const RegisterPreferences = () => {
     if (incomes.length > 1) {
       setIncomes(incomes.filter((_, i) => i !== index));
     } else {
-      Alert.alert("Errore", "Devi avere almeno una fonte di reddito.");
+      Alert.alert("Errore", "Devi avere almeno una preferenza.");
     }
   };
 
@@ -66,7 +66,7 @@ const RegisterPreferences = () => {
   
       console.log("Payload inviato:", JSON.stringify(payload, null, 2));
   
-      const response = await axios.post("http://192.168.1.5:5000/api/v1/register", payload);
+      const response = await axios.post("https://backend.money-app-api.com/api/v1/register", payload);
   
       if (response.data.success) {
         Alert.alert("Successo", "Registrazione completata!");

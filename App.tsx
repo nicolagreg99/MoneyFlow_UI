@@ -18,6 +18,7 @@ import IncomesScreen from "./assets/components/IncomesScreen";
 import InsertIncomesScreen from "./assets/components/InsertIncomesScreen";
 import MenuScreen from "./assets/components/Menu";
 import UpdatePasswordScreen from "./assets/components/UpdatePassword";
+import EditUser from "./assets/components/EditUser"; // 👈 Import EditUser
 
 // Definizione dei tipi di parametri per le schermate
 export type RootStackParamList = {
@@ -32,6 +33,7 @@ export type RootStackParamList = {
   InsertIncomes: undefined;
   ExpensesView: undefined;
   IncomesView: undefined;
+  EditUser: undefined;  
 };
 
 export type BottomTabParamList = {
@@ -117,6 +119,14 @@ const App = () => {
           name="IncomesView" 
           component={IncomesScreen} 
           options={({ navigation }) => ({ title: "Incomes", headerRight: () => <MenuButton navigation={navigation} /> })}
+        />
+        <Stack.Screen 
+          name="EditUser" 
+          component={EditUser} 
+          options={({ navigation }) => ({ 
+            title: "Modifica Profilo", 
+            headerRight: () => <MenuButton navigation={navigation} /> 
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

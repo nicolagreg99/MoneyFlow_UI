@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from 'react-native';
 import { CheckSquare, Square } from 'lucide-react-native';
 import ExpensesStyles from '../../styles/Expenses_style';
-
-const expenseFilterOptions = ["Vestiti", "Cibo", "Extra", "Trasporto", "Regalo"];
-const incomeFilterOptions = ["Stipendio", "Regalo", "Extra"];
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [filterOptions, setFilterOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Determina le opzioni in base al tipo di filtro (spese o entrate)
-  const filterOptions = filterType === "entrate" ? incomeFilterOptions : expenseFilterOptions;
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = await AsyncStorage.getItem('authToken'); // Recupera il token salvato
+        if (!token) return;
+
+        const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
+          headers: { 'x-access-token': token }
+        });
+
+        if (response.data) {
+          setFilterOptions(
+            filterType === "entrate" ? response.data.incomes_categories : response.data.expenses_categories
+          );
+        }
+      } catch (error) {
+        console.error("Errore nel recupero delle categorie:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [filterType]);
 
   const toggleFilter = (filter) => {
     if (selectedFilters.includes(filter)) {
-      setSelectedFilters(selectedFilters.filter(f => f !== filter)); 
+      setSelectedFilters(selectedFilters.filter(f => f !== filter));
     } else {
-      setSelectedFilters([...selectedFilters, filter]); 
+      setSelectedFilters([...selectedFilters, filter]);
     }
   };
 
@@ -43,23 +66,27 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
               {filterType === "entrate" ? "Seleziona Categoria di Entrata" : "Seleziona Categoria di Spesa"}
             </Text>
 
-            <FlatList
-              data={filterOptions}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity 
-                  style={ExpensesStyles.filterOptionRow} 
-                  onPress={() => toggleFilter(item)}
-                >
-                  {selectedFilters.includes(item) ? (
-                    <CheckSquare size={22} color="#16A085" />
-                  ) : (
-                    <Square size={22} color="#666" />
-                  )}
-                  <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
+            {loading ? (
+              <ActivityIndicator size="large" color="#16A085" />
+            ) : (
+              <FlatList
+                data={filterOptions}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity 
+                    style={ExpensesStyles.filterOptionRow} 
+                    onPress={() => toggleFilter(item)}
+                  >
+                    {selectedFilters.includes(item) ? (
+                      <CheckSquare size={22} color="#16A085" />
+                    ) : (
+                      <Square size={22} color="#666" />
+                    )}
+                    <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
 
             <TouchableOpacity 
               style={ExpensesStyles.modalCloseButton} 
