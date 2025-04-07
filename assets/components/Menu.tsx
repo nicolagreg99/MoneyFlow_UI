@@ -17,7 +17,7 @@ type RootStackParamList = {
   Expenses: undefined;
   InsertIncomes: undefined;
   Incomes: undefined;
-  EditUser: undefined; // 👈 Aggiunto per navigare alla schermata di modifica profilo
+  EditUser: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Menu">;
@@ -53,7 +53,7 @@ const MenuScreen = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch("https://backend.money-app-api.com/api/v1/logout", {
+        const response = await fetch("http://192.168.1.5:5000/api/v1/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -61,14 +61,29 @@ const MenuScreen = () => {
           },
         });
 
-        const data = await response.json();
+        const contentType = response.headers.get("content-type");
 
         if (response.ok) {
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            console.log("Logout success:", data);
+          } else {
+            console.warn("Logout effettuato, ma la risposta non è in formato JSON.");
+          }
+
           await AsyncStorage.removeItem("userData");
           await AsyncStorage.removeItem("authToken");
           navigation.navigate("Login");
         } else {
-          console.error("Errore nel logout API:", data);
+          let errorMsg = "Errore nel logout API.";
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            errorMsg = errorData.message || errorMsg;
+          } else {
+            const errorText = await response.text();
+            console.error("Errore grezzo:", errorText);
+          }
+          console.error(errorMsg);
         }
       } else {
         console.error("Token di accesso non trovato.");
@@ -112,7 +127,6 @@ const MenuScreen = () => {
               <Text style={MenuStyles.email}>{userData.email}</Text>
             </View>
 
-            {/* Bottone impostazioni */}
             <TouchableOpacity 
               style={MenuStyles.settingsButton} 
               onPress={() => navigation.navigate("EditUser")}
@@ -138,7 +152,7 @@ const MenuScreen = () => {
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("ExpensesView")}
+                  onPress={() => navigation.navigate("Expenses")}
                 >
                   <Text style={MenuStyles.subMenuText}>📜 Visualizza Spese</Text>
                 </TouchableOpacity>
@@ -163,7 +177,7 @@ const MenuScreen = () => {
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("IncomesView")}
+                  onPress={() => navigation.navigate("Incomes")}
                 >
                   <Text style={MenuStyles.subMenuText}>📜 Visualizza Entrate</Text>
                 </TouchableOpacity>

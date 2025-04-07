@@ -16,7 +16,7 @@ const ForgotPasswordScreen = () => {
   
     setLoading(true);
     try {
-      const response = await fetch('https://backend.money-app-api.com/request_reset', {
+      const response = await fetch('http://192.168.1.5:5000/request_reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

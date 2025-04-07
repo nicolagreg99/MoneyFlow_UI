@@ -66,7 +66,7 @@ const RegisterPreferences = () => {
   
       console.log("Payload inviato:", JSON.stringify(payload, null, 2));
   
-      const response = await axios.post("https://backend.money-app-api.com/api/v1/register", payload);
+      const response = await axios.post("http://192.168.1.5:5000/api/v1/register", payload);
   
       if (response.data.success) {
         Alert.alert("Successo", "Registrazione completata!");
