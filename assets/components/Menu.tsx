@@ -152,7 +152,7 @@ const MenuScreen = () => {
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("ExpensesView")}
+                  onPress={() => navigation.navigate("Expenses")}
                 >
                   <Text style={MenuStyles.subMenuText}>📜 Visualizza Spese</Text>
                 </TouchableOpacity>
