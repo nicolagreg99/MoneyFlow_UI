@@ -90,27 +90,31 @@ const InsertExpensesScreen = () => {
   };
 
   const handleSubmit = async () => {
+    // Modifica dell'importo per sostituire la virgola con il punto
+    const formattedAmount = amount.replace(',', '.');
+  
     const errors = {
-      amount: !amount.trim(),
+      amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
       selectedType: selectedType.length === 0,
     };
+  
     setErrorFields(errors);
-
+  
     if (Object.values(errors).some((err) => err) || !userId || !authToken) {
       return;
     }
-
+  
     const expenseData = {
       tipo: selectedType[0],
-      valore: parseFloat(amount),
+      valore: parseFloat(formattedAmount),
       giorno: date.toISOString().split("T")[0],
       descrizione: description.trim(),
       user_id: userId,
     };
-
+  
     setLoading(true);
-
+  
     try {
       await axios.post(API_URL, expenseData, {
         headers: {
@@ -119,9 +123,9 @@ const InsertExpensesScreen = () => {
           "x-access-token": authToken,
         },
       });
-
+  
       showBanner(successBannerOpacity);
-
+  
       setAmount("");
       setDescription("");
       setSelectedType([]);
@@ -133,6 +137,7 @@ const InsertExpensesScreen = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <View style={ExpensesStyles.container}>
