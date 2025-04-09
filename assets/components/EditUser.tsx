@@ -11,7 +11,7 @@ import EditUserStyles from '../styles/EditUser_style';
 
 const CategorySection = ({ title, value, onChangeText, onAdd, data, onRemove, color, sectionStyle, buttonStyle }) => (
   <View style={sectionStyle}>
-    <Text style={EditUserStyles.sectionTitle}>{`Categorie di ${title}`}</Text>
+    <Text style={[EditUserStyles.sectionTitle, { textAlign: 'center' }]}>{`Categorie di ${title}`}</Text>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <View style={{ flex: 1 }}>
         <View style={EditUserStyles.inputContainer}>

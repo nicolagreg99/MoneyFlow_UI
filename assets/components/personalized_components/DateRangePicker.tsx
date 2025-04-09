@@ -9,13 +9,26 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
 
+  const fixDate = (date) => {
+    const correctedDate = new Date(date);
+    correctedDate.setHours(12, 0, 0, 0); // Evita ambiguità a mezzanotte
+    return correctedDate;
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleFromDateChange = (event, selectedDate) => {
-    if (selectedDate) setFromDate(selectedDate);
+    if (selectedDate) setFromDate(fixDate(selectedDate));
     setShowFromPicker(false);
   };
 
   const handleToDateChange = (event, selectedDate) => {
-    if (selectedDate) setToDate(selectedDate);
+    if (selectedDate) setToDate(fixDate(selectedDate));
     setShowToPicker(false);
   };
 
@@ -43,7 +56,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
             onPress={() => setShowFromPicker(true)}
           >
             <Text style={ExpensesStyles.dateText}>
-              {fromDate.toISOString().split('T')[0]}
+              {formatDate(fromDate)}
             </Text>
           </TouchableOpacity>
 
@@ -63,7 +76,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
             onPress={() => setShowToPicker(true)}
           >
             <Text style={ExpensesStyles.dateText}>
-              {toDate.toISOString().split('T')[0]}
+              {formatDate(toDate)}
             </Text>
           </TouchableOpacity>
 
