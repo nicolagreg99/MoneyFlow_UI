@@ -65,6 +65,8 @@ const MenuStyles = StyleSheet.create({
     elevation: 3,
   },
   menuItem: {
+    flexDirection: "row", // aggiunto
+    gap: 10,               // aggiunto
     backgroundColor: "#3498DB",
     padding: 15,
     borderRadius: 10,
@@ -83,8 +85,11 @@ const MenuStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   subMenuItem: {
+    flexDirection: "row", // aggiunto
+    gap: 10,               // aggiunto
+    alignItems: "center",  // aggiunto
     padding: 12,
-    paddingLeft: 25, // 🔹 Indentazione visiva per il sottomenù
+    paddingLeft: 25,
     borderBottomWidth: 1,
     borderBottomColor: "#D5DBDB",
   },
@@ -120,7 +125,7 @@ const MenuStyles = StyleSheet.create({
     backgroundColor: "#3498DB",
     alignItems: "center",
     justifyContent: "center",
-  },  
+  },
 });
 
 export default MenuStyles;

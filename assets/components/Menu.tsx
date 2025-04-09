@@ -6,13 +6,14 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MenuStyles from "../styles/Menu_style";
 import appJson from "../../app.json";
 
 type RootStackParamList = {
   Menu: undefined;
   Login: undefined;
-  Main: undefined;
+  Main: { screen?: string };
   InsertExpenses: undefined;
   Expenses: undefined;
   InsertIncomes: undefined;
@@ -53,7 +54,7 @@ const MenuScreen = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch("http://192.168.1.5:5000/api/v1/logout", {
+        const response = await fetch("https://backend.money-app-api.com/api/v1/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -138,64 +139,92 @@ const MenuScreen = () => {
           {/* Menu Navigazione */}
           <View style={MenuStyles.menuContainer}>
             <TouchableOpacity style={MenuStyles.menuItem} onPress={() => navigation.navigate("Main")}>
-              <Text style={MenuStyles.menuText}>🏠 Home</Text>
-            </TouchableOpacity>
+              <FontAwesome name="home" size={24} color="#FFF" />
+              <Text style={[MenuStyles.menuText, { marginLeft: 4 }]}>Home</Text>
+              </TouchableOpacity>
 
             <TouchableOpacity
               style={MenuStyles.menuItem}
               onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
             >
-              <Text style={MenuStyles.menuText}>💰 Spese {showExpensesSubMenu ? "▲" : "▼"}</Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialIcons name="attach-money" size={24} color="#FFF" />
+                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Spese</Text> {/* Spazio tra icona e testo */}
+                </View>
+                <MaterialIcons 
+                  name={showExpensesSubMenu ? "expand-less" : "expand-more"} 
+                  size={24} 
+                  color="#FFF" 
+                />
+              </View>
             </TouchableOpacity>
+
+
 
             {showExpensesSubMenu && (
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("ExpensesView")}
+                  onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
                 >
-                  <Text style={MenuStyles.subMenuText}>📜 Visualizza Spese</Text>
+                  <FontAwesome name="list" size={18} color="#3498DB" />
+                  <Text style={MenuStyles.subMenuText}>Visualizza Spese</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
                   onPress={() => navigation.navigate("InsertExpenses")}
                 >
-                  <Text style={MenuStyles.subMenuText}>➕ Inserisci Spesa</Text>
+                  <MaterialIcons name="add" size={18} color="#3498DB" />
+                  <Text style={MenuStyles.subMenuText}>Inserisci Spesa</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            <TouchableOpacity
-              style={MenuStyles.menuItem}
-              onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
-            >
-              <Text style={MenuStyles.menuText}>📈 Entrate {showIncomesSubMenu ? "▲" : "▼"}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={MenuStyles.menuItem}
+            onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <MaterialIcons name="account-balance-wallet" size={24} color="#FFF" />
+                <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Entrate</Text> {/* Spazio tra icona e testo */}
+              </View>
+              <MaterialIcons 
+                name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
+                size={24} 
+                color="#FFF" 
+              />
+            </View>
+          </TouchableOpacity>
+
 
             {showIncomesSubMenu && (
               <View style={MenuStyles.subMenuContainer}>
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
-                  onPress={() => navigation.navigate("IncomesView")}
+                  onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
                 >
-                  <Text style={MenuStyles.subMenuText}>📜 Visualizza Entrate</Text>
+                  <FontAwesome name="list" size={18} color="#3498DB" />
+                  <Text style={MenuStyles.subMenuText}>Visualizza Entrate</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={MenuStyles.subMenuItem}
                   onPress={() => navigation.navigate("InsertIncomes")}
                 >
-                  <Text style={MenuStyles.subMenuText}>➕ Inserisci Entrata</Text>
+                  <MaterialIcons name="add" size={18} color="#3498DB" />
+                  <Text style={MenuStyles.subMenuText}>Inserisci Entrata</Text>
                 </TouchableOpacity>
               </View>
             )}
-          </View>
 
-          {/* Logout */}
-          <TouchableOpacity style={MenuStyles.logoutButton} onPress={confirmLogout}>
-            <Text style={MenuStyles.menuText}>🚪 Logout</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={[MenuStyles.menuItem, MenuStyles.logoutButton]} onPress={confirmLogout}>
+              <FontAwesome name="sign-out" size={24} color="#FFF" />
+              <Text style={MenuStyles.menuText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Versione app */}
           <Text style={MenuStyles.versionText}>Versione {appJson.expo.version}</Text>

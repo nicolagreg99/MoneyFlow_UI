@@ -19,8 +19,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import ExpensesStyles from "../styles/ExpensesInsert_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
-const API_URL = "http://192.168.1.5:5000/api/v1/incomes/insert";
-const ME_URL = "http://192.168.1.5:5000/api/v1/me";
+const API_URL = "https://backend.money-app-api.com/api/v1/incomes/insert";
+const ME_URL = "https://backend.money-app-api.com/api/v1/me";
 
 const InsertExpensesScreen = () => {
   const navigation = useNavigation();
