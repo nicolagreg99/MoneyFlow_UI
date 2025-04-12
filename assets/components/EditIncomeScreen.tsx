@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
   Animated,
   Easing,
   Platform,
@@ -21,14 +20,10 @@ const EditIncomeScreen = () => {
   const route = useRoute();
   const { income } = route.params || {};
 
-  // DEBUG LOGS
-  console.log("== ROUTE PARAMS ==");
-  console.log(route.params);
-  console.log("== INCOME OBJ ==");
-  console.log(income);
-
   const [amount, setAmount] = useState("");
+  const [amountFocused, setAmountFocused] = useState(false);
   const [description, setDescription] = useState("");
+  const [descriptionFocused, setDescriptionFocused] = useState(false);
   const [selectedType, setSelectedType] = useState([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -45,13 +40,9 @@ const EditIncomeScreen = () => {
 
   useEffect(() => {
     if (!income) {
-      console.error("❌ Errore: parametro 'income' non trovato!");
       navigation.goBack();
       return;
     }
-
-    // Log valori income
-    console.log("📦 Income ricevuta:", income);
 
     setAmount(income.valore?.toString() || "");
     setDescription(income.descrizione || "");
@@ -108,10 +99,7 @@ const EditIncomeScreen = () => {
       descrizione: description.trim(),
     };
 
-    const PATCH_URL = `http://192.168.1.5:5000/api/v1/edit_income/${income.id}`;
-
-    console.log("🔧 Invio PATCH a:", PATCH_URL);
-    console.log("📤 Payload:", payload);
+    const PATCH_URL = `https://backend.money-app-api.com/api/v1/edit_income/${income.id}`;
 
     setLoading(true);
 
@@ -123,11 +111,9 @@ const EditIncomeScreen = () => {
         },
       });
 
-      console.log("✅ Entrata aggiornata con successo!");
       showBanner(successBannerOpacity);
       setTimeout(() => navigation.goBack(), 1500);
     } catch (error) {
-      console.error("❌ Errore aggiornamento:", error);
       showBanner(errorBannerOpacity);
     } finally {
       setLoading(false);
@@ -138,22 +124,46 @@ const EditIncomeScreen = () => {
     <View style={IncomesStyles.container}>
       <Text style={IncomesStyles.header}>Modifica Entrata</Text>
 
-      <TextInput
-        style={[IncomesStyles.input, errorFields.amount && IncomesStyles.errorInput]}
-        placeholder="Importo (€) *"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
-      {errorFields.amount && <Text style={IncomesStyles.errorText}>Inserisci un importo!</Text>}
+      <View style={IncomesStyles.inputWrapper}>
+        {(amount.length > 0 || amountFocused) && (
+          <Text style={IncomesStyles.floatingLabel}>Importo (€) *</Text>
+        )}
+        <TextInput
+          style={[
+            IncomesStyles.input,
+            errorFields.amount && IncomesStyles.errorInput,
+          ]}
+          onFocus={() => setAmountFocused(true)}
+          onBlur={() => setAmountFocused(false)}
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+          placeholder={amount.length > 0 || amountFocused ? "" : "Importo (€) *"}
+        />
+      </View>
+      {errorFields.amount && (
+        <Text style={IncomesStyles.errorText}>Inserisci un importo!</Text>
+      )}
 
-      <TextInput
-        style={[IncomesStyles.input, errorFields.description && IncomesStyles.errorInput]}
-        placeholder="Descrizione *"
-        value={description}
-        onChangeText={setDescription}
-      />
-      {errorFields.description && <Text style={IncomesStyles.errorText}>Inserisci una descrizione!</Text>}
+      <View style={IncomesStyles.inputWrapper}>
+        {(description.length > 0 || descriptionFocused) && (
+          <Text style={IncomesStyles.floatingLabel}>Descrizione *</Text>
+        )}
+        <TextInput
+          style={[
+            IncomesStyles.input,
+            errorFields.description && IncomesStyles.errorInput,
+          ]}
+          onFocus={() => setDescriptionFocused(true)}
+          onBlur={() => setDescriptionFocused(false)}
+          value={description}
+          onChangeText={setDescription}
+          placeholder={description.length > 0 || descriptionFocused ? "" : "Descrizione *"}
+        />
+      </View>
+      {errorFields.description && (
+        <Text style={IncomesStyles.errorText}>Inserisci una descrizione!</Text>
+      )}
 
       <Text style={IncomesStyles.label}>Tipo *</Text>
       <FilterSelector
@@ -161,7 +171,9 @@ const EditIncomeScreen = () => {
         setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])}
         filterType="entrate"
       />
-      {errorFields.selectedType && <Text style={IncomesStyles.errorText}>Seleziona un tipo!</Text>}
+      {errorFields.selectedType && (
+        <Text style={IncomesStyles.errorText}>Seleziona un tipo!</Text>
+      )}
 
       <Text style={IncomesStyles.label}>Data:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)} style={IncomesStyles.datePickerButton}>

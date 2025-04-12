@@ -71,7 +71,7 @@ const EditUser = () => {
         const token = await AsyncStorage.getItem('authToken');
         if (!token) return;
 
-        const response = await axios.get('http://192.168.1.5:5000/api/v1/me', {
+        const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
           headers: { 'x-access-token': token },
         });
 
@@ -135,7 +135,7 @@ const EditUser = () => {
       if (!token) return;
 
       const response = await axios.patch(
-        'http://192.168.1.5:5000/api/v1/edit_user',
+        'https://backend.money-app-api.com/api/v1/edit_user',
         dataToSend,
         { headers: { 'x-access-token': token } }
       );

@@ -21,14 +21,12 @@ const EditExpenseScreen = () => {
   const route = useRoute();
   const { expense } = route.params || {};
 
-  // DEBUG LOGS
-  console.log("== ROUTE PARAMS ==");
-  console.log(route.params);
-  console.log("== EXPENSE OBJ ==");
-  console.log(expense);
-
   const [amount, setAmount] = useState("");
+  const [amountFocused, setAmountFocused] = useState(false);
+
   const [description, setDescription] = useState("");
+  const [descriptionFocused, setDescriptionFocused] = useState(false);
+
   const [selectedType, setSelectedType] = useState([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -50,7 +48,6 @@ const EditExpenseScreen = () => {
       return;
     }
 
-    // Log valori expense
     console.log("📦 Expense ricevuta:", expense);
 
     setAmount(expense.valore?.toString() || "");
@@ -108,7 +105,7 @@ const EditExpenseScreen = () => {
       descrizione: description.trim(),
     };
 
-    const PATCH_URL = `http://192.168.1.5:5000/api/v1/edit_expense/${expense.id}`;
+    const PATCH_URL = `https://backend.money-app-api.com/api/v1/edit_expense/${expense.id}`;
 
     console.log("🔧 Invio PATCH a:", PATCH_URL);
     console.log("📤 Payload:", payload);
@@ -138,22 +135,48 @@ const EditExpenseScreen = () => {
     <View style={ExpensesStyles.container}>
       <Text style={ExpensesStyles.header}>Modifica Spesa</Text>
 
-      <TextInput
-        style={[ExpensesStyles.input, errorFields.amount && ExpensesStyles.errorInput]}
-        placeholder="Importo (€) *"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
-      {errorFields.amount && <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>}
+      {/* Importo */}
+      <View style={ExpensesStyles.inputWrapper}>
+        {(amount.length > 0 || amountFocused) && (
+          <Text style={ExpensesStyles.floatingLabel}>Importo (€) *</Text>
+        )}
+        <TextInput
+          style={[
+            ExpensesStyles.input,
+            errorFields.amount && ExpensesStyles.errorInput,
+          ]}
+          onFocus={() => setAmountFocused(true)}
+          onBlur={() => setAmountFocused(false)}
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+          placeholder={amount.length > 0 || amountFocused ? "" : "Importo (€) *"}
+        />
+      </View>
+      {errorFields.amount && (
+        <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>
+      )}
 
-      <TextInput
-        style={[ExpensesStyles.input, errorFields.description && ExpensesStyles.errorInput]}
-        placeholder="Descrizione *"
-        value={description}
-        onChangeText={setDescription}
-      />
-      {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}
+      {/* Descrizione */}
+      <View style={ExpensesStyles.inputWrapper}>
+        {(description.length > 0 || descriptionFocused) && (
+          <Text style={ExpensesStyles.floatingLabel}>Descrizione *</Text>
+        )}
+        <TextInput
+          style={[
+            ExpensesStyles.input,
+            errorFields.description && ExpensesStyles.errorInput,
+          ]}
+          onFocus={() => setDescriptionFocused(true)}
+          onBlur={() => setDescriptionFocused(false)}
+          value={description}
+          onChangeText={setDescription}
+          placeholder={description.length > 0 || descriptionFocused ? "" : "Descrizione *"}
+        />
+      </View>
+      {errorFields.description && (
+        <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>
+      )}
 
       <Text style={ExpensesStyles.label}>Tipo *</Text>
       <FilterSelector
@@ -161,7 +184,9 @@ const EditExpenseScreen = () => {
         setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])}
         filterType="spese"
       />
-      {errorFields.selectedType && <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>}
+      {errorFields.selectedType && (
+        <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>
+      )}
 
       <Text style={ExpensesStyles.label}>Data:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)} style={ExpensesStyles.datePickerButton}>

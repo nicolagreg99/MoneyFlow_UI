@@ -121,7 +121,24 @@ const IncomesStyles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  
+  inputWrapper: {
+    position: "relative",
+    marginBottom: 15,
+  },
+  floatingLabel: {
+    position: "absolute",
+    top: -8,
+    left: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    fontSize: 12,
+    color: "#3498DB",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#3498DB",
+    zIndex: 1,
+  }    
 });
 
 export default IncomesStyles;

@@ -19,8 +19,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import ExpensesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
-const API_URL = "http://192.168.1.5:5000/api/v1/incomes/insert";
-const ME_URL = "http://192.168.1.5:5000/api/v1/me";
+const API_URL = "https://backend.money-app-api.com/api/v1/incomes/insert";
+const ME_URL = "https://backend.money-app-api.com/api/v1/me";
 
 const InsertExpensesScreen = () => {
   const navigation = useNavigation();
@@ -32,6 +32,8 @@ const InsertExpensesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [amountFocused, setAmountFocused] = useState(false);
+  const [descriptionFocused, setDescriptionFocused] = useState(false);
   const [errorFields, setErrorFields] = useState({
     amount: false,
     description: false,
@@ -91,42 +93,41 @@ const InsertExpensesScreen = () => {
   };
 
   const handleSubmit = async () => {
-    // Modifica dell'importo per sostituire la virgola con il punto
     const formattedAmount = amount.replace(',', '.');
-  
+
     const errors = {
       amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
       selectedType: selectedType.length === 0,
     };
-  
+
     setErrorFields(errors);
-  
+
     if (Object.values(errors).some((err) => err) || !userId || !authToken) {
       return;
     }
-  
-    const expenseData = {
+
+    const incomeData = {
       tipo: selectedType[0],
       valore: parseFloat(formattedAmount),
       giorno: date.toISOString().split("T")[0],
       descrizione: description.trim(),
       user_id: userId,
     };
-  
+
     setLoading(true);
-  
+
     try {
-      await axios.post(API_URL, expenseData, {
+      await axios.post(API_URL, incomeData, {
         headers: {
           Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json",
           "x-access-token": authToken,
         },
       });
-  
+
       showBanner(successBannerOpacity);
-  
+
       setAmount("");
       setDescription("");
       setSelectedType([]);
@@ -137,7 +138,7 @@ const InsertExpensesScreen = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
@@ -150,41 +151,58 @@ const InsertExpensesScreen = () => {
               <ActivityIndicator size="large" color="#3498DB" />
             ) : (
               <>
-                {/* Banner di successo */}
                 <Animated.View style={[ExpensesStyles.successBanner, { opacity: successBannerOpacity }]}>
                   <Text style={ExpensesStyles.successText}>Entrata inserita con successo!</Text>
                 </Animated.View>
 
-                {/* Banner di errore */}
                 <Animated.View style={[ExpensesStyles.errorBanner, { opacity: errorBannerOpacity }]}>
                   <Text style={ExpensesStyles.errorText}>Errore nell'inserimento!</Text>
                 </Animated.View>
 
-                <TextInput
-                  style={[
-                    ExpensesStyles.input,
-                    errorFields.amount && ExpensesStyles.errorInput,
-                  ]}
-                  placeholder="Importo (€) *"
-                  keyboardType="numeric"
-                  value={amount}
-                  onChangeText={setAmount}
-                />
+                {/* Floating Label - Amount */}
+                <View style={ExpensesStyles.inputWrapper}>
+                  {(amount.length > 0 || amountFocused) && (
+                    <Text style={ExpensesStyles.floatingLabel}>Importo (€) *</Text>
+                  )}
+                  <TextInput
+                    style={[
+                      ExpensesStyles.input,
+                      errorFields.amount && ExpensesStyles.errorInput,
+                    ]}
+                    onFocus={() => setAmountFocused(true)}
+                    onBlur={() => setAmountFocused(false)}
+                    keyboardType="numeric"
+                    value={amount}
+                    onChangeText={setAmount}
+                    placeholder={amount.length > 0 || amountFocused ? "" : "Importo (€) *"}
+                  />
+                </View>
                 {errorFields.amount && <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>}
 
-                <TextInput
-                  style={[
-                    ExpensesStyles.input,
-                    errorFields.description && ExpensesStyles.errorInput,
-                  ]}
-                  placeholder="Descrizione *"
-                  value={description}
-                  onChangeText={setDescription}
-                />
+                {/* Floating Label - Description */}
+                <View style={ExpensesStyles.inputWrapper}>
+                  {(description.length > 0 || descriptionFocused) && (
+                    <Text style={ExpensesStyles.floatingLabel}>Descrizione *</Text>
+                  )}
+                  <TextInput
+                    style={[
+                      ExpensesStyles.input,
+                      errorFields.description && ExpensesStyles.errorInput,
+                    ]}
+                    onFocus={() => setDescriptionFocused(true)}
+                    onBlur={() => setDescriptionFocused(false)}
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder={description.length > 0 || descriptionFocused ? "" : "Descrizione *"}
+                  />
+                </View>
                 {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}
 
-                <Text style={ExpensesStyles.label}>Seleziona il tipo: *</Text>
-                <FilterSelector selectedFilters={selectedType} setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])} filterType="entrate"/>
+                <FilterSelector
+                  selectedFilters={selectedType}
+                  setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])}
+                  filterType="entrate"
+                />
                 {errorFields.selectedType && <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>}
 
                 <Text style={ExpensesStyles.label}>Seleziona la data:</Text>
@@ -201,10 +219,11 @@ const InsertExpensesScreen = () => {
                 <TouchableOpacity style={[ExpensesStyles.button, loading && { opacity: 0.6 }]} onPress={handleSubmit} disabled={loading}>
                   <Text style={ExpensesStyles.buttonText}>{loading ? "Invio..." : "Inserisci Entrata"}</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={ExpensesStyles.linkButton}
                   onPress={() => navigation.navigate("IncomesView")}
-                  >
+                >
                   <Text style={ExpensesStyles.linkButtonText}>📊 Visualizza le Entrate</Text>
                 </TouchableOpacity>
               </>
