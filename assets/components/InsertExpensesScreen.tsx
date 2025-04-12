@@ -13,7 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-import ExpensesStyles from "../styles/ExpensesInsert_style";
+import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
 const API_URL = "http://192.168.1.5:5000/api/v1/expenses/insert";

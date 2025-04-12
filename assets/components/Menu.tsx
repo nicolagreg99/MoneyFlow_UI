@@ -127,7 +127,6 @@ const MenuScreen = () => {
               <Text style={MenuStyles.username}>{userData.username}</Text>
               <Text style={MenuStyles.email}>{userData.email}</Text>
             </View>
-
             <TouchableOpacity 
               style={MenuStyles.settingsButton} 
               onPress={() => navigation.navigate("EditUser")}
@@ -141,26 +140,24 @@ const MenuScreen = () => {
             <TouchableOpacity style={MenuStyles.menuItem} onPress={() => navigation.navigate("Main")}>
               <FontAwesome name="home" size={24} color="#FFF" />
               <Text style={[MenuStyles.menuText, { marginLeft: 4 }]}>Home</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
 
-            <TouchableOpacity
-              style={MenuStyles.menuItem}
-              onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
-            >
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+            <View style={MenuStyles.menuItem}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+                onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
+              >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <MaterialIcons name="attach-money" size={24} color="#FFF" />
-                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Spese</Text> {/* Spazio tra icona e testo */}
+                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Spese</Text>
                 </View>
                 <MaterialIcons 
                   name={showExpensesSubMenu ? "expand-less" : "expand-more"} 
                   size={24} 
                   color="#FFF" 
                 />
-              </View>
-            </TouchableOpacity>
-
-
+              </TouchableOpacity>
+            </View>
 
             {showExpensesSubMenu && (
               <View style={MenuStyles.subMenuContainer}>
@@ -182,23 +179,22 @@ const MenuScreen = () => {
               </View>
             )}
 
-          <TouchableOpacity
-            style={MenuStyles.menuItem}
-            onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
-          >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <MaterialIcons name="account-balance-wallet" size={24} color="#FFF" />
-                <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Entrate</Text> {/* Spazio tra icona e testo */}
-              </View>
-              <MaterialIcons 
-                name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
-                size={24} 
-                color="#FFF" 
-              />
+            <View style={MenuStyles.menuItem}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+                onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialIcons name="account-balance-wallet" size={24} color="#FFF" />
+                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Entrate</Text>
+                </View>
+                <MaterialIcons 
+                  name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
+                  size={24} 
+                  color="#FFF" 
+                />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-
 
             {showIncomesSubMenu && (
               <View style={MenuStyles.subMenuContainer}>
