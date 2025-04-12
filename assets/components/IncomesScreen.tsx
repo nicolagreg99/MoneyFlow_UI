@@ -4,7 +4,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import IncomesStyle from "../styles/Incomes_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
@@ -33,6 +33,7 @@ const IncomesScreen = () => {
     Investimenti: "#4BC0C0",
     Regalo: "#FF6384",
     Extra: "#36A2EB",
+
     Altro: "#AAAAAA",
   };
 
@@ -60,15 +61,20 @@ const IncomesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato");
+        setError("Token non trovato. Effettua nuovamente il login.");
         setLoading(false);
         return;
       }
 
       const params = buildQueryParams();
+
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total?${params}`, { headers: { "x-access-token": token } }),
-        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total_by_category?${params}`, { headers: { "x-access-token": token } })
+        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total?${params}`, {
+          headers: { "x-access-token": token },
+        }),
+        axios.get(`http://192.168.1.5:5000/api/v1/incomes/total_by_category?${params}`, {
+          headers: { "x-access-token": token },
+        }),
       ]);
 
       setTotalIncomes(parseFloat(totalResponse.data.total) || 0);
@@ -86,20 +92,20 @@ const IncomesScreen = () => {
       }
     } catch (error) {
       console.error("Errore durante la richiesta:", error.response?.data || error.message);
-      setError("Errore nel recupero dei dati");
+      setError("Errore nel recupero dei dati. Controlla la tua connessione.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  const fetchIncomesList = async () => {
+  const fetchTransactionList = async () => {
     setLoading(true);
     setError(null);
 
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato");
+        setError("Token non trovato. Effettua nuovamente il login.");
         setLoading(false);
         return;
       }
@@ -111,17 +117,16 @@ const IncomesScreen = () => {
 
       if (response.data && Array.isArray(response.data)) {
         setTransactions(response.data);
-        setModalVisible(true);
       } else {
         setTransactions([]);
-        setError("Nessuna entrata trovata per il periodo selezionato.");
+        setError("Nessuna transazione trovata per il periodo selezionato.");
       }
     } catch (error) {
-      console.error("Errore durante il recupero della lista delle entrate:", error.response?.data || error.message);
-      setError("Errore nel recupero dei dati della lista");
+      console.error("Errore durante il recupero delle transazioni:", error.response?.data || error.message);
+      setError("Errore nel recupero delle transazioni.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const deleteIncome = async (incomeId) => {
@@ -151,75 +156,97 @@ const IncomesScreen = () => {
     setSelectedFilters([]);
   };
 
+  const handleEdit = (income) => {
+    navigation.navigate("EditIncomes", { income });
+  };
+
   useEffect(() => {
-    fetchIncomesData();
-  }, [fromDate, toDate, selectedFilters]);
+    setModalVisible(false);
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchIncomesData();
+      fetchTransactionList();
+    }, [fromDate, toDate, selectedFilters])
+  );
 
   return (
-    <ScrollView contentContainerStyle={IncomesStyle.scrollContainer}>
-      <View style={IncomesStyle.container}>
-        
-        <View style={IncomesStyle.titleContainer}>
-          <Text style={IncomesStyle.title}>Gestione Entrate</Text>
-        </View>
-        
-        <View style={IncomesStyle.actionsContainer}>
-          <TouchableOpacity 
-            style={IncomesStyle.iconButton}
-            onPress={() => navigation.navigate("InsertIncomes")}
-          >
-            <Ionicons name="add-circle-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={IncomesStyle.iconButton}
-            onPress={fetchIncomesList}
-          >
-            <Ionicons name="list-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={IncomesStyle.refreshButton}
-            onPress={resetFilters}
-          >
-            <Ionicons name="refresh" size={30} color="#555" />
-          </TouchableOpacity>
-        </View>
+    <>
+      <ScrollView contentContainerStyle={IncomesStyle.scrollContainer}>
+        <View style={IncomesStyle.container}>
+          <View style={IncomesStyle.titleContainer}>
+            <Text style={IncomesStyle.title}>Gestione Entrate</Text>
+          </View>
 
-        <DateRangePicker 
-          fromDate={fromDate} 
-          setFromDate={setFromDate} 
-          toDate={toDate} 
-          setToDate={setToDate} 
+          <View style={IncomesStyle.actionsContainer}>
+            <TouchableOpacity
+              style={IncomesStyle.iconButton}
+              onPress={() => navigation.navigate("InsertIncomes")}
+            >
+              <Ionicons name="add-circle-outline" size={30} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={IncomesStyle.iconButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Ionicons name="list-outline" size={30} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={IncomesStyle.refreshButton}
+              onPress={resetFilters}
+            >
+              <Ionicons name="refresh" size={30} color="#555" />
+            </TouchableOpacity>
+          </View>
+
+          <DateRangePicker
+            fromDate={fromDate}
+            setFromDate={setFromDate}
+            toDate={toDate}
+            setToDate={setToDate}
+          />
+
+          <FilterSelector
+            selectedFilters={selectedFilters}
+            setSelectedFilters={setSelectedFilters}
+            filterType="entrate"
+          />
+
+          <View style={IncomesStyle.totalContainer}>
+            <Text style={IncomesStyle.totalText}>Totale Entrate</Text>
+            <Text style={IncomesStyle.totalAmount}>
+              {totalIncomes !== 0 ? `€${totalIncomes.toFixed(2)}` : "0,00 €"}
+            </Text>
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : error ? (
+            <Text style={IncomesStyle.errorText}>{error}</Text>
+          ) : chartData.length > 0 ? (
+            <PieChartGraph data={chartData} total={totalIncomes} />
+          ) : (
+            <Text style={IncomesStyle.noDataText}>Nessun dato disponibile</Text>
+          )}
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TransactionList
+          transactions={transactions}
+          onClose={() => setModalVisible(false)}
+          onDelete={deleteIncome}
+          onEdit={handleEdit}
+          transactionType="entrata" 
         />
-
-        <FilterSelector 
-          selectedFilters={selectedFilters} 
-          setSelectedFilters={setSelectedFilters} 
-          filterType="entrate" 
-        />
-
-        <View style={IncomesStyle.totalContainer}>
-          <Text style={IncomesStyle.totalText}>Totale entrate</Text>
-          <Text style={IncomesStyle.totalAmount}>
-            {totalIncomes !== 0 ? `€${totalIncomes.toFixed(2)}` : "0,00 €"}
-          </Text>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : error ? (
-          <Text style={IncomesStyle.errorText}>{error}</Text>
-        ) : chartData.length > 0 ? (
-          <PieChartGraph data={chartData} total={totalIncomes} />
-        ) : (
-          <Text style={IncomesStyle.noDataText}>Nessun dato disponibile</Text>
-        )}
-
-        <Modal visible={isModalVisible} animationType="slide" transparent={false}>
-          <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} onDelete={deleteIncome} />
-        </Modal>
-
-      </View>
-    </ScrollView>
+      </Modal>
+    </>
   );
 };
 

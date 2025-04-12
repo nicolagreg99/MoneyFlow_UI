@@ -20,7 +20,9 @@ import InsertIncomesScreen from "./assets/components/InsertIncomesScreen";
 import MenuScreen from "./assets/components/Menu";
 import UpdatePasswordScreen from "./assets/components/UpdatePassword";
 import EditUser from "./assets/components/EditUser";
-import EditExpensesScreen from "./assets/components/EditExpenseScreen";
+import EditExpenseScreen from "./assets/components/EditExpenseScreen";
+import EditIncomeScreen from "./assets/components/EditIncomeScreen";
+
 
 // Parametri delle schermate
 export type RootStackParamList = {
@@ -37,7 +39,7 @@ export type RootStackParamList = {
   IncomesView: undefined;
   EditUser: undefined;
   EditTransaction: { transaction: any };
-  EditExpenses: { transaction: any }; // ✅ Aggiunto
+  EditExpenses: { transaction: any };
 };
 
 export type BottomTabParamList = {
@@ -135,8 +137,13 @@ const App = () => {
         />
         <Stack.Screen 
           name="EditExpenses" 
-          component={EditExpensesScreen} 
+          component={EditExpenseScreen} 
           options={{ presentation: "modal", title: "Modifica Spesa" }} 
+        />
+        <Stack.Screen 
+          name="EditIncomes" 
+          component={EditIncomeScreen} 
+          options={{ presentation: "modal", title: "Modifica Entrata" }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

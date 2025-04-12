@@ -13,19 +13,19 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
+import IncomesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 
-const EditExpenseScreen = () => {
+const EditIncomeScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { expense } = route.params || {};
+  const { income } = route.params || {};
 
   // DEBUG LOGS
   console.log("== ROUTE PARAMS ==");
   console.log(route.params);
-  console.log("== EXPENSE OBJ ==");
-  console.log(expense);
+  console.log("== INCOME OBJ ==");
+  console.log(income);
 
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -44,19 +44,19 @@ const EditExpenseScreen = () => {
   const errorBannerOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!expense) {
-      console.error("❌ Errore: parametro 'expense' non trovato!");
+    if (!income) {
+      console.error("❌ Errore: parametro 'income' non trovato!");
       navigation.goBack();
       return;
     }
 
-    // Log valori expense
-    console.log("📦 Expense ricevuta:", expense);
+    // Log valori income
+    console.log("📦 Income ricevuta:", income);
 
-    setAmount(expense.valore?.toString() || "");
-    setDescription(expense.descrizione || "");
-    setSelectedType([expense.tipo]);
-    setDate(new Date(expense.giorno));
+    setAmount(income.valore?.toString() || "");
+    setDescription(income.descrizione || "");
+    setSelectedType([income.tipo]);
+    setDate(new Date(income.giorno));
 
     const fetchToken = async () => {
       const token = await AsyncStorage.getItem("authToken");
@@ -108,7 +108,7 @@ const EditExpenseScreen = () => {
       descrizione: description.trim(),
     };
 
-    const PATCH_URL = `http://192.168.1.5:5000/api/v1/edit_expense/${expense.id}`;
+    const PATCH_URL = `http://192.168.1.5:5000/api/v1/edit_income/${income.id}`;
 
     console.log("🔧 Invio PATCH a:", PATCH_URL);
     console.log("📤 Payload:", payload);
@@ -123,7 +123,7 @@ const EditExpenseScreen = () => {
         },
       });
 
-      console.log("✅ Spesa aggiornata con successo!");
+      console.log("✅ Entrata aggiornata con successo!");
       showBanner(successBannerOpacity);
       setTimeout(() => navigation.goBack(), 1500);
     } catch (error) {
@@ -135,37 +135,37 @@ const EditExpenseScreen = () => {
   };
 
   return (
-    <View style={ExpensesStyles.container}>
-      <Text style={ExpensesStyles.header}>Modifica Spesa</Text>
+    <View style={IncomesStyles.container}>
+      <Text style={IncomesStyles.header}>Modifica Entrata</Text>
 
       <TextInput
-        style={[ExpensesStyles.input, errorFields.amount && ExpensesStyles.errorInput]}
+        style={[IncomesStyles.input, errorFields.amount && IncomesStyles.errorInput]}
         placeholder="Importo (€) *"
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount}
       />
-      {errorFields.amount && <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>}
+      {errorFields.amount && <Text style={IncomesStyles.errorText}>Inserisci un importo!</Text>}
 
       <TextInput
-        style={[ExpensesStyles.input, errorFields.description && ExpensesStyles.errorInput]}
+        style={[IncomesStyles.input, errorFields.description && IncomesStyles.errorInput]}
         placeholder="Descrizione *"
         value={description}
         onChangeText={setDescription}
       />
-      {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}
+      {errorFields.description && <Text style={IncomesStyles.errorText}>Inserisci una descrizione!</Text>}
 
-      <Text style={ExpensesStyles.label}>Tipo *</Text>
+      <Text style={IncomesStyles.label}>Tipo *</Text>
       <FilterSelector
         selectedFilters={selectedType}
         setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])}
-        filterType="spese"
+        filterType="entrate"
       />
-      {errorFields.selectedType && <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>}
+      {errorFields.selectedType && <Text style={IncomesStyles.errorText}>Seleziona un tipo!</Text>}
 
-      <Text style={ExpensesStyles.label}>Data:</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={ExpensesStyles.datePickerButton}>
-        <Text style={ExpensesStyles.datePickerText}>{date.toLocaleDateString()}</Text>
+      <Text style={IncomesStyles.label}>Data:</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={IncomesStyles.datePickerButton}>
+        <Text style={IncomesStyles.datePickerText}>{date.toLocaleDateString()}</Text>
       </TouchableOpacity>
 
       {showDatePicker && (
@@ -178,24 +178,24 @@ const EditExpenseScreen = () => {
       )}
 
       <TouchableOpacity
-        style={[ExpensesStyles.button, loading && { opacity: 0.6 }]}
+        style={[IncomesStyles.button, loading && { opacity: 0.6 }]}
         onPress={handleSubmit}
         disabled={loading}
       >
-        <Text style={ExpensesStyles.buttonText}>
+        <Text style={IncomesStyles.buttonText}>
           {loading ? "Salvataggio..." : "Salva Modifiche"}
         </Text>
       </TouchableOpacity>
 
-      <Animated.View style={[ExpensesStyles.successBanner, { opacity: successBannerOpacity }]}>
-        <Text style={ExpensesStyles.successText}>✅ Spesa modificata!</Text>
+      <Animated.View style={[IncomesStyles.successBanner, { opacity: successBannerOpacity }]}>
+        <Text style={IncomesStyles.successText}>✅ Entrata modificata!</Text>
       </Animated.View>
 
-      <Animated.View style={[ExpensesStyles.errorBanner, { opacity: errorBannerOpacity }]}>
-        <Text style={ExpensesStyles.errorText}>Errore! Riprova più tardi.</Text>
+      <Animated.View style={[IncomesStyles.errorBanner, { opacity: errorBannerOpacity }]}>
+        <Text style={IncomesStyles.errorText}>Errore! Riprova più tardi.</Text>
       </Animated.View>
     </View>
   );
 };
 
-export default EditExpenseScreen;
+export default EditIncomeScreen;

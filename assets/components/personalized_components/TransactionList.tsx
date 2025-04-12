@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from "@react-navigation/native"; // ✅ per navigare
+import { useNavigation } from "@react-navigation/native";
 
-const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
+const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionType }) => {
   const [sortedTransactions, setSortedTransactions] = useState([]);
-  const [sortKey, setSortKey] = useState(null);
-  const [sortOrder, setSortOrder] = useState(null);
+  const [sortKey, setSortKey] = useState("giorno");
+  const [sortOrder, setSortOrder] = useState("desc");  
   const [editingTransaction, setEditingTransaction] = useState(null);
 
-  const navigation = useNavigation(); // ✅
+  const navigation = useNavigation();
 
   useEffect(() => {
     setSortedTransactions(sortTransactions(transactions, sortKey, sortOrder));
@@ -17,7 +17,6 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
 
   const sortTransactions = (data, key, order) => {
     if (!key) return data;
-
     return [...data].sort((a, b) => {
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
@@ -30,7 +29,6 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
 
       valueA = valueA.toString().toLowerCase();
       valueB = valueB.toString().toLowerCase();
-
       return order === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
   };
@@ -58,10 +56,13 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
   const handleEdit = (transaction) => {
     onClose();
     setTimeout(() => {
-      navigation.navigate("EditExpenses", { expense: transaction });
+      if (transactionType === "entrata") {
+        navigation.navigate("EditIncomes", { income: transaction });
+      } else {
+        navigation.navigate("EditExpenses", { expense: transaction });
+      }
     }, 300);
   };
-   
   
 
   const handleCancelEdit = () => {
@@ -80,7 +81,12 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
   };
 
   const renderSortIcon = (key) => (
-    <Icon name={sortKey === key ? (sortOrder === "asc" ? "sort-up" : "sort-down") : "sort"} size={12} color={sortKey === key ? "#007bff" : "#aaa"} style={{ marginLeft: 5 }} />
+    <Icon
+      name={sortKey === key ? (sortOrder === "asc" ? "sort-up" : "sort-down") : "sort"}
+      size={12}
+      color={sortKey === key ? "#007bff" : "#aaa"}
+      style={{ marginLeft: 5 }}
+    />
   );
 
   return (
@@ -96,7 +102,11 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
           ListHeaderComponent={() => (
             <View style={styles.headerRow}>
               {["descrizione", "tipo", "valore", "giorno"].map((key, index) => (
-                <TouchableOpacity key={index} style={[styles.headerCell, { flex: key === "valore" ? 1.5 : 2 }]} onPress={() => handleSort(key)}>
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.headerCell, { flex: key === "valore" ? 1.5 : 2 }]}
+                  onPress={() => handleSort(key)}
+                >
                   <Text style={styles.headerText}>
                     {key.charAt(0).toUpperCase() + key.slice(1)} {renderSortIcon(key)}
                   </Text>

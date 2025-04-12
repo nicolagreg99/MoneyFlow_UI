@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-  Modal,
+import { 
+  View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Modal 
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -93,7 +88,7 @@ const ExpensesScreen = () => {
         setChartData(formattedData);
       } else {
         setChartData([]);
-        setError("Nessun dato disponibile per il grafico.");
+        setError(chartResponse.data.messaggio || "Nessun dato disponibile");
       }
     } catch (error) {
       console.error("Errore durante la richiesta:", error.response?.data || error.message);
@@ -219,7 +214,7 @@ const ExpensesScreen = () => {
           />
 
           <View style={ExpensesStyles.totalContainer}>
-            <Text style={ExpensesStyles.totalText}>Totale spese</Text>
+            <Text style={ExpensesStyles.totalText}>Totale Spese</Text>
             <Text style={ExpensesStyles.totalAmount}>
               {totalExpenses !== 0 ? `€${totalExpenses.toFixed(2)}` : "0,00 €"}
             </Text>
@@ -248,10 +243,11 @@ const ExpensesScreen = () => {
           onClose={() => setModalVisible(false)}
           onDelete={deleteExpense}
           onEdit={handleEdit}
+          transactionType="spesa"
         />
       </Modal>
     </>
   );
 };
 
-export default ExpensesScreen;
+export default ExpensesScreen; 
