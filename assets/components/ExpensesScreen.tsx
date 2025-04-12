@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Modal 
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Modal,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import ExpensesStyles from "../styles/Expenses_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
@@ -69,10 +74,10 @@ const ExpensesScreen = () => {
       const params = buildQueryParams();
 
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`https://backend.money-app-api.com/api/v1/expenses/total?${params}`, {
+        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total?${params}`, {
           headers: { "x-access-token": token },
         }),
-        axios.get(`https://backend.money-app-api.com/api/v1/expenses/total_by_category?${params}`, {
+        axios.get(`http://192.168.1.5:5000/api/v1/expenses/total_by_category?${params}`, {
           headers: { "x-access-token": token },
         }),
       ]);
@@ -111,7 +116,7 @@ const ExpensesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`https://backend.money-app-api.com/api/v1/expenses/list?${params}`, {
+      const response = await axios.get(`http://192.168.1.5:5000/api/v1/expenses/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
@@ -136,12 +141,11 @@ const ExpensesScreen = () => {
         setError("Token non trovato. Effettua nuovamente il login.");
         return;
       }
-  
-      await axios.delete(`https://backend.money-app-api.com/api/v1/expenses/${expenseId}`, {
+
+      await axios.delete(`http://192.168.1.5:5000/api/v1/expenses/${expenseId}`, {
         headers: { "x-access-token": token },
       });
-  
-      // Aggiorna la lista dopo la cancellazione
+
       setTransactions((prevTransactions) =>
         prevTransactions.filter((transaction) => transaction.id !== expenseId)
       );
@@ -150,7 +154,6 @@ const ExpensesScreen = () => {
       setError("Errore durante la cancellazione della spesa.");
     }
   };
-  
 
   const resetFilters = () => {
     setFromDate(firstDayOfMonth);
@@ -158,77 +161,96 @@ const ExpensesScreen = () => {
     setSelectedFilters([]);
   };
 
+  const handleEdit = (expense) => {
+    navigation.navigate("EditExpenses", { expense });
+  };
+
   useEffect(() => {
-    fetchExpensesData();
-    fetchTransactionList();
-  }, [fromDate, toDate, selectedFilters]);
+    setModalVisible(false);
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchExpensesData();
+      fetchTransactionList();
+    }, [fromDate, toDate, selectedFilters])
+  );
 
   return (
-    <ScrollView contentContainerStyle={ExpensesStyles.scrollContainer}>
-      <View style={ExpensesStyles.container}>
-        
-        <View style={ExpensesStyles.titleContainer}>
-          <Text style={ExpensesStyles.title}>Gestione Spese</Text>
-        </View>
-        
-        <View style={ExpensesStyles.actionsContainer}>
-          <TouchableOpacity 
-            style={ExpensesStyles.iconButton}
-            onPress={() => navigation.navigate("InsertExpenses")}
-          >
-            <Ionicons name="add-circle-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={ExpensesStyles.iconButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Ionicons name="list-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={ExpensesStyles.refreshButton}
-            onPress={resetFilters}
-          >
-            <Ionicons name="refresh" size={30} color="#555" />
-          </TouchableOpacity>
-        </View>
-  
-        <DateRangePicker 
-          fromDate={fromDate} 
-          setFromDate={setFromDate} 
-          toDate={toDate} 
-          setToDate={setToDate} 
-        />
-  
-        <FilterSelector 
-          selectedFilters={selectedFilters} 
-          setSelectedFilters={setSelectedFilters} 
-          filterType="spese" 
-        />
-  
-        <View style={ExpensesStyles.totalContainer}>
-          <Text style={ExpensesStyles.totalText}>Totale spese</Text>
-          <Text style={ExpensesStyles.totalAmount}>
-            {totalExpenses !== 0 ? `€${totalExpenses.toFixed(2)}` : "0,00 €"}
-          </Text>
-        </View>
-  
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : error ? (
-          <Text style={ExpensesStyles.errorText}>{error}</Text>
-        ) : chartData.length > 0 ? (
-          <PieChartGraph data={chartData} total={totalExpenses} />
-        ) : (
-          <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
-        )}
-  
-        <Modal visible={isModalVisible} animationType="slide" transparent={false}>
-          <TransactionList transactions={transactions} onClose={() => setModalVisible(false)} onDelete={deleteExpense} />
-        </Modal>
+    <>
+      <ScrollView contentContainerStyle={ExpensesStyles.scrollContainer}>
+        <View style={ExpensesStyles.container}>
+          <View style={ExpensesStyles.titleContainer}>
+            <Text style={ExpensesStyles.title}>Gestione Spese</Text>
+          </View>
 
-        
-      </View>
-    </ScrollView>
+          <View style={ExpensesStyles.actionsContainer}>
+            <TouchableOpacity
+              style={ExpensesStyles.iconButton}
+              onPress={() => navigation.navigate("InsertExpenses")}
+            >
+              <Ionicons name="add-circle-outline" size={30} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={ExpensesStyles.iconButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Ionicons name="list-outline" size={30} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={ExpensesStyles.refreshButton}
+              onPress={resetFilters}
+            >
+              <Ionicons name="refresh" size={30} color="#555" />
+            </TouchableOpacity>
+          </View>
+
+          <DateRangePicker
+            fromDate={fromDate}
+            setFromDate={setFromDate}
+            toDate={toDate}
+            setToDate={setToDate}
+          />
+
+          <FilterSelector
+            selectedFilters={selectedFilters}
+            setSelectedFilters={setSelectedFilters}
+            filterType="spese"
+          />
+
+          <View style={ExpensesStyles.totalContainer}>
+            <Text style={ExpensesStyles.totalText}>Totale spese</Text>
+            <Text style={ExpensesStyles.totalAmount}>
+              {totalExpenses !== 0 ? `€${totalExpenses.toFixed(2)}` : "0,00 €"}
+            </Text>
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : error ? (
+            <Text style={ExpensesStyles.errorText}>{error}</Text>
+          ) : chartData.length > 0 ? (
+            <PieChartGraph data={chartData} total={totalExpenses} />
+          ) : (
+            <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
+          )}
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TransactionList
+          transactions={transactions}
+          onClose={() => setModalVisible(false)}
+          onDelete={deleteExpense}
+          onEdit={handleEdit}
+        />
+      </Modal>
+    </>
   );
 };
 

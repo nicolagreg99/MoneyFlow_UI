@@ -16,7 +16,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
         const token = await AsyncStorage.getItem('authToken'); // Recupera il token salvato
         if (!token) return;
 
-        const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
+        const response = await axios.get('http://192.168.1.5:5000/api/v1/me', {
           headers: { 'x-access-token': token }
         });
 

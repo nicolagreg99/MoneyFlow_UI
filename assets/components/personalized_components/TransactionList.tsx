@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useNavigation } from "@react-navigation/native"; // ✅ per navigare
 
-const TransactionList = ({ transactions, onClose, onDelete }) => {
+const TransactionList = ({ transactions, onClose, onDelete, onEdit }) => {
   const [sortedTransactions, setSortedTransactions] = useState([]);
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+
+  const navigation = useNavigation(); // ✅
 
   useEffect(() => {
     setSortedTransactions(sortTransactions(transactions, sortKey, sortOrder));
@@ -13,24 +17,23 @@ const TransactionList = ({ transactions, onClose, onDelete }) => {
 
   const sortTransactions = (data, key, order) => {
     if (!key) return data;
-  
+
     return [...data].sort((a, b) => {
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
-  
+
       if (key === "valore") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
         return order === "asc" ? valueA - valueB : valueB - valueA;
       }
-  
+
       valueA = valueA.toString().toLowerCase();
       valueB = valueB.toString().toLowerCase();
-      
+
       return order === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
   };
-  
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -50,6 +53,24 @@ const TransactionList = ({ transactions, onClose, onDelete }) => {
         { text: "Elimina", onPress: () => onDelete(id), style: "destructive" },
       ]
     );
+  };
+
+  const handleEdit = (transaction) => {
+    onClose();
+    setTimeout(() => {
+      navigation.navigate("EditExpenses", { expense: transaction });
+    }, 300);
+  };
+   
+  
+
+  const handleCancelEdit = () => {
+    setEditingTransaction(null);
+  };
+
+  const handleSaveEdit = async (updatedTransaction) => {
+    await onEdit(updatedTransaction);
+    setEditingTransaction(null);
   };
 
   const formatDate = (dateString) => {
@@ -92,9 +113,14 @@ const TransactionList = ({ transactions, onClose, onDelete }) => {
               <Text style={[styles.cell, { flex: 2 }]}>{item.tipo || "N/D"}</Text>
               <Text style={[styles.cell, { flex: 1.5 }]}>€{parseFloat(item.valore).toFixed(2)}</Text>
               <Text style={[styles.cell, { flex: 2 }]}>{formatDate(item.giorno)}</Text>
-              <TouchableOpacity style={styles.iconButton} onPress={() => handleDelete(item.id)}>
-                <Icon name="trash" size={16} color="red" />
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row", flex: 1, justifyContent: "space-around" }}>
+                <TouchableOpacity onPress={() => handleEdit(item)}>
+                  <Icon name="pencil" size={16} color="#007bff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                  <Icon name="trash" size={16} color="red" />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         />
@@ -111,12 +137,12 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     backgroundColor: "#f9f9f9",
-    paddingHorizontal: 10, // Ridotto il padding ai bordi
+    paddingHorizontal: 10,
     paddingVertical: 12,
     borderRadius: 8,
   },
   title: {
-    fontSize: 20, // Ridotta per recuperare spazio
+    fontSize: 20,
     fontWeight: "bold",
     color: "#1E3A8A",
     textAlign: "center",
@@ -130,7 +156,7 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: "row",
-    paddingVertical: 6, // Compattato
+    paddingVertical: 6,
     backgroundColor: "#e3e3e3",
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
@@ -142,38 +168,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerText: {
-    fontSize: 12, // Ridotto leggermente
+    fontSize: 12,
     fontWeight: "bold",
     color: "#007bff",
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 8, // Ridotto per recuperare spazio
+    paddingVertical: 8,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     alignItems: "center",
   },
   cell: {
-    fontSize: 13, // Compattato leggermente
+    fontSize: 13,
     color: "#444",
     textAlign: "center",
   },
   iconButton: {
     flex: 1,
     alignItems: "center",
-    padding: 4, // Meno ingombrante
+    padding: 4,
   },
   closeButton: {
     marginTop: 12,
-    padding: 8, // Ridotto
+    padding: 8,
     backgroundColor: "#007bff",
     borderRadius: 8,
     alignItems: "center",
   },
   closeButtonText: {
     color: "#fff",
-    fontSize: 14, // Più compatto
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

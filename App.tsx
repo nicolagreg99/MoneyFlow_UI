@@ -7,6 +7,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Screens
 import LoginForm from "./assets/components/LoginForm";
 import RegisterPersonalInfo from "./assets/components/RegisterPersonalInfo";
 import RegisterPreferences from "./assets/components/RegisterPreferences";
@@ -18,9 +19,10 @@ import IncomesScreen from "./assets/components/IncomesScreen";
 import InsertIncomesScreen from "./assets/components/InsertIncomesScreen";
 import MenuScreen from "./assets/components/Menu";
 import UpdatePasswordScreen from "./assets/components/UpdatePassword";
-import EditUser from "./assets/components/EditUser"; // 👈 Import EditUser
+import EditUser from "./assets/components/EditUser";
+import EditExpensesScreen from "./assets/components/EditExpenseScreen";
 
-// Definizione dei tipi di parametri per le schermate
+// Parametri delle schermate
 export type RootStackParamList = {
   Login: undefined;
   RegisterPersonalInfo: undefined;
@@ -33,7 +35,9 @@ export type RootStackParamList = {
   InsertIncomes: undefined;
   ExpensesView: undefined;
   IncomesView: undefined;
-  EditUser: undefined;  
+  EditUser: undefined;
+  EditTransaction: { transaction: any };
+  EditExpenses: { transaction: any }; // ✅ Aggiunto
 };
 
 export type BottomTabParamList = {
@@ -45,14 +49,14 @@ export type BottomTabParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-// Pulsante Menu
+// Pulsante per accedere al Menu
 const MenuButton = ({ navigation }: any) => (
   <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate("Menu")}>
     <Icon name="menu" size={28} color="#3498DB" />
   </TouchableOpacity>
 );
 
-// Navigatore per i tab principali
+// Navigatore per la parte bassa (Home, Spese, Entrate)
 const MainTabs = ({ navigation }: any) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -71,6 +75,7 @@ const MainTabs = ({ navigation }: any) => (
   </Tab.Navigator>
 );
 
+// App principale
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -127,6 +132,11 @@ const App = () => {
             title: "Modifica Profilo", 
             headerRight: () => <MenuButton navigation={navigation} /> 
           })}
+        />
+        <Stack.Screen 
+          name="EditExpenses" 
+          component={EditExpensesScreen} 
+          options={{ presentation: "modal", title: "Modifica Spesa" }} 
         />
       </Stack.Navigator>
     </NavigationContainer>
