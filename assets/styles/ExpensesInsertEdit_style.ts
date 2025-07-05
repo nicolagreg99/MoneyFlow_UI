@@ -99,12 +99,11 @@ const ExpensesStyles = StyleSheet.create({
     shadowRadius: 4,
   },
   errorText: {
-    color: "#fff",
+    color: 'red',
     fontSize: 16,
     fontWeight: "bold",
   },
 
-  // ⚠️ Stile per campi errati
   errorInput: {
     borderColor: "#E74C3C",
   },

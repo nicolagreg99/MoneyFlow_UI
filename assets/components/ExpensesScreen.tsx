@@ -46,13 +46,29 @@ const ExpensesScreen = () => {
     }
   };
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const buildQueryParams = () => {
     let params = new URLSearchParams();
-    params.append("from_date", fromDate.toISOString().split("T")[0]);
-    params.append("to_date", toDate.toISOString().split("T")[0]);
+    const formattedFromDate = formatDate(fromDate);
+    const formattedToDate = formatDate(toDate);
+
+    params.append("from_date", formattedFromDate);
+    params.append("to_date", formattedToDate);
     selectedFilters.forEach((filter) => params.append("tipo", filter));
-    return params.toString();
+
+    const queryString = params.toString();
+
+    console.log("Query Params:", queryString);
+
+    return queryString;
   };
+
 
   const fetchExpensesData = async () => {
     setLoading(true);
