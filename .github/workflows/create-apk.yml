@@ -9,8 +9,7 @@ env:
   EAS_PROFILE: preview
 
 jobs:
-  build:
-    name: Build Android APK
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm ci
+          node-version: '18'
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
@@ -33,3 +29,4 @@ jobs:
 
       - name: Build Android APK with profile ${{ env.EAS_PROFILE }}
         run: eas build --platform android --profile $EAS_PROFILE --non-interactive
+
