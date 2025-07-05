@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ChevronDown, ChevronUp, Calendar } from 'lucide-react-native';
+import { Feather } from '@expo/vector-icons';
 import ExpensesStyles from '../../styles/Expenses_style';
 
 const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
@@ -40,10 +40,14 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
         onPress={() => setExpanded(!expanded)}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Calendar size={20} color="#555" style={{ marginRight: 8 }} />
+          <Feather name="calendar" size={20} color="#555" style={{ marginRight: 8 }} />
           <Text style={ExpensesStyles.accordionTitle}>Seleziona Date</Text>
         </View>
-        {expanded ? <ChevronUp size={20} color="#555" /> : <ChevronDown size={20} color="#555" />}
+        {expanded ? (
+          <Feather name="chevron-up" size={20} color="#555" />
+        ) : (
+          <Feather name="chevron-down" size={20} color="#555" />
+        )}
       </TouchableOpacity>
 
       {/* CONTENITORE DATE */}
@@ -55,9 +59,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
             style={ExpensesStyles.datePickerBox}
             onPress={() => setShowFromPicker(true)}
           >
-            <Text style={ExpensesStyles.dateText}>
-              {formatDate(fromDate)}
-            </Text>
+            <Text style={ExpensesStyles.dateText}>{formatDate(fromDate)}</Text>
           </TouchableOpacity>
 
           {showFromPicker && (
@@ -75,9 +77,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
             style={ExpensesStyles.datePickerBox}
             onPress={() => setShowToPicker(true)}
           >
-            <Text style={ExpensesStyles.dateText}>
-              {formatDate(toDate)}
-            </Text>
+            <Text style={ExpensesStyles.dateText}>{formatDate(toDate)}</Text>
           </TouchableOpacity>
 
           {showToPicker && (

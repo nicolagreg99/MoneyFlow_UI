@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from 'react-native';
-import { CheckSquare, Square } from 'lucide-react-native';
+import { Feather } from '@expo/vector-icons';
 import ExpensesStyles from '../../styles/Expenses_style';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +13,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = await AsyncStorage.getItem('authToken'); // Recupera il token salvato
+        const token = await AsyncStorage.getItem('authToken');
         if (!token) return;
 
         const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
@@ -78,9 +78,9 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
                     onPress={() => toggleFilter(item)}
                   >
                     {selectedFilters.includes(item) ? (
-                      <CheckSquare size={22} color="#16A085" />
+                      <Feather name="check-square" size={22} color="#16A085" />
                     ) : (
-                      <Square size={22} color="#666" />
+                      <Feather name="square" size={22} color="#666" />
                     )}
                     <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
                   </TouchableOpacity>
