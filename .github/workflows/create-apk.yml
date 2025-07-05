@@ -5,8 +5,12 @@ on:
     tags:
       - '*'
 
+env:
+  EAS_PROFILE: preview
+
 jobs:
-  build-apk:
+  build:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -16,13 +20,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # - name: Authenticate with Expo
-      #   run: eas login --token ${{ secrets.EXPO_TOKEN }}
+      - name: Authenticate with Expo
+        run: eas login --token ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build APK (preview profile)
-        run: eas build -p android --profile preview --non-interactive
+      - name: Build Android APK with profile ${{ env.EAS_PROFILE }}
+        run: eas build --platform android --profile $EAS_PROFILE --non-interactive
