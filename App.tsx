@@ -6,6 +6,9 @@ import { TouchableOpacity } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen"; 
+
+SplashScreen.preventAutoHideAsync();
 
 // Screens
 import LoginForm from "./assets/components/LoginForm";
@@ -23,8 +26,6 @@ import EditUser from "./assets/components/EditUser";
 import EditExpenseScreen from "./assets/components/EditExpenseScreen";
 import EditIncomeScreen from "./assets/components/EditIncomeScreen";
 
-
-// Parametri delle schermate
 export type RootStackParamList = {
   Login: undefined;
   RegisterPersonalInfo: undefined;
@@ -51,14 +52,12 @@ export type BottomTabParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-// Pulsante per accedere al Menu
 const MenuButton = ({ navigation }: any) => (
   <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate("Menu")}>
     <Icon name="menu" size={28} color="#3498DB" />
   </TouchableOpacity>
 );
 
-// Navigatore per la parte bassa (Home, Spese, Entrate)
 const MainTabs = ({ navigation }: any) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -79,19 +78,27 @@ const MainTabs = ({ navigation }: any) => (
 
 // App principale
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
+        await new Promise(resolve => setTimeout(resolve, 1000));
         setIsAuthenticated(!!token);
       } catch (error) {
         console.error("Errore nel recupero del token:", error);
+        setIsAuthenticated(false);
+      } finally {
+        await SplashScreen.hideAsync(); 
       }
     };
     checkAuth();
   }, []);
+
+  if (isAuthenticated === null) {
+    return null;
+  }
 
   return (
     <NavigationContainer>
