@@ -96,6 +96,31 @@ const MainPage = () => {
 
   const data = [
     {
+      key: 'widgets',
+      component: (
+        <View style={MainStyles.section}>
+          <Text style={MainStyles.widgetTitle}>📌 Riepilogo Annuale</Text>
+          <View style={MainStyles.widgetsContainer}>
+            <StatsWidget
+              title="Totale Entrate"
+              value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`}
+              icon="📊"
+            />
+            <StatsWidget
+              title="Totale Spese"
+              value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`}
+              icon="💰"
+            />
+            <StatsWidget
+              title="Bilancio Netto"
+              value={`€${(entrate.reduce((a, b) => a + b, 0) - spese.reduce((a, b) => a + b, 0)).toFixed(2)}`}
+              icon="📈"
+            />
+          </View>
+        </View>
+      ),
+    },
+    {
       key: 'chart',
       component: (
         <View style={MainStyles.section}>
@@ -115,31 +140,6 @@ const MainPage = () => {
               valore: (entrate[labels.indexOf(mese)] || 0) - (spese[labels.indexOf(mese)] || 0),
             }))}
           />
-        </View>
-      ),
-    },
-    {
-      key: 'widgets',
-      component: (
-        <View style={MainStyles.section}>
-          <Text style={MainStyles.widgetTitle}>📌 Riepilogo Annuale</Text>
-          <View style={MainStyles.widgetsContainer}>
-            <StatsWidget
-              title="Totale Spese"
-              value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`}
-              icon="💰"
-            />
-            <StatsWidget
-              title="Totale Entrate"
-              value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`}
-              icon="📊"
-            />
-            <StatsWidget
-              title="Bilancio Netto"
-              value={`€${(entrate.reduce((a, b) => a + b, 0) - spese.reduce((a, b) => a + b, 0)).toFixed(2)}`}
-              icon="📈"
-            />
-          </View>
         </View>
       ),
     }

@@ -47,7 +47,7 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
             ],
           }}
           width={chartWidth}
-          height={300}
+          height={330}
           fromZero
           yAxisLabel="€"
           yAxisInterval={1}
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   customLabelsContainer: {
     position: 'absolute',
-    top: 270,
+    top: 300,
     flexDirection: 'row',
     height: 40,
   },

@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 
-const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionType }) => {
+const TransactionList = ({
+  transactions,
+  onClose,
+  onDelete,
+  onEdit,
+  transactionType,
+}) => {
   const [sortedTransactions, setSortedTransactions] = useState([]);
   const [sortKey, setSortKey] = useState("giorno");
-  const [sortOrder, setSortOrder] = useState("desc");  
+  const [sortOrder, setSortOrder] = useState("desc");
   const [editingTransaction, setEditingTransaction] = useState(null);
 
   const navigation = useNavigation();
@@ -29,7 +42,9 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionT
 
       valueA = valueA.toString().toLowerCase();
       valueB = valueB.toString().toLowerCase();
-      return order === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      return order === "asc"
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
     });
   };
 
@@ -42,14 +57,23 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionT
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, descrizione, valore, tipo) => {
+    const message = `
+Descrizione: ${descrizione || "Senza descrizione"}
+Valore: €${parseFloat(valore).toFixed(2)}
+Tipo: ${tipo || "N/D"}
+
+❗ Questa operazione è irreversibile. Procedere con l'eliminazione?
+    `.trim();
+
     Alert.alert(
       "Conferma Eliminazione",
-      "Sei sicuro di voler eliminare questa transazione?",
+      message,
       [
         { text: "Annulla", style: "cancel" },
         { text: "Elimina", onPress: () => onDelete(id), style: "destructive" },
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
@@ -63,7 +87,6 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionT
       }
     }, 300);
   };
-  
 
   const handleCancelEdit = () => {
     setEditingTransaction(null);
@@ -127,7 +150,7 @@ const TransactionList = ({ transactions, onClose, onDelete, onEdit, transactionT
                 <TouchableOpacity onPress={() => handleEdit(item)}>
                   <Icon name="pencil" size={16} color="#007bff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                <TouchableOpacity onPress={() => handleDelete(item.id, item.descrizione, item.valore, item.tipo)}>
                   <Icon name="trash" size={16} color="red" />
                 </TouchableOpacity>
               </View>
@@ -194,11 +217,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#444",
     textAlign: "center",
-  },
-  iconButton: {
-    flex: 1,
-    alignItems: "center",
-    padding: 4,
   },
   closeButton: {
     marginTop: 12,

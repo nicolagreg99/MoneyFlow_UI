@@ -4,7 +4,7 @@ const MainStyles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#f5f5f5',
-    paddingVertical: 20, // sopra e sotto
+    paddingBottom: 20, // sopra e sotto
     paddingHorizontal: 20, // a sinistra e destra
   },
   header: {
