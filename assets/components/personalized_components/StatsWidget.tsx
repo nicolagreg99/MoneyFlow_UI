@@ -12,7 +12,7 @@ const StatsWidget: React.FC<StatsWidgetProps> = ({ title, value, icon }) => {
   return (
     <View style={MainStyles.widget}>
       <Text style={MainStyles.widgetIcon}>{icon}</Text>
-      <Text style={MainStyles.widgetTitle}>{title}</Text>
+      <Text style={MainStyles.widgetName}>{title}</Text>
       <Text style={MainStyles.widgetValue}>{value}</Text>
     </View>
   );

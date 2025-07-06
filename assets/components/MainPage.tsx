@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ActivityIndicator, Alert, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import MainStyles from '../styles/Main_style';
 import LineChartComponent from './personalized_components/LineChartComponent';
 import StatsWidget from './personalized_components/StatsWidget';
@@ -31,58 +31,60 @@ const MainPage = () => {
     return mesiDinamici;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const token = await AsyncStorage.getItem('authToken');
-        if (!token) {
-          Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
-          navigation.navigate("Login");
-          return;
-        }
-
-        const headers = { "x-access-token": token };
-
-        const [speseRes, entrateRes, balanceRes] = await Promise.all([
-          fetch(API_SPESA, { headers }),
-          fetch(API_ENTRATE, { headers }),
-          fetch(API_BILANCIO, { headers })
-        ]);
-
-        if (speseRes.status === 401 || entrateRes.status === 401 || balanceRes.status === 401) {
-          Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
-          await AsyncStorage.removeItem('authToken');
-          navigation.navigate("Login");
-          return;
-        }
-
-        if (!speseRes.ok || !entrateRes.ok || !balanceRes.ok) {
-          throw new Error("Errore nel recupero dei dati");
-        }
-
-        const speseData = await speseRes.json();
-        const entrateData = await entrateRes.json();
-        const balanceData = await balanceRes.json();
-
-        const mesiDinamici = getLast12Months();
-        const speseMapped = mesiDinamici.map(mese => speseData[mese] || 0);
-        const entrateMapped = mesiDinamici.map(mese => entrateData[mese] || 0);
-
-        setLabels(mesiDinamici);
-        setSpese(speseMapped);
-        setEntrate(entrateMapped);
-        setBalances(balanceData);
-      } catch (error: any) {
-        Alert.alert("Errore", error.message);
-        console.error(error);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
+        navigation.navigate("Login");
+        return;
       }
-    };
 
-    fetchData();
-  }, []);
+      const headers = { "x-access-token": token };
+
+      const [speseRes, entrateRes, balanceRes] = await Promise.all([
+        fetch(API_SPESA, { headers }),
+        fetch(API_ENTRATE, { headers }),
+        fetch(API_BILANCIO, { headers })
+      ]);
+
+      if (speseRes.status === 401 || entrateRes.status === 401 || balanceRes.status === 401) {
+        Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
+        await AsyncStorage.removeItem('authToken');
+        navigation.navigate("Login");
+        return;
+      }
+
+      if (!speseRes.ok || !entrateRes.ok || !balanceRes.ok) {
+        throw new Error("Errore nel recupero dei dati");
+      }
+
+      const speseData = await speseRes.json();
+      const entrateData = await entrateRes.json();
+      const balanceData = await balanceRes.json();
+
+      const mesiDinamici = getLast12Months();
+      const speseMapped = mesiDinamici.map(mese => speseData[mese] || 0);
+      const entrateMapped = mesiDinamici.map(mese => entrateData[mese] || 0);
+
+      setLabels(mesiDinamici);
+      setSpese(speseMapped);
+      setEntrate(entrateMapped);
+      setBalances(balanceData);
+    } catch (error: any) {
+      Alert.alert("Errore", error.message);
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -93,42 +95,54 @@ const MainPage = () => {
   }
 
   const data = [
-    { key: 'chart', component: <LineChartComponent labels={labels} entrate={entrate} spese={spese} /> },
+    {
+      key: 'chart',
+      component: (
+        <View style={MainStyles.section}>
+          <LineChartComponent labels={labels} entrate={entrate} spese={spese} />
+        </View>
+      ),
+    },
     {
       key: 'table',
       component: (
-        <MonthlyBalanceTable
-          balances={labels.map(mese => ({
-            mese,
-            entrate: entrate[labels.indexOf(mese)] || 0,
-            spese: spese[labels.indexOf(mese)] || 0,
-            valore: (entrate[labels.indexOf(mese)] || 0) - (spese[labels.indexOf(mese)] || 0),
-          }))}
-        />
+        <View style={MainStyles.section}>
+          <MonthlyBalanceTable
+            balances={labels.map(mese => ({
+              mese,
+              entrate: entrate[labels.indexOf(mese)] || 0,
+              spese: spese[labels.indexOf(mese)] || 0,
+              valore: (entrate[labels.indexOf(mese)] || 0) - (spese[labels.indexOf(mese)] || 0),
+            }))}
+          />
+        </View>
       ),
     },
-    // {
-    //   key: 'widgets',
-    //   component: (
-    //     <View style={MainStyles.widgetsContainer}>
-    //       <StatsWidget
-    //         title="Totale Spese"
-    //         value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`}
-    //         icon="💰"
-    //       />
-    //       <StatsWidget
-    //         title="Totale Entrate"
-    //         value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`}
-    //         icon="📊"
-    //       />
-    //       <StatsWidget
-    //         title="Bilancio Netto"
-    //         value={`€${(entrate.reduce((a, b) => a + b, 0) - spese.reduce((a, b) => a + b, 0)).toFixed(2)}`}
-    //         icon="📈"
-    //       />
-    //     </View>
-    //   ),
-    // },
+    {
+      key: 'widgets',
+      component: (
+        <View style={MainStyles.section}>
+          <Text style={MainStyles.widgetTitle}>📌 Riepilogo Annuale</Text>
+          <View style={MainStyles.widgetsContainer}>
+            <StatsWidget
+              title="Totale Spese"
+              value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`}
+              icon="💰"
+            />
+            <StatsWidget
+              title="Totale Entrate"
+              value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`}
+              icon="📊"
+            />
+            <StatsWidget
+              title="Bilancio Netto"
+              value={`€${(entrate.reduce((a, b) => a + b, 0) - spese.reduce((a, b) => a + b, 0)).toFixed(2)}`}
+              icon="📈"
+            />
+          </View>
+        </View>
+      ),
+    }
   ];
 
   return (

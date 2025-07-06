@@ -68,87 +68,106 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances }) =
   const renderSortIcon = (key: SortKey) => (
     <Icon
       name={sortKey === key ? (sortOrder === 'asc' ? 'sort-up' : 'sort-down') : 'sort'}
-      size={12}
-      color={sortKey === key ? '#007bff' : '#aaa'}
-      style={{ marginLeft: 4 }}
+      size={14}
+      color={sortKey === key ? '#007bff' : '#ccc'}
+      style={{ marginLeft: 6 }}
     />
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bilanci Mensili (Entrate - Spese)</Text>
+      <Text style={styles.title}>📅 Bilanci Mensili</Text>
 
-      <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('mese')}>
-          <Text style={styles.headerText}>Mese {renderSortIcon('mese')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('entrate')}>
-          <Text style={styles.headerText}>Entrate {renderSortIcon('entrate')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('spese')}>
-          <Text style={styles.headerText}>Spese {renderSortIcon('spese')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('valore')}>
-          <Text style={styles.headerText}>Bilancio {renderSortIcon('valore')}</Text>
-        </TouchableOpacity>
+      <View style={styles.table}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('mese')}>
+            <Text style={styles.headerText}>Mese {renderSortIcon('mese')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('entrate')}>
+            <Text style={styles.headerText}>Entrate {renderSortIcon('entrate')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('spese')}>
+            <Text style={styles.headerText}>Spese {renderSortIcon('spese')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('valore')}>
+            <Text style={styles.headerText}>Bilancio {renderSortIcon('valore')}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={sortedData}
+          keyExtractor={(item) => item.mese}
+          renderItem={({ item, index }) => (
+            <View style={[styles.row, index % 2 === 0 && styles.rowAlternate]}>
+              <Text style={styles.cell}>{item.mese}</Text>
+              <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>€{item.entrate.toFixed(2)}</Text>
+              <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>€{item.spese.toFixed(2)}</Text>
+              <Text style={[
+                styles.cell,
+                {
+                  textAlign: 'right',
+                  color: item.valore >= 0 ? '#27ae60' : '#c0392b',
+                  fontWeight: 'bold',
+                }
+              ]}>
+                €{item.valore.toFixed(2)}
+              </Text>
+            </View>
+          )}
+        />
       </View>
-
-      <FlatList
-        data={sortedData}
-        keyExtractor={(item) => item.mese}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.cell}>{item.mese}</Text>
-            <Text style={[styles.cell, { color: 'green', textAlign: 'right' }]}>€{item.entrate.toFixed(2)}</Text>
-            <Text style={[styles.cell, { color: 'red', textAlign: 'right' }]}>€{item.spese.toFixed(2)}</Text>
-            <Text style={[styles.cell, { textAlign: 'right', color: item.valore >= 0 ? 'green' : 'red' }]}>
-              €{item.valore.toFixed(2)}
-            </Text>
-          </View>
-        )}
-      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 8,   // padding sinistro
-    paddingRight: 8,  // padding destro bloccato
-    paddingBottom: 40,
-    flex: 1,
+    width: '100%',
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 12,
     textAlign: 'center',
-    color: '#000',
+    color: '#2c3e50',
+  },
+  table: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
   },
   headerRow: {
     flexDirection: 'row',
-    backgroundColor: '#e3e3e3',
+    backgroundColor: '#f0f4f7',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ddd',
   },
   headerCell: {
     flex: 1,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 10,
   },
   headerText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#007bff',
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#34495e',
   },
   row: {
     flexDirection: 'row',
-    paddingVertical: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     borderBottomWidth: 0.5,
-    borderColor: '#ccc',
+    borderColor: '#eee',
     alignItems: 'center',
+  },
+  rowAlternate: {
+    backgroundColor: '#fafafa',
   },
   cell: {
     flex: 1,

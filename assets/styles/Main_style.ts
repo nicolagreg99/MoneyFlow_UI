@@ -4,8 +4,8 @@ const MainStyles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#f5f5f5',
-    padding: 20,
-    alignItems: 'center',
+    paddingVertical: 20, // sopra e sotto
+    paddingHorizontal: 20, // a sinistra e destra
   },
   header: {
     fontSize: 24,
@@ -17,15 +17,15 @@ const MainStyles = StyleSheet.create({
   widgetsContainer: {
     width: '100%',
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 20, // Aggiungi margine superiore per distanziare i widget dal grafico
+    alignItems: 'center',
+    marginTop: 20,
     marginBottom: 20,
   },
   widget: {
-    width: '48%',
+    width: '32%',
     backgroundColor: 'white',
-    padding: 15,
+    padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     shadowColor: "#000",
@@ -33,22 +33,30 @@ const MainStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 15,
-  },
-  widgetIcon: {
-    fontSize: 30,
-    marginBottom: 5,
   },
   widgetTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-  },
-  widgetValue: {
+    textAlign: 'center',
+    marginTop: 20,
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  widgetIcon: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  widgetName: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    textAlign: 'center',
+  },
+  widgetValue: {
+    fontSize: 14, 
+    fontWeight: 'bold',
     color: '#3498DB',
-    marginTop: 5,
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 
