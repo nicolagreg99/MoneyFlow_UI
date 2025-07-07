@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard 
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import LoginStyles from "../styles/Login_style";
+import RegisterStyles from "../styles/Register_style";
 
 const RegisterPersonalInfo = () => {
   const [formData, setFormData] = useState({
@@ -19,10 +19,10 @@ const RegisterPersonalInfo = () => {
   const navigation = useNavigation();
 
   const validateForm = () => {
-    let newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
-    if (!formData.username) newErrors.username = "Il nome utente è obbligatorio";
-    if (!formData.email.includes("@")) newErrors.email = "L'email non è valida";
+    if (!formData.username.trim()) newErrors.username = "Il nome utente è obbligatorio";
+    if (!formData.email.trim() || !formData.email.includes("@")) newErrors.email = "Email non valida";
     if (formData.password.length < 6) newErrors.password = "Minimo 6 caratteri";
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Le password non coincidono";
 
@@ -31,67 +31,77 @@ const RegisterPersonalInfo = () => {
   };
 
   const handleNext = () => {
-    if (!validateForm()) return;
-    navigation.navigate("RegisterPreferences", { formData });
+    if (validateForm()) {
+      navigation.navigate("RegisterPreferences", { formData });
+    }
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} 
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={[LoginStyles.scrollContainer, { paddingHorizontal: 20, paddingTop: 40 }]}>
-          <Text style={LoginStyles.header}>Registrazione</Text>
+        <ScrollView contentContainerStyle={[RegisterStyles.scrollContainer, { padding: 20 }]}>
+          <Text style={RegisterStyles.header}>Registrazione</Text>
+          <Text style={RegisterStyles.subHeader}>Compila i campi obbligatori</Text>
 
           <TextInput
-            style={[LoginStyles.input, errors.username ? LoginStyles.errorBorder : null]}
+            style={[RegisterStyles.input, errors.username && RegisterStyles.errorBorder]}
             placeholder="Username *"
+            value={formData.username}
             onChangeText={(text) => setFormData({ ...formData, username: text })}
           />
-          {errors.username && <Text style={LoginStyles.formError}>{errors.username}</Text>}
+          {errors.username && <Text style={RegisterStyles.formError}>{errors.username}</Text>}
 
           <TextInput
-            style={[LoginStyles.input, errors.email ? LoginStyles.errorBorder : null]}
+            style={[RegisterStyles.input, errors.email && RegisterStyles.errorBorder]}
             placeholder="Email *"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={formData.email}
             onChangeText={(text) => setFormData({ ...formData, email: text })}
           />
-          {errors.email && <Text style={LoginStyles.formError}>{errors.email}</Text>}
+          {errors.email && <Text style={RegisterStyles.formError}>{errors.email}</Text>}
 
           <TextInput
-            style={[LoginStyles.input, errors.password ? LoginStyles.errorBorder : null]}
+            style={[RegisterStyles.input, errors.password && RegisterStyles.errorBorder]}
             placeholder="Password *"
             secureTextEntry
+            value={formData.password}
             onChangeText={(text) => setFormData({ ...formData, password: text })}
           />
-          {errors.password && <Text style={LoginStyles.formError}>{errors.password}</Text>}
+          {errors.password && <Text style={RegisterStyles.formError}>{errors.password}</Text>}
 
           <TextInput
-            style={[LoginStyles.input, errors.confirmPassword ? LoginStyles.errorBorder : null]}
+            style={[RegisterStyles.input, errors.confirmPassword && RegisterStyles.errorBorder]}
             placeholder="Conferma Password *"
             secureTextEntry
+            value={formData.confirmPassword}
             onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
           />
-          {errors.confirmPassword && <Text style={LoginStyles.formError}>{errors.confirmPassword}</Text>}
+          {errors.confirmPassword && <Text style={RegisterStyles.formError}>{errors.confirmPassword}</Text>}
 
           <TextInput
-            style={LoginStyles.input}
+            style={RegisterStyles.input}
             placeholder="Nome"
+            value={formData.first_name}
             onChangeText={(text) => setFormData({ ...formData, first_name: text })}
           />
 
           <TextInput
-            style={LoginStyles.input}
+            style={RegisterStyles.input}
             placeholder="Cognome"
+            value={formData.last_name}
             onChangeText={(text) => setFormData({ ...formData, last_name: text })}
           />
 
-          <TouchableOpacity style={LoginStyles.button} onPress={handleNext}>
-            <Text style={LoginStyles.buttonText}>Avanti</Text>
+          <TouchableOpacity style={RegisterStyles.button} onPress={handleNext}>
+            <Text style={RegisterStyles.buttonText}>Avanti</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={LoginStyles.link}>Hai già un account? Accedi</Text>
+            <Text style={RegisterStyles.link}>Hai già un account? Accedi</Text>
           </TouchableOpacity>
         </ScrollView>
       </TouchableWithoutFeedback>

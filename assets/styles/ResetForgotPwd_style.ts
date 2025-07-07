@@ -1,6 +1,6 @@
 import { StyleSheet, Platform } from 'react-native';
 
-const LoginStyles = StyleSheet.create({
+const ResetForgotPwd = StyleSheet.create({
   container: {
     width: '90%',
     flex: 1,
@@ -8,27 +8,16 @@ const LoginStyles = StyleSheet.create({
     alignSelf: 'center',
     paddingTop: Platform.OS === 'ios' ? 50 : 30,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingBottom: 20,
-  },
-  logo: {
-    width: 130,
-    height: 130,
-    alignSelf: 'center',
-    marginBottom: 20,
-    marginTop: 30,
-  },
   header: {
     fontSize: 28,
+    paddingBottom: 15,
     fontWeight: 'bold',
     color: '#2C3E50',
     textAlign: 'center',
     fontFamily: 'Roboto',
   },
   subHeader: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#7F8C8D',
     textAlign: 'center',
     marginBottom: 5,
@@ -66,34 +55,19 @@ const LoginStyles = StyleSheet.create({
     width: '100%',
     paddingRight: 40,
   },
-  eyeIconContainer: {
-    position: 'absolute',
-    right: 12,
-    top: '50%',
-    transform: [{ translateY: -12 }],
-  },
-  iconContainer: {
-    position: 'absolute',
-    right: 12,
-    top: '50%',
-    transform: [{ translateY: -12 }],
-  },
-  footer: {
-    marginTop: 30,
+  button: {
+    backgroundColor: '#3498DB',
+    paddingVertical: 14,
+    borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 15,
+    elevation: 4,
   },
-  footerText: {
-    fontSize: 14,
-    color: '#BDC3C7',
-    marginBottom: 8,
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
     fontFamily: 'Roboto',
-  },
-  formError: {
-    color: '#E74C3C',
-    marginTop: 5,
-    fontSize: 14,
-    textAlign: 'center',
   },
   link: {
     color: '#3498DB',
@@ -102,19 +76,6 @@ const LoginStyles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontFamily: 'Roboto',
   },
-  banner: {
-    padding: 12,
-    marginBottom: 15,
-    width: '100%',
-    textAlign: 'center',
-    borderRadius: 8,
-  },
-  bannerText: {
-    color: '#2ECC71',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
 });
 
-export default LoginStyles;
+export default ResetForgotPwd;

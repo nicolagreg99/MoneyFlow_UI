@@ -79,7 +79,6 @@ const LoginForm = () => {
       }
     } catch (error) {
       setFormErrors({ general: "Errore di connessione o credenziali non valide" });
-      setLoginStatus({ type: 'error', message: "Errore di connessione o credenziali non valide" });
     }
   };
 
@@ -95,7 +94,7 @@ const LoginForm = () => {
         >
           <View style={LoginStyles.container}>
             {loginStatus && (
-              <View style={[LoginStyles.banner, loginStatus.type === 'success' ? LoginStyles.successBanner : LoginStyles.errorBanner]}>
+              <View style={[LoginStyles.banner]}>
                 <Text style={LoginStyles.bannerText}>{loginStatus.message}</Text>
               </View>
             )}
@@ -118,17 +117,47 @@ const LoginForm = () => {
             <Text style={LoginStyles.subHeader}>Inserisci le tue credenziali per accedere alla tua dashboard personale</Text>
 
             <TextInput
-              style={LoginStyles.input}
+              style={{
+                borderWidth: 1,
+                borderColor: '#BDC3C7',
+                marginBottom: 15,
+                paddingHorizontal: 15,
+                fontSize: 16,
+                borderRadius: 10,
+                backgroundColor: '#fff',
+                shadowColor: '#000',
+                shadowOpacity: 0.1,
+                shadowRadius: 5,
+                elevation: 3,
+                height: 50,
+                width: '100%',
+              }}
               placeholder="Username"
+              placeholderTextColor="#7F8C8D"
               value={formValues.username}
               onChangeText={(text) => handleChange('username', text)}
             />
             <Text style={LoginStyles.formError}>{formErrors.username}</Text>
 
-            <View style={LoginStyles.passwordContainer}>
+            <View>
               <TextInput
-                style={LoginStyles.inputPassword}
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#BDC3C7',
+                  paddingHorizontal: 15,
+                  fontSize: 16,
+                  borderRadius: 10,
+                  backgroundColor: '#fff',
+                  shadowColor: '#000',
+                  shadowOpacity: 0.1,
+                  shadowRadius: 5,
+                  elevation: 3,
+                  height: 50,
+                  width: '100%',
+                  paddingRight: 40,
+                }}
                 placeholder="Password"
+                placeholderTextColor="#7F8C8D"
                 secureTextEntry={!showPassword}
                 value={formValues.password}
                 onChangeText={(text) => handleChange('password', text)}

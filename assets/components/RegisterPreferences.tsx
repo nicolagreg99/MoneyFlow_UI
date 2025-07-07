@@ -5,7 +5,7 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; 
 import axios from "axios";
-import LoginStyles from "../styles/Login_style";
+import RegisterStyles from "../styles/Register_style";
 
 const RegisterPreferences = () => {
   const route = useRoute();
@@ -106,63 +106,63 @@ const RegisterPreferences = () => {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={[LoginStyles.scrollContainer, { paddingHorizontal: 20, paddingTop: 40 }]}>
-          <Text style={LoginStyles.header}>Preferenze</Text>
+        <ScrollView contentContainerStyle={[RegisterStyles.scrollContainer, { paddingHorizontal: 20, paddingTop: 40 }]}>
+          <Text style={RegisterStyles.header}>Preferenze</Text>
 
           {/* Contenitore Spese */}
-          <View style={LoginStyles.sectionContainer}>
-            <Text style={LoginStyles.subHeader}>Categorie di spesa</Text>
+          <View style={RegisterStyles.sectionContainer}>
+            <Text style={RegisterStyles.subHeader}>Categorie di spesa</Text>
             {expenses.map((item, index) => (
-              <View key={index} style={LoginStyles.listItemContainer}>
-                <Text style={LoginStyles.listItem}>{item}</Text>
+              <View key={index} style={RegisterStyles.listItemContainer}>
+                <Text style={RegisterStyles.listItem}>{item}</Text>
                 <TouchableOpacity onPress={() => removeExpense(index)}>
                   <Ionicons name="trash-outline" size={20} color="red" />
                 </TouchableOpacity>
               </View>
             ))}
-            <View style={LoginStyles.inputContainer}>
+            <View style={RegisterStyles.inputContainer}>
               <TextInput 
-                style={LoginStyles.input} 
+                style={RegisterStyles.input} 
                 placeholder="Aggiungi nuova preferenza" 
                 value={newExpense} 
                 onChangeText={setNewExpense} 
               />
-              <TouchableOpacity style={LoginStyles.addButton} onPress={addExpense}>
-                <Text style={LoginStyles.buttonText}>+</Text>
+              <TouchableOpacity style={RegisterStyles.addButton} onPress={addExpense}>
+                <Text style={RegisterStyles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Contenitore Entrate */}
-          <View style={LoginStyles.sectionContainer}>
-          <Text style={LoginStyles.subHeader}>Categorie di entrate</Text>
+          <View style={RegisterStyles.sectionContainer}>
+          <Text style={RegisterStyles.subHeader}>Categorie di entrate</Text>
             {incomes.map((item, index) => (
-              <View key={index} style={LoginStyles.listItemContainer}>
-                <Text style={LoginStyles.listItem}>{item}</Text>
+              <View key={index} style={RegisterStyles.listItemContainer}>
+                <Text style={RegisterStyles.listItem}>{item}</Text>
                 <TouchableOpacity onPress={() => removeIncome(index)}>
                   <Ionicons name="trash-outline" size={20} color="red" />
                 </TouchableOpacity>
               </View>
             ))}
-            <View style={LoginStyles.inputContainer}>
+            <View style={RegisterStyles.inputContainer}>
               <TextInput 
-                style={LoginStyles.input} 
+                style={RegisterStyles.input} 
                 placeholder="Aggiungi nuova preferenza" 
                 value={newIncome} 
                 onChangeText={setNewIncome} 
               />
-              <TouchableOpacity style={LoginStyles.addButton} onPress={addIncome}>
-                <Text style={LoginStyles.buttonText}>+</Text>
+              <TouchableOpacity style={RegisterStyles.addButton} onPress={addIncome}>
+                <Text style={RegisterStyles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <TouchableOpacity style={LoginStyles.button} onPress={handleRegister}>
-            <Text style={LoginStyles.buttonText}>Completa Registrazione</Text>
+          <TouchableOpacity style={RegisterStyles.button} onPress={handleRegister}>
+            <Text style={RegisterStyles.buttonText}>Completa Registrazione</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={LoginStyles.link}>Hai già un account?</Text>
+            <Text style={RegisterStyles.link}>Hai già un account?</Text>
           </TouchableOpacity>
         </ScrollView>
       </TouchableWithoutFeedback>

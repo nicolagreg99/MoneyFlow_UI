@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import LoginStyles from '../styles/Login_style'; 
+import ResetForgotPwd from '../styles/ResetForgotPwd_style'; 
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
@@ -42,12 +42,12 @@ const ForgotPasswordScreen = () => {
   
 
   return (
-    <View style={LoginStyles.container}>
-      <Text style={LoginStyles.header}>Recupera la Password</Text>
-      <Text style={LoginStyles.subHeader}>Inserisci la tua email per ricevere il link di reset.</Text>
+    <View style={ResetForgotPwd.container}>
+      <Text style={ResetForgotPwd.header}>Recupera la Password</Text>
+      <Text style={ResetForgotPwd.subHeader}>Inserisci la tua email per ricevere il link di reset.</Text>
 
       <TextInput
-        style={LoginStyles.input}
+        style={ResetForgotPwd.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -55,17 +55,17 @@ const ForgotPasswordScreen = () => {
       />
 
       <TouchableOpacity
-        style={LoginStyles.button}
+        style={ResetForgotPwd.button}
         onPress={handlePasswordReset}
         disabled={loading}
       >
-        <Text style={LoginStyles.buttonText}>
+        <Text style={ResetForgotPwd.buttonText}>
           {loading ? 'Caricamento...' : 'Reset Password'}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={LoginStyles.link}>Torna alla pagina di login</Text>
+        <Text style={ResetForgotPwd.link}>Torna alla pagina di login</Text>
       </TouchableOpacity>
     </View>
   );
