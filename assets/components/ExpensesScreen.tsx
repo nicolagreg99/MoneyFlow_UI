@@ -11,6 +11,8 @@ import FilterSelector from "./personalized_components/FilterSelector";
 import PieChartGraph from "./personalized_components/PieChart";
 import TransactionList from "./personalized_components/TransactionList";
 import { Ionicons } from "@expo/vector-icons";
+import API from "../../config/api";
+
 
 const ExpensesScreen = () => {
   const navigation = useNavigation();
@@ -85,10 +87,10 @@ const ExpensesScreen = () => {
       const params = buildQueryParams();
 
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`https://backend.money-app-api.com/api/v1/expenses/total?${params}`, {
+        axios.get(`${API.BASE_URL}/api/v1/expenses/total?${params}`, {
           headers: { "x-access-token": token },
         }),
-        axios.get(`https://backend.money-app-api.com/api/v1/expenses/total_by_category?${params}`, {
+        axios.get(`${API.BASE_URL}/api/v1/expenses/total_by_category?${params}`, {
           headers: { "x-access-token": token },
         }),
       ]);
@@ -127,7 +129,7 @@ const ExpensesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`https://backend.money-app-api.com/api/v1/expenses/list?${params}`, {
+      const response = await axios.get(`${API.BASE_URL}/api/v1/expenses/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
@@ -153,7 +155,7 @@ const ExpensesScreen = () => {
         return;
       }
 
-      await axios.delete(`https://backend.money-app-api.com/api/v1/expenses/${expenseId}`, {
+      await axios.delete(`${API.BASE_URL}/api/v1/expenses/${expenseId}`, {
         headers: { "x-access-token": token },
       });
 

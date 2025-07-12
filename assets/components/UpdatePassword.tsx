@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert } from 'react-native';
 import { useLinking } from '@react-navigation/native';
+import API from "../../config/api";
 
 const UpdatePasswordScreen = ({ route, navigation }: any) => {
   const [password, setPassword] = useState('');
@@ -45,7 +46,7 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://backend.money-app-api.com/reset_password', {
+      const response = await fetch(`${API.BASE_URL}/reset_password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }), 

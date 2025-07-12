@@ -11,6 +11,7 @@ import FilterSelector from "./personalized_components/FilterSelector";
 import PieChartGraph from "./personalized_components/PieChart";
 import TransactionList from "./personalized_components/TransactionList";
 import { Ionicons } from "@expo/vector-icons";
+import API from "../../config/api";
 
 const IncomesScreen = () => {
   const navigation = useNavigation();
@@ -69,10 +70,10 @@ const IncomesScreen = () => {
       const params = buildQueryParams();
 
       const [totalResponse, chartResponse] = await Promise.all([
-        axios.get(`https://backend.money-app-api.com/api/v1/incomes/total?${params}`, {
+        axios.get(`${API.BASE_URL}/api/v1/incomes/total?${params}`, {
           headers: { "x-access-token": token },
         }),
-        axios.get(`https://backend.money-app-api.com/api/v1/incomes/total_by_category?${params}`, {
+        axios.get(`${API.BASE_URL}/api/v1/incomes/total_by_category?${params}`, {
           headers: { "x-access-token": token },
         }),
       ]);
@@ -111,7 +112,7 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`https://backend.money-app-api.com/api/v1/incomes/list?${params}`, {
+      const response = await axios.get(`${API.BASE_URL}/api/v1/incomes/list?${params}`, {
         headers: { "x-access-token": token },
       });
 
@@ -137,7 +138,7 @@ const IncomesScreen = () => {
         return;
       }
   
-      await axios.delete(`https://backend.money-app-api.com/api/v1/incomes/${incomeId}`, {
+      await axios.delete(`${API.BASE_URL}/api/v1/incomes/${incomeId}`, {
         headers: { "x-access-token": token },
       });
   

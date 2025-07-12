@@ -6,6 +6,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; 
 import axios from "axios";
 import RegisterStyles from "../styles/Register_style";
+import API from "../../config/api";
 
 const RegisterPreferences = () => {
   const route = useRoute();
@@ -66,7 +67,7 @@ const RegisterPreferences = () => {
   
       console.log("Payload inviato:", JSON.stringify(payload, null, 2));
   
-      const response = await axios.post("https://backend.money-app-api.com/api/v1/register", payload);
+      const response = await axios.post(`${API.BASE_URL}/api/v1/register`, payload);
   
       if (response.data.success) {
         Alert.alert("Successo", "Registrazione completata!");
@@ -124,6 +125,7 @@ const RegisterPreferences = () => {
               <TextInput 
                 style={RegisterStyles.input} 
                 placeholder="Aggiungi nuova preferenza" 
+                placeholderTextColor="#7F8C8D"
                 value={newExpense} 
                 onChangeText={setNewExpense} 
               />

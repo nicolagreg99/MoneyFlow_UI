@@ -9,6 +9,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MenuStyles from "../styles/Menu_style";
 import appJson from "../../app.json";
+import API from "../../config/api";
 
 type RootStackParamList = {
   Menu: undefined;
@@ -54,7 +55,7 @@ const MenuScreen = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch("https://backend.money-app-api.com/api/v1/logout", {
+        const response = await fetch(`${API.BASE_URL}/api/v1/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

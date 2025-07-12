@@ -14,6 +14,8 @@ import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import IncomesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
+import API from "../../config/api";
+
 
 const EditIncomeScreen = () => {
   const navigation = useNavigation();
@@ -99,7 +101,7 @@ const EditIncomeScreen = () => {
       descrizione: description.trim(),
     };
 
-    const PATCH_URL = `https://backend.money-app-api.com/api/v1/edit_income/${income.id}`;
+    const PATCH_URL = `${API.BASE_URL}/api/v1/edit_income/${income.id}`;
 
     setLoading(true);
 

@@ -18,9 +18,10 @@ import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ExpensesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
+import API from "../../config/api";
 
-const API_URL = "https://backend.money-app-api.com/api/v1/incomes/insert";
-const ME_URL = "https://backend.money-app-api.com/api/v1/me";
+const API_URL = `${API.BASE_URL}/api/v1/incomes/insert`;
+const ME_URL = `${API.BASE_URL}/api/v1/me`;
 
 const InsertExpensesScreen = () => {
   const navigation = useNavigation();
@@ -175,6 +176,7 @@ const InsertExpensesScreen = () => {
                     value={amount}
                     onChangeText={setAmount}
                     placeholder={amount.length > 0 || amountFocused ? "" : "Importo (€) *"}
+                    placeholderTextColor="#7F8C8D"
                   />
                 </View>
                 {errorFields.amount && <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>}
@@ -194,6 +196,7 @@ const InsertExpensesScreen = () => {
                     value={description}
                     onChangeText={setDescription}
                     placeholder={description.length > 0 || descriptionFocused ? "" : "Descrizione *"}
+                    placeholderTextColor="#7F8C8D"
                   />
                 </View>
                 {errorFields.description && <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>}

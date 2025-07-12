@@ -49,6 +49,7 @@ const RegisterPersonalInfo = () => {
           <TextInput
             style={[RegisterStyles.input, errors.username && RegisterStyles.errorBorder]}
             placeholder="Username *"
+            placeholderTextColor="#7F8C8D"
             value={formData.username}
             onChangeText={(text) => setFormData({ ...formData, username: text })}
           />
@@ -59,6 +60,7 @@ const RegisterPersonalInfo = () => {
             placeholder="Email *"
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor="#7F8C8D"
             value={formData.email}
             onChangeText={(text) => setFormData({ ...formData, email: text })}
           />
@@ -67,6 +69,7 @@ const RegisterPersonalInfo = () => {
           <TextInput
             style={[RegisterStyles.input, errors.password && RegisterStyles.errorBorder]}
             placeholder="Password *"
+            placeholderTextColor="#7F8C8D"
             secureTextEntry
             value={formData.password}
             onChangeText={(text) => setFormData({ ...formData, password: text })}
@@ -76,6 +79,7 @@ const RegisterPersonalInfo = () => {
           <TextInput
             style={[RegisterStyles.input, errors.confirmPassword && RegisterStyles.errorBorder]}
             placeholder="Conferma Password *"
+            placeholderTextColor="#7F8C8D"
             secureTextEntry
             value={formData.confirmPassword}
             onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
@@ -85,6 +89,7 @@ const RegisterPersonalInfo = () => {
           <TextInput
             style={RegisterStyles.input}
             placeholder="Nome"
+            placeholderTextColor="#7F8C8D"
             value={formData.first_name}
             onChangeText={(text) => setFormData({ ...formData, first_name: text })}
           />
@@ -93,6 +98,7 @@ const RegisterPersonalInfo = () => {
             style={RegisterStyles.input}
             placeholder="Cognome"
             value={formData.last_name}
+            placeholderTextColor="#7F8C8D"
             onChangeText={(text) => setFormData({ ...formData, last_name: text })}
           />
 

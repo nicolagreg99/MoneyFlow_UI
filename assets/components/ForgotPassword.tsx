@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ResetForgotPwd from '../styles/ResetForgotPwd_style'; 
+import API from "../../config/api";
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
@@ -16,7 +17,7 @@ const ForgotPasswordScreen = () => {
   
     setLoading(true);
     try {
-      const response = await fetch('https://backend.money-app-api.com/request_reset', {
+      const response = await fetch(`${API.BASE_URL}/request_reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

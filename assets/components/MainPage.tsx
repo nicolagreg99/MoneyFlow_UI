@@ -6,10 +6,11 @@ import MainStyles from '../styles/Main_style';
 import LineChartComponent from './personalized_components/LineChartComponent';
 import StatsWidget from './personalized_components/StatsWidget';
 import MonthlyBalanceTable from './personalized_components/MonthlyBalanceTable';
+import API from "../../config/api";
 
-const API_SPESA = "https://backend.money-app-api.com/api/v1/expenses/total_by_month";
-const API_ENTRATE = "https://backend.money-app-api.com/api/v1/incomes/total_by_month";
-const API_BILANCIO = "https://backend.money-app-api.com/api/v1/balances/total_by_month";
+const API_SPESA = `${API.BASE_URL}/api/v1/expenses/total_by_month`;
+const API_ENTRATE = `${API.BASE_URL}/api/v1/incomes/total_by_month`;
+const API_BILANCIO = `${API.BASE_URL}/api/v1/balances/total_by_month`;
 
 const MainPage = () => {
   const [spese, setSpese] = useState<number[]>([]);

@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import EditUserStyles from '../styles/EditUser_style';
+import API from "../../config/api";
+
 
 const CategorySection = ({ title, value, onChangeText, onAdd, data, onRemove, color, sectionStyle, buttonStyle }) => (
   <View style={sectionStyle}>
@@ -71,7 +73,7 @@ const EditUser = () => {
         const token = await AsyncStorage.getItem('authToken');
         if (!token) return;
 
-        const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
+        const response = await axios.get(`${API.BASE_URL}/api/v1/me`, {
           headers: { 'x-access-token': token },
         });
 
@@ -135,7 +137,7 @@ const EditUser = () => {
       if (!token) return;
 
       const response = await axios.patch(
-        'https://backend.money-app-api.com/api/v1/edit_user',
+        `${API.BASE_URL}/api/v1/edit_user`,
         dataToSend,
         { headers: { 'x-access-token': token } }
       );

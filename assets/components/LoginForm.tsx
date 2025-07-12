@@ -9,6 +9,7 @@ import axios from 'axios';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import LoginStyles from '../styles/Login_style';
+import API from "../../config/api";
 
 type RootStackParamList = {
   Login: undefined;
@@ -58,11 +59,11 @@ const LoginForm = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("https://backend.money-app-api.com/api/v1/login", formValues);
+      const response = await axios.post(`${API.BASE_URL}/api/v1/login`, formValues);
       if (response.data.token) {
         await AsyncStorage.setItem('authToken', response.data.token);
   
-        const userResponse = await axios.get('https://backend.money-app-api.com/api/v1/me', {
+        const userResponse = await axios.get(`${API.BASE_URL}/api/v1/me`, {
           headers: { 'x-access-token': response.data.token },
         });
   

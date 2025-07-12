@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import ExpensesStyles from '../../styles/Expenses_style';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API from "../../../config/api";
 
 const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -16,7 +17,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
         const token = await AsyncStorage.getItem('authToken');
         if (!token) return;
 
-        const response = await axios.get('https://backend.money-app-api.com/api/v1/me', {
+        const response = await axios.get(`${API.BASE_URL}/api/v1/me`, {
           headers: { 'x-access-token': token }
         });
 
