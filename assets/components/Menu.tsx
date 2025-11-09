@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { 
-  View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert 
+  View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert, Animated 
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -10,15 +10,14 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MenuStyles from "../styles/Menu_style";
 import appJson from "../../app.json";
 import API from "../../config/api";
+import { getCurrencyFlag } from "./EditUser"; // <-- importiamo la funzione
 
 type RootStackParamList = {
   Menu: undefined;
   Login: undefined;
   Main: { screen?: string };
   InsertExpenses: undefined;
-  Expenses: undefined;
   InsertIncomes: undefined;
-  Incomes: undefined;
   EditUser: undefined;
 };
 
@@ -49,61 +48,34 @@ const MenuScreen = () => {
     };
 
     loadUserData();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", loadUserData);
+    return unsubscribe;
+  }, [navigation]);
 
   const handleLogout = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        const response = await fetch(`${API.BASE_URL}/api/v1/logout`, {
+        await fetch(`${API.BASE_URL}/api/v1/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-access-token": token,
           },
         });
-
-        const contentType = response.headers.get("content-type");
-
-        if (response.ok) {
-          if (contentType && contentType.includes("application/json")) {
-            const data = await response.json();
-            console.log("Logout success:", data);
-          } else {
-            console.warn("Logout effettuato, ma la risposta non è in formato JSON.");
-          }
-
-          await AsyncStorage.removeItem("userData");
-          await AsyncStorage.removeItem("authToken");
-          navigation.navigate("Login");
-        } else {
-          let errorMsg = "Errore nel logout API.";
-          if (contentType && contentType.includes("application/json")) {
-            const errorData = await response.json();
-            errorMsg = errorData.message || errorMsg;
-          } else {
-            const errorText = await response.text();
-            console.error("Errore grezzo:", errorText);
-          }
-          console.error(errorMsg);
-        }
-      } else {
-        console.error("Token di accesso non trovato.");
       }
+      await AsyncStorage.multiRemove(["authToken", "userData"]);
+      navigation.navigate("Login");
     } catch (error) {
       console.error("Errore nel logout:", error);
     }
   };
 
   const confirmLogout = () => {
-    Alert.alert(
-      "Conferma Logout", 
-      "Sei sicuro di voler uscire?", 
-      [
-        { text: "Annulla", style: "cancel" },
-        { text: "Esci", style: "destructive", onPress: handleLogout }
-      ]
-    );
+    Alert.alert("Conferma Logout", "Vuoi davvero uscire?", [
+      { text: "Annulla", style: "cancel" },
+      { text: "Esci", style: "destructive", onPress: handleLogout },
+    ]);
   };
 
   return (
@@ -113,117 +85,123 @@ const MenuScreen = () => {
       ) : userData ? (
         <ScrollView 
           style={{ width: "100%" }} 
-          contentContainerStyle={{ flexGrow: 1, alignItems: "center", paddingBottom: 20 }} 
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, alignItems: "center", paddingBottom: 20 }}
         >
           {/* Profilo Utente */}
-          <View style={MenuStyles.profileContainer}>
-            <View style={MenuStyles.profileIcon}>
-              <Text style={MenuStyles.profileIconText}>
-                {userData.username.charAt(0).toUpperCase()}
+          <View style={MenuStyles.profileCard}>
+            <View style={MenuStyles.avatar}>
+              <Text style={MenuStyles.avatarText}>
+                {userData.username?.[0]?.toUpperCase() || "U"}
               </Text>
             </View>
-            <View style={MenuStyles.profileDetails}>
-              <Text style={MenuStyles.header}>Profilo Utente</Text>
-              <Text style={MenuStyles.username}>{userData.username}</Text>
-              <Text style={MenuStyles.email}>{userData.email}</Text>
+
+            <View style={MenuStyles.profileInfo}>
+              <Text style={MenuStyles.nameText}>{userData.username}</Text>
+              <Text style={MenuStyles.emailText}>{userData.email}</Text>
+              {userData.default_currency && (
+                <Text style={MenuStyles.currencyText}>
+                  {getCurrencyFlag(userData.default_currency)} {userData.default_currency}
+                </Text>
+              )}
             </View>
+
             <TouchableOpacity 
               style={MenuStyles.settingsButton} 
               onPress={() => navigation.navigate("EditUser")}
             >
-              <MaterialIcons name="settings" size={24} color="#FFF" />
+              <MaterialIcons name="settings" size={22} color="#3498DB" />
             </TouchableOpacity>
           </View>
 
-          {/* Menu Navigazione */}
-          <View style={MenuStyles.menuContainer}>
-            <TouchableOpacity style={MenuStyles.menuItem} onPress={() => navigation.navigate("Main")}>
-              <FontAwesome name="home" size={24} color="#FFF" />
-              <Text style={[MenuStyles.menuText, { marginLeft: 4 }]}>Home</Text>
+          {/* Menu */}
+          <View style={MenuStyles.menuWrapper}>
+            <TouchableOpacity 
+              style={MenuStyles.menuItem} 
+              onPress={() => navigation.navigate("Main")}
+            >
+              <FontAwesome name="home" size={20} color="#3498DB" />
+              <Text style={MenuStyles.menuLabel}>Home</Text>
             </TouchableOpacity>
 
-            <View style={MenuStyles.menuItem}>
-              <TouchableOpacity
-                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}
-                onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <MaterialIcons name="attach-money" size={24} color="#FFF" />
-                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Spese</Text>
-                </View>
-                <MaterialIcons 
-                  name={showExpensesSubMenu ? "expand-less" : "expand-more"} 
-                  size={24} 
-                  color="#FFF" 
-                />
-              </TouchableOpacity>
-            </View>
+            {/* Spese */}
+            <TouchableOpacity 
+              style={MenuStyles.menuItem}
+              onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
+            >
+              <MaterialIcons name="attach-money" size={20} color="#3498DB" />
+              <Text style={MenuStyles.menuLabel}>Spese</Text>
+              <MaterialIcons 
+                name={showExpensesSubMenu ? "expand-less" : "expand-more"} 
+                size={22} 
+                color="#3498DB" 
+                style={{ marginLeft: "auto" }}
+              />
+            </TouchableOpacity>
 
             {showExpensesSubMenu && (
-              <View style={MenuStyles.subMenuContainer}>
-                <TouchableOpacity
-                  style={MenuStyles.subMenuItem}
+              <View style={MenuStyles.subMenu}>
+                <TouchableOpacity 
+                  style={MenuStyles.subItem}
                   onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
                 >
-                  <FontAwesome name="list" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subMenuText}>Visualizza Spese</Text>
+                  <FontAwesome name="list" size={16} color="#3498DB" />
+                  <Text style={MenuStyles.subText}>Visualizza Spese</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={MenuStyles.subMenuItem}
+                <TouchableOpacity 
+                  style={MenuStyles.subItem}
                   onPress={() => navigation.navigate("InsertExpenses")}
                 >
                   <MaterialIcons name="add" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subMenuText}>Inserisci Spesa</Text>
+                  <Text style={MenuStyles.subText}>Aggiungi Spesa</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            <View style={MenuStyles.menuItem}>
-              <TouchableOpacity
-                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}
-                onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <MaterialIcons name="account-balance-wallet" size={24} color="#FFF" />
-                  <Text style={[MenuStyles.menuText, { marginLeft: 10 }]}>Entrate</Text>
-                </View>
-                <MaterialIcons 
-                  name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
-                  size={24} 
-                  color="#FFF" 
-                />
-              </TouchableOpacity>
-            </View>
+            {/* Entrate */}
+            <TouchableOpacity 
+              style={MenuStyles.menuItem}
+              onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
+            >
+              <MaterialIcons name="account-balance-wallet" size={20} color="#3498DB" />
+              <Text style={MenuStyles.menuLabel}>Entrate</Text>
+              <MaterialIcons 
+                name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
+                size={22} 
+                color="#3498DB" 
+                style={{ marginLeft: "auto" }}
+              />
+            </TouchableOpacity>
 
             {showIncomesSubMenu && (
-              <View style={MenuStyles.subMenuContainer}>
-                <TouchableOpacity
-                  style={MenuStyles.subMenuItem}
+              <View style={MenuStyles.subMenu}>
+                <TouchableOpacity 
+                  style={MenuStyles.subItem}
                   onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
                 >
-                  <FontAwesome name="list" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subMenuText}>Visualizza Entrate</Text>
+                  <FontAwesome name="list" size={16} color="#3498DB" />
+                  <Text style={MenuStyles.subText}>Visualizza Entrate</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={MenuStyles.subMenuItem}
+                <TouchableOpacity 
+                  style={MenuStyles.subItem}
                   onPress={() => navigation.navigate("InsertIncomes")}
                 >
                   <MaterialIcons name="add" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subMenuText}>Inserisci Entrata</Text>
+                  <Text style={MenuStyles.subText}>Aggiungi Entrata</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            <TouchableOpacity style={[MenuStyles.menuItem, MenuStyles.logoutButton]} onPress={confirmLogout}>
-              <FontAwesome name="sign-out" size={24} color="#FFF" />
-              <Text style={MenuStyles.menuText}>Logout</Text>
+            <TouchableOpacity 
+              style={[MenuStyles.menuItem, MenuStyles.logoutButton]} 
+              onPress={confirmLogout}
+            >
+              <FontAwesome name="sign-out" size={20} color="#fff" />
+              <Text style={MenuStyles.logoutText}>Logout</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Versione app */}
           <Text style={MenuStyles.versionText}>Versione {appJson.expo.version}</Text>
         </ScrollView>
       ) : (

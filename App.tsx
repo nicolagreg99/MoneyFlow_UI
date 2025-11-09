@@ -6,6 +6,8 @@ import { TouchableOpacity } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "./assets/config/toastConfig";
 
 // Screens
 import LoginForm from "./assets/components/LoginForm";
@@ -146,6 +148,7 @@ const App = () => {
           options={{ presentation: "modal", title: "Modifica Entrata" }} 
         />
       </Stack.Navigator>
+      <Toast config={toastConfig} />
     </NavigationContainer>
   );
 };
