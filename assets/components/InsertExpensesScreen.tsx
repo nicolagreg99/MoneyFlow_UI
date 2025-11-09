@@ -182,7 +182,7 @@ const InsertExpensesScreen = () => {
                 placeholder={
                   amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
                 }
-                placeholderTextColor="#33a6aeff"
+                placeholderTextColor="#7F8C8D"
               />
 
               {/* Selettore valuta dentro la cella */}

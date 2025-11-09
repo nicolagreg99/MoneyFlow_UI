@@ -34,12 +34,28 @@ const TransactionList = ({
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
 
-      if (key === "valore" || key === "converted_value") {
+      // Se l'ordinamento è per "valore", usiamo sempre il valore convertito
+      if (key === "valore") {
+        valueA = parseFloat(a.converted_value ?? a.valore ?? 0);
+        valueB = parseFloat(b.converted_value ?? b.valore ?? 0);
+        return order === "asc" ? valueA - valueB : valueB - valueA;
+      }
+
+      // Se si ordina per "converted_value", stesso comportamento
+      if (key === "converted_value") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
         return order === "asc" ? valueA - valueB : valueB - valueA;
       }
 
+      // Se si ordina per data
+      if (key === "giorno") {
+        const dateA = new Date(a.giorno);
+        const dateB = new Date(b.giorno);
+        return order === "asc" ? dateA - dateB : dateB - dateA;
+      }
+
+      // Altri campi testuali (descrizione, tipo, ecc.)
       valueA = valueA.toString().toLowerCase();
       valueB = valueB.toString().toLowerCase();
       return order === "asc"

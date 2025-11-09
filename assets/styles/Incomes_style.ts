@@ -17,7 +17,6 @@ const IncomesStyle = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
-  // Titolo in alto (su un livello)
   titleContainer: {
     marginBottom: 20,
     alignItems: 'center',
@@ -30,7 +29,6 @@ const IncomesStyle = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.8,
   },
-  /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -81,7 +79,6 @@ const IncomesStyle = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  /** 🎛️ Filtro Entrate **/
   filterContainer: {
     marginBottom: 20,
   },
@@ -107,7 +104,6 @@ const IncomesStyle = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  /** 🏆 Totale Entrate **/
   totalContainer: {
     backgroundColor: '#4CAF50',
     paddingVertical: 12,
@@ -128,11 +124,10 @@ const IncomesStyle = StyleSheet.create({
     marginBottom: 10,
   },
   totalAmount: {
-    fontSize: 34,
+    fontSize: 25,
     color: '#fff',
     fontWeight: '700',
   },
-  /** 📊 Contenitore del Grafico **/
   chartWrapper: {
     width: '100%',
     alignItems: 'center',
@@ -181,7 +176,6 @@ const IncomesStyle = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
-  /** 📌 Modale per la selezione **/
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',

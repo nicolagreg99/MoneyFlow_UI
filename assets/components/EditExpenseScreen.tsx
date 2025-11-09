@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
-  Animated,
-  Easing,
   Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -16,7 +13,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
-
+import CurrencyPicker from "./personalized_components/CurrencyPicker";
+import Toast from "react-native-toast-message";
 
 const EditExpenseScreen = () => {
   const navigation = useNavigation();
@@ -25,12 +23,12 @@ const EditExpenseScreen = () => {
 
   const [amount, setAmount] = useState("");
   const [amountFocused, setAmountFocused] = useState(false);
-
   const [description, setDescription] = useState("");
   const [descriptionFocused, setDescriptionFocused] = useState(false);
-
   const [selectedType, setSelectedType] = useState([]);
   const [date, setDate] = useState(new Date());
+  const [currency, setCurrency] = useState("EUR");
+  const [userCurrency, setUserCurrency] = useState("EUR");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -40,28 +38,30 @@ const EditExpenseScreen = () => {
     selectedType: false,
   });
 
-  const successBannerOpacity = useRef(new Animated.Value(0)).current;
-  const errorBannerOpacity = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
     if (!expense) {
-      console.error("❌ Errore: parametro 'expense' non trovato!");
       navigation.goBack();
       return;
     }
-
-    console.log("📦 Expense ricevuta:", expense);
 
     setAmount(expense.valore?.toString() || "");
     setDescription(expense.descrizione || "");
     setSelectedType([expense.tipo]);
     setDate(new Date(expense.giorno));
+    setCurrency(expense.currency || "EUR");
 
-    const fetchToken = async () => {
+    const fetchUserData = async () => {
       const token = await AsyncStorage.getItem("authToken");
+      const storedUserData = await AsyncStorage.getItem("userData");
+      if (storedUserData) {
+        const user = JSON.parse(storedUserData);
+        const defaultCurrency = user.default_currency || user.currency || "EUR";
+        setUserCurrency(defaultCurrency);
+      }
       setAuthToken(token);
     };
-    fetchToken();
+
+    fetchUserData();
   }, []);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -69,27 +69,8 @@ const EditExpenseScreen = () => {
     if (selectedDate) setDate(selectedDate);
   };
 
-  const showBanner = (bannerOpacity: Animated.Value) => {
-    Animated.sequence([
-      Animated.timing(bannerOpacity, {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }),
-      Animated.delay(1500),
-      Animated.timing(bannerOpacity, {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
   const handleSubmit = async () => {
     const formattedAmount = amount.replace(",", ".");
-
     const errors = {
       amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
@@ -98,20 +79,17 @@ const EditExpenseScreen = () => {
 
     setErrorFields(errors);
 
-    if (Object.values(errors).some((err) => err) || !authToken) return;
+    if (Object.values(errors).some(Boolean) || !authToken) return;
 
     const payload = {
       tipo: selectedType[0],
       valore: parseFloat(formattedAmount),
       giorno: date.toISOString().split("T")[0],
       descrizione: description.trim(),
+      currency,
     };
 
     const PATCH_URL = `${API.BASE_URL}/api/v1/edit_expense/${expense.id}`;
-
-    console.log("🔧 Invio PATCH a:", PATCH_URL);
-    console.log("📤 Payload:", payload);
-
     setLoading(true);
 
     try {
@@ -122,12 +100,20 @@ const EditExpenseScreen = () => {
         },
       });
 
-      console.log("✅ Spesa aggiornata con successo!");
-      showBanner(successBannerOpacity);
+      Toast.show({
+        type: "success",
+        text1: "Spesa modificata con successo",
+        position: "bottom",
+      });
+
       setTimeout(() => navigation.goBack(), 1500);
     } catch (error) {
-      console.error("❌ Errore aggiornamento:", error);
-      showBanner(errorBannerOpacity);
+      console.error("Errore aggiornamento:", error);
+      Toast.show({
+        type: "error",
+        text1: "Errore durante la modifica",
+        position: "bottom",
+      });
     } finally {
       setLoading(false);
     }
@@ -137,29 +123,46 @@ const EditExpenseScreen = () => {
     <View style={ExpensesStyles.container}>
       <Text style={ExpensesStyles.header}>Modifica Spesa</Text>
 
-      {/* Importo */}
-      <View style={ExpensesStyles.inputWrapper}>
+      <View style={[ExpensesStyles.inputWrapper, { position: "relative" }]}>
         {(amount.length > 0 || amountFocused) && (
-          <Text style={ExpensesStyles.floatingLabel}>Importo (€) *</Text>
+          <Text style={ExpensesStyles.floatingLabel}>Importo *</Text>
         )}
-        <TextInput
-          style={[
-            ExpensesStyles.input,
-            errorFields.amount && ExpensesStyles.errorInput,
-          ]}
-          onFocus={() => setAmountFocused(true)}
-          onBlur={() => setAmountFocused(false)}
-          keyboardType="numeric"
-          value={amount}
-          onChangeText={setAmount}
-          placeholder={amount.length > 0 || amountFocused ? "" : "Importo (€) *"}
-        />
+
+        <View style={{ position: "relative", justifyContent: "center" }}>
+          <TextInput
+            style={[
+              ExpensesStyles.input,
+              errorFields.amount && ExpensesStyles.errorInput,
+            ]}
+            onFocus={() => setAmountFocused(true)}
+            onBlur={() => setAmountFocused(false)}
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+            placeholder={
+              amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
+            }
+            placeholderTextColor="#7F8C8D"
+          />
+
+          <View
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 0,
+              bottom: 0,
+              justifyContent: "center",
+              transform: [{ translateY: -6 }],
+            }}
+          >
+            <CurrencyPicker currency={currency} setCurrency={setCurrency} compactMode />
+          </View>
+        </View>
       </View>
       {errorFields.amount && (
         <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>
       )}
 
-      {/* Descrizione */}
       <View style={ExpensesStyles.inputWrapper}>
         {(description.length > 0 || descriptionFocused) && (
           <Text style={ExpensesStyles.floatingLabel}>Descrizione *</Text>
@@ -173,7 +176,10 @@ const EditExpenseScreen = () => {
           onBlur={() => setDescriptionFocused(false)}
           value={description}
           onChangeText={setDescription}
-          placeholder={description.length > 0 || descriptionFocused ? "" : "Descrizione *"}
+          placeholder={
+            description.length > 0 || descriptionFocused ? "" : "Descrizione *"
+          }
+          placeholderTextColor="#7F8C8D"
         />
       </View>
       {errorFields.description && (
@@ -183,7 +189,9 @@ const EditExpenseScreen = () => {
       <Text style={ExpensesStyles.label}>Tipo *</Text>
       <FilterSelector
         selectedFilters={selectedType}
-        setSelectedFilters={(filters) => setSelectedType([filters[filters.length - 1]])}
+        setSelectedFilters={(filters) =>
+          setSelectedType([filters[filters.length - 1]])
+        }
         filterType="spese"
       />
       {errorFields.selectedType && (
@@ -191,8 +199,13 @@ const EditExpenseScreen = () => {
       )}
 
       <Text style={ExpensesStyles.label}>Data:</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={ExpensesStyles.datePickerButton}>
-        <Text style={ExpensesStyles.datePickerText}>{date.toLocaleDateString()}</Text>
+      <TouchableOpacity
+        onPress={() => setShowDatePicker(true)}
+        style={ExpensesStyles.datePickerButton}
+      >
+        <Text style={ExpensesStyles.datePickerText}>
+          {date.toLocaleDateString("it-IT")}
+        </Text>
       </TouchableOpacity>
 
       {showDatePicker && (
@@ -213,14 +226,6 @@ const EditExpenseScreen = () => {
           {loading ? "Salvataggio..." : "Salva Modifiche"}
         </Text>
       </TouchableOpacity>
-
-      <Animated.View style={[ExpensesStyles.successBanner, { opacity: successBannerOpacity }]}>
-        <Text style={ExpensesStyles.successText}>✅ Spesa modificata!</Text>
-      </Animated.View>
-
-      <Animated.View style={[ExpensesStyles.errorBanner, { opacity: errorBannerOpacity }]}>
-        <Text style={ExpensesStyles.errorText}>Errore! Riprova più tardi.</Text>
-      </Animated.View>
     </View>
   );
 };

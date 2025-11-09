@@ -16,13 +16,10 @@ const LineChartComponent: React.FC<Props> = ({ labels, entrate, spese }) => {
 
   const chartWidth = Dimensions.get('window').width - 40;
 
-  // 🔹 Calcola il massimo valore tra entrate e spese
   const maxVal = Math.max(...entrate, ...spese);
 
-  // 🔹 Arrotonda al multiplo di 500 superiore
   const roundedMax = Math.ceil(maxVal / 500) * 500;
 
-  // 🔹 Numero di segmenti = quante volte 500 entra nel max
   const numberOfSegments = roundedMax / 500;
 
   return (

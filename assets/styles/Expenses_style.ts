@@ -127,7 +127,7 @@ const ExpensesStyles = StyleSheet.create({
     marginBottom: 10,
   },
   totalAmount: {
-    fontSize: 30,
+    fontSize: 25,
     color: '#fff',
     fontWeight: '700',
   },
