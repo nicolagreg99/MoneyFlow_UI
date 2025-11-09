@@ -10,7 +10,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MenuStyles from "../styles/Menu_style";
 import appJson from "../../app.json";
 import API from "../../config/api";
-import { getCurrencyFlag } from "./EditUser"; // <-- importiamo la funzione
+import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
 
 type RootStackParamList = {
   Menu: undefined;

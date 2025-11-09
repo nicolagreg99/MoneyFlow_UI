@@ -56,7 +56,7 @@ const EditUserStyles = StyleSheet.create({
     padding: 0,
     margin: 0,
   },
-  currencyContainerSmall: {
+  nameContainerSmall: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -67,11 +67,11 @@ const EditUserStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e1e5e9',
   },
-  currencyLabelSmall: {
+  nameLabelSmall: {
     fontSize: 13,
     color: '#666',
   },
-  currencyDisplaySmall: {
+  nameDisplaySmall: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -220,67 +220,7 @@ const EditUserStyles = StyleSheet.create({
     color: '#fff',
     fontSize: 17,
     fontWeight: 'bold',
-  },
-
-  // --- MODAL ---
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalCard: {
-    width: '85%',
-    maxHeight: '70%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#16A085',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  searchInput: {
-    width: '100%',
-    backgroundColor: '#f2f2f2',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 15,
-    marginBottom: 12,
-  },
-  currencyItem: {
-    width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  currencyItemText: {
-    fontSize: 15,
-    color: '#333',
-    textAlign: 'left',
-  },
-  modalCloseButton: {
-    marginTop: 10,
-    backgroundColor: '#16A085',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
-  },
-  modalCloseText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  }
 });
 
 export default EditUserStyles;

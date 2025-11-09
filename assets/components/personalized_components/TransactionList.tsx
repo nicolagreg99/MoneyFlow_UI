@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { getCurrencyFlag } from "../personalized_components/CurrencyPicker";
 
 const TransactionList = ({
   transactions,
@@ -20,7 +21,6 @@ const TransactionList = ({
   const [sortedTransactions, setSortedTransactions] = useState([]);
   const [sortKey, setSortKey] = useState("giorno");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [editingTransaction, setEditingTransaction] = useState(null);
 
   const navigation = useNavigation();
 
@@ -34,7 +34,7 @@ const TransactionList = ({
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
 
-      if (key === "valore") {
+      if (key === "valore" || key === "converted_value") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
         return order === "asc" ? valueA - valueB : valueB - valueA;
@@ -57,10 +57,10 @@ const TransactionList = ({
     }
   };
 
-  const handleDelete = (id, descrizione, valore, tipo) => {
+  const handleDelete = (id, descrizione, valore, tipo, currency) => {
     const message = `
 Descrizione: ${descrizione || "Senza descrizione"}
-Valore: €${parseFloat(valore).toFixed(2)}
+Valore: ${valore} ${currency || ""}
 Tipo: ${tipo || "N/D"}
 
 ❗ Questa operazione è irreversibile. Procedere con l'eliminazione?
@@ -88,19 +88,14 @@ Tipo: ${tipo || "N/D"}
     }, 300);
   };
 
-  const handleCancelEdit = () => {
-    setEditingTransaction(null);
-  };
-
-  const handleSaveEdit = async (updatedTransaction) => {
-    await onEdit(updatedTransaction);
-    setEditingTransaction(null);
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/D";
     const date = new Date(dateString);
-    return isNaN(date) ? "N/D" : date.toLocaleDateString("it-IT");
+    if (isNaN(date)) return "N/D";
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}/${month}/${year}`;
   };
 
   const renderSortIcon = (key) => (
@@ -127,7 +122,7 @@ Tipo: ${tipo || "N/D"}
               {["descrizione", "tipo", "valore", "giorno"].map((key, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={[styles.headerCell, { flex: key === "valore" ? 1.5 : 2 }]}
+                  style={[styles.headerCell, { flex: key === "valore" ? 2 : 2 }]}
                   onPress={() => handleSort(key)}
                 >
                   <Text style={styles.headerText}>
@@ -140,22 +135,55 @@ Tipo: ${tipo || "N/D"}
               </View>
             </View>
           )}
-          renderItem={({ item }) => (
-            <View style={styles.row}>
-              <Text style={[styles.cell, { flex: 2 }]}>{item.descrizione || "N/D"}</Text>
-              <Text style={[styles.cell, { flex: 2 }]}>{item.tipo || "N/D"}</Text>
-              <Text style={[styles.cell, { flex: 1.5 }]}>€{parseFloat(item.valore).toFixed(2)}</Text>
-              <Text style={[styles.cell, { flex: 2 }]}>{formatDate(item.giorno)}</Text>
-              <View style={{ flexDirection: "row", flex: 1, justifyContent: "space-around" }}>
-                <TouchableOpacity onPress={() => handleEdit(item)}>
-                  <Icon name="pencil" size={16} color="#007bff" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDelete(item.id, item.descrizione, item.valore, item.tipo)}>
-                  <Icon name="trash" size={16} color="red" />
-                </TouchableOpacity>
+          renderItem={({ item }) => {
+            const origFlag = getCurrencyFlag(item.currency);
+            const userFlag = getCurrencyFlag(item.user_currency);
+
+            return (
+              <View style={styles.row}>
+                <Text style={[styles.cell, { flex: 2 }]}>
+                  {item.descrizione || "N/D"}
+                </Text>
+                <Text style={[styles.cell, { flex: 2 }]}>
+                  {item.tipo || "N/D"}
+                </Text>
+
+                <View style={[styles.valueContainer, { flex: 2 }]}>
+                  <Text style={styles.valueText}>
+                    {origFlag} {parseFloat(item.valore).toLocaleString()} {item.currency}
+                  </Text>
+
+                  {item.currency !== item.user_currency && (
+                    <Text style={styles.convertedText}>
+                      ≈ {userFlag} {parseFloat(item.converted_value).toLocaleString()}{" "}
+                      {item.user_currency}
+                    </Text>
+                  )}
+                </View>
+
+                <Text style={[styles.cell, { flex: 1.4 }]}>{formatDate(item.giorno)}</Text>
+
+                <View style={{ flexDirection: "row", flex: 1, justifyContent: "space-around" }}>
+                  <TouchableOpacity onPress={() => handleEdit(item)}>
+                    <Icon name="pencil" size={15} color="#007bff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleDelete(
+                        item.id,
+                        item.descrizione,
+                        item.valore,
+                        item.tipo,
+                        item.currency
+                      )
+                    }
+                  >
+                    <Icon name="trash" size={15} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
+            );
+          }}
         />
       )}
 
@@ -175,14 +203,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "bold",
     color: "#1E3A8A",
     textAlign: "center",
     marginBottom: 10,
   },
   noTransactionsText: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#888",
     textAlign: "center",
     marginTop: 12,
@@ -201,25 +229,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "bold",
     color: "#007bff",
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 8,
+    paddingVertical: 6,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     alignItems: "center",
   },
   cell: {
-    fontSize: 13,
+    fontSize: 12,
     color: "#444",
     textAlign: "center",
   },
+  valueContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  valueText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#222",
+  },
+  convertedText: {
+    fontSize: 11,
+    color: "#777",
+  },
   closeButton: {
-    marginTop: 12,
+    marginTop: 10,
     padding: 8,
     backgroundColor: "#007bff",
     borderRadius: 8,
@@ -227,7 +268,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
   },
 });
