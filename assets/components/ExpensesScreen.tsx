@@ -233,12 +233,6 @@ const ExpensesScreen = () => {
             filterType="spese"
           />
 
-          <View style={ExpensesStyles.totalContainer}>
-            <Text style={ExpensesStyles.totalText}>Totale Spese</Text>
-            <Text style={ExpensesStyles.totalAmount}>
-              {currencyFlag} {totalExpenses.toFixed(2)} {userCurrency}
-            </Text>
-          </View>
 
           {loading ? (
             <ActivityIndicator size="large" color="#007BFF" />

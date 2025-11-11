@@ -18,7 +18,6 @@ const ExpensesStyles = StyleSheet.create({
     elevation: 3,
   },
   titleContainer: {
-    marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -80,10 +79,6 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  /** 🎛️ Filtro Spese **/
-  filterContainer: {
-    marginBottom: 20,
-  },
   filterBox: {
     backgroundColor: '#fff',
     padding: 14,
@@ -107,30 +102,30 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
   },
   /** 🏆 Totale Spese **/
-  totalContainer: {
-    backgroundColor: '#FF6347',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  totalText: {
-    fontSize: 20,
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  totalAmount: {
-    fontSize: 25,
-    color: '#fff',
-    fontWeight: '700',
-  },
+  // totalContainer: {
+  //   backgroundColor: '#FF6347',
+  //   paddingVertical: 12,
+  //   paddingHorizontal: 20,
+  //   borderRadius: 12,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   shadowColor: '#000',
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 4,
+  //   elevation: 3,
+  //   marginBottom: 20,
+  // },
+  // totalText: {
+  //   fontSize: 20,
+  //   color: '#fff',
+  //   fontWeight: 'bold',
+  //   marginBottom: 10,
+  // },
+  // totalAmount: {
+  //   fontSize: 25,
+  //   color: '#fff',
+  //   fontWeight: '700',
+  // },
   /** 📊 Contenitore del Grafico **/
   chartWrapper: {
     width: '100%',

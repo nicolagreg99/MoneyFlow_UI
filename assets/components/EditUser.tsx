@@ -15,7 +15,16 @@ import EditUserStyles from "../styles/EditUser_style";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 
-const CategorySection = ({ title, value, onChangeText, onAdd, data, onRemove, color, chipStyle }) => (
+const CategorySection = ({
+  title,
+  value,
+  onChangeText,
+  onAdd,
+  data,
+  onRemove,
+  color,
+  chipStyle,
+}) => (
   <View style={[EditUserStyles.sectionBox, { borderLeftColor: color }]}>
     <Text style={EditUserStyles.sectionTitle}>{`Categorie di ${title}`}</Text>
 
@@ -62,6 +71,10 @@ const EditUser = () => {
   const [incomes, setIncomes] = useState([]);
   const [currency, setCurrency] = useState("EUR");
 
+  // Stati per le nuove categorie
+  const [newExpenseCategory, setNewExpenseCategory] = useState("");
+  const [newIncomeCategory, setNewIncomeCategory] = useState("");
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -93,6 +106,44 @@ const EditUser = () => {
     fetchUserData();
   }, []);
 
+  // ➕ Aggiunta e rimozione categorie
+  const handleAddExpenseCategory = () => {
+    const trimmed = newExpenseCategory.trim();
+    if (!trimmed) {
+      Toast.show({ type: "info", text1: "Inserisci un nome valido", position: "bottom" });
+      return;
+    }
+    if (expenses.includes(trimmed)) {
+      Toast.show({ type: "info", text1: "Categoria già presente", position: "bottom" });
+      return;
+    }
+    setExpenses([...expenses, trimmed]);
+    setNewExpenseCategory("");
+  };
+
+  const handleRemoveExpenseCategory = (index) => {
+    setExpenses(expenses.filter((_, i) => i !== index));
+  };
+
+  const handleAddIncomeCategory = () => {
+    const trimmed = newIncomeCategory.trim();
+    if (!trimmed) {
+      Toast.show({ type: "info", text1: "Inserisci un nome valido", position: "bottom" });
+      return;
+    }
+    if (incomes.includes(trimmed)) {
+      Toast.show({ type: "info", text1: "Categoria già presente", position: "bottom" });
+      return;
+    }
+    setIncomes([...incomes, trimmed]);
+    setNewIncomeCategory("");
+  };
+
+  const handleRemoveIncomeCategory = (index) => {
+    setIncomes(incomes.filter((_, i) => i !== index));
+  };
+
+  // 🔄 Aggiornamento dati utente
   const handleUpdate = async () => {
     const payload = {
       ...userData,
@@ -122,14 +173,12 @@ const EditUser = () => {
 
       console.log("AsyncStorage aggiornato:", updatedUserData);
 
-
       Toast.show({
         type: "success",
         text1: "Profilo aggiornato con successo!",
         position: "bottom",
       });
       navigation.navigate("Menu", { refresh: true });
-
     } catch {
       Toast.show({
         type: "error",
@@ -196,22 +245,22 @@ const EditUser = () => {
 
           <CategorySection
             title="Spese"
-            value=""
-            onChangeText={() => {}}
-            onAdd={() => {}}
+            value={newExpenseCategory}
+            onChangeText={setNewExpenseCategory}
+            onAdd={handleAddExpenseCategory}
             data={expenses}
-            onRemove={() => {}}
+            onRemove={handleRemoveExpenseCategory}
             color="#e74c3c"
             chipStyle={EditUserStyles.expenseChip}
           />
 
           <CategorySection
             title="Entrate"
-            value=""
-            onChangeText={() => {}}
-            onAdd={() => {}}
+            value={newIncomeCategory}
+            onChangeText={setNewIncomeCategory}
+            onAdd={handleAddIncomeCategory}
             data={incomes}
-            onRemove={() => {}}
+            onRemove={handleRemoveIncomeCategory}
             color="#2ecc71"
             chipStyle={EditUserStyles.incomeChip}
           />

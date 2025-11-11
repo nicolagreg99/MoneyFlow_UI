@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, ActivityIndicator, Alert, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import MainStyles from '../styles/Main_style';
-import LineChartComponent from './personalized_components/LineChartComponent';
-import StatsWidget from './personalized_components/StatsWidget';
-import MonthlyBalanceTable from './personalized_components/MonthlyBalanceTable';
+import React, { useState, useCallback } from "react";
+import { View, Text, ActivityIndicator, ScrollView } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import MainStyles from "../styles/Main_style";
+import LineChartComponent from "./personalized_components/LineChartComponent";
+import StatsWidget from "./personalized_components/StatsWidget";
+import MonthlyBalanceTable from "./personalized_components/MonthlyBalanceTable";
+import { showToast } from "../config/toastConfig";
 import API from "../../config/api";
 
 const API_SPESA = `${API.BASE_URL}/api/v1/expenses/total_by_month`;
@@ -18,10 +19,14 @@ const MainPage = () => {
   const [labels, setLabels] = useState<string[]>([]);
   const [balances, setBalances] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
+  const [userCurrency, setUserCurrency] = useState("EUR");
   const navigation = useNavigation();
 
   const getLast12Months = () => {
-    const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+    const mesi = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ];
     const oggi = new Date();
     let mesiDinamici: string[] = [];
 
@@ -35,9 +40,9 @@ const MainPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
+        showToast("Sessione scaduta. Effettua nuovamente il login.", "error");
         navigation.navigate("Login");
         return;
       }
@@ -47,12 +52,12 @@ const MainPage = () => {
       const [speseRes, entrateRes, balanceRes] = await Promise.all([
         fetch(API_SPESA, { headers }),
         fetch(API_ENTRATE, { headers }),
-        fetch(API_BILANCIO, { headers })
+        fetch(API_BILANCIO, { headers }),
       ]);
 
       if (speseRes.status === 401 || entrateRes.status === 401 || balanceRes.status === 401) {
-        Alert.alert("Sessione scaduta", "Effettua nuovamente il login.");
-        await AsyncStorage.removeItem('authToken');
+        showToast("Sessione scaduta. Effettua nuovamente il login.", "error");
+        await AsyncStorage.removeItem("authToken");
         navigation.navigate("Login");
         return;
       }
@@ -66,16 +71,21 @@ const MainPage = () => {
       const balanceData = await balanceRes.json();
 
       const mesiDinamici = getLast12Months();
-      const speseMapped = mesiDinamici.map(mese => speseData[mese] || 0);
-      const entrateMapped = mesiDinamici.map(mese => entrateData[mese] || 0);
+
+      const speseMonthly = speseData.monthly_totals || {};
+      const entrateMonthly = entrateData.monthly_totals || {};
+
+      const speseMapped = mesiDinamici.map((mese) => parseFloat(speseMonthly[mese] || 0));
+      const entrateMapped = mesiDinamici.map((mese) => parseFloat(entrateMonthly[mese] || 0));
 
       setLabels(mesiDinamici);
       setSpese(speseMapped);
       setEntrate(entrateMapped);
       setBalances(balanceData);
+      setUserCurrency(speseData.currency || "EUR");
     } catch (error: any) {
-      Alert.alert("Errore", error.message);
-      console.error(error);
+      console.error("Errore:", error);
+      showToast("Errore durante il caricamento dei dati", "error");
     } finally {
       setLoading(false);
     }
@@ -89,70 +99,73 @@ const MainPage = () => {
 
   if (loading) {
     return (
-      <View style={MainStyles.container}>
-        <ActivityIndicator size="large" color="#3498DB" />
+      <View style={MainStyles.loadingContainer}>
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <Text style={MainStyles.loadingText}>Caricamento dati...</Text>
       </View>
     );
   }
 
-  const data = [
-    {
-      key: 'widgets',
-      component: (
-        <View style={MainStyles.section}>
-          <Text style={MainStyles.widgetTitle}>📌 Riepilogo Annuale</Text>
-          <View style={MainStyles.widgetsContainer}>
-            <StatsWidget
-              title="Totale Entrate"
-              value={`€${entrate.reduce((a, b) => a + b, 0).toFixed(2)}`}
-              icon="📊"
-            />
-            <StatsWidget
-              title="Totale Spese"
-              value={`€${spese.reduce((a, b) => a + b, 0).toFixed(2)}`}
-              icon="💰"
-            />
-            <StatsWidget
-              title="Bilancio Netto"
-              value={`€${(entrate.reduce((a, b) => a + b, 0) - spese.reduce((a, b) => a + b, 0)).toFixed(2)}`}
-              icon="📈"
-            />
-          </View>
+  const totalEntrate = entrate.reduce((a, b) => a + b, 0);
+  const totalSpese = spese.reduce((a, b) => a + b, 0);
+  const bilancioNetto = totalEntrate - totalSpese;
+
+  return (
+    <ScrollView 
+      style={MainStyles.container} 
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled={true}
+    >
+
+      {/* Widgets statistiche */}
+      <View style={MainStyles.statsSection}>
+        <Text style={MainStyles.sectionTitle}>💰 Riepilogo Annuale</Text>
+        <View style={MainStyles.widgetsContainer}>
+          <StatsWidget
+            title="Totale Entrate"
+            value={`${totalEntrate.toFixed(2)} ${userCurrency}`}
+            icon="📈"
+          />
+          <StatsWidget
+            title="Totale Spese"
+            value={`${totalSpese.toFixed(2)} ${userCurrency}`}
+            icon="💸"
+          />
+          <StatsWidget
+            title="Bilancio Netto"
+            value={`${bilancioNetto.toFixed(2)} ${userCurrency}`}
+            icon={bilancioNetto >= 0 ? "✅" : "⚠️"}
+          />
         </View>
-      ),
-    },
-    {
-      key: 'chart',
-      component: (
-        <View style={MainStyles.section}>
-          <LineChartComponent labels={labels} entrate={entrate} spese={spese} />
-        </View>
-      ),
-    },
-    {
-      key: 'table',
-      component: (
-        <View style={MainStyles.section}>
+      </View>
+
+      {/* Grafico */}
+      <LineChartComponent
+        labels={labels}
+        entrate={entrate}
+        spese={spese}
+        currency={userCurrency}
+      />
+
+      {/* Tabella mensile */}
+      <View style={MainStyles.tableSection}>
+        <Text style={MainStyles.sectionTitle}>📋 Dettaglio Mensile</Text>
+        <View>
           <MonthlyBalanceTable
-            balances={labels.map(mese => ({
+            balances={labels.map((mese) => ({
               mese,
               entrate: entrate[labels.indexOf(mese)] || 0,
               spese: spese[labels.indexOf(mese)] || 0,
               valore: (entrate[labels.indexOf(mese)] || 0) - (spese[labels.indexOf(mese)] || 0),
             }))}
+            currency={userCurrency}
           />
         </View>
-      ),
-    }
-  ];
+      </View>
 
-  return (
-    <FlatList
-      data={data}
-      renderItem={({ item }) => <View style={{ marginBottom: 20 }}>{item.component}</View>}
-      keyExtractor={item => item.key}
-      contentContainerStyle={MainStyles.container}
-    />
+      {/* Spazio finale */}
+      <View style={{ height: 24 }} />
+    </ScrollView>
   );
 };
 

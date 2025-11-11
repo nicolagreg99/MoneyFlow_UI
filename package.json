@@ -40,7 +40,8 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.21.0",
-    "styled-components": "^6.1.14"
+    "styled-components": "^6.1.14",
+    "victory-native": "^36.9.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

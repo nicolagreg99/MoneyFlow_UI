@@ -229,13 +229,6 @@ const IncomesScreen = () => {
             filterType="entrate"
           />
 
-          <View style={IncomesStyle.totalContainer}>
-            <Text style={IncomesStyle.totalText}>Totale Entrate</Text>
-            <Text style={IncomesStyle.totalAmount}>
-              {currencyFlag} {totalIncomes.toFixed(2)} {userCurrency}
-            </Text>
-          </View>
-
           {loading ? (
             <ActivityIndicator size="large" color="#007BFF" />
           ) : error ? (
