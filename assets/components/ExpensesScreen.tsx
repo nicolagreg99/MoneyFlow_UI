@@ -8,7 +8,7 @@ import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
 import PieChartGraph from "./personalized_components/PieChart";
 import TransactionList from "./personalized_components/TransactionList";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import API from "../../config/api";
 import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
 
@@ -20,13 +20,13 @@ const ExpensesScreen = () => {
 
   const [fromDate, setFromDate] = useState(firstDayOfMonth);
   const [toDate, setToDate] = useState(today);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [totalExpenses, setTotalExpenses] = useState<number>(0);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [totalExpenses, setTotalExpenses] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [userCurrency, setUserCurrency] = useState("EUR");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
 
   const fixedColors = {
@@ -59,7 +59,7 @@ const ExpensesScreen = () => {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     const year = date.getFullYear();
     const month = `${date.getMonth() + 1}`.padStart(2, "0");
     const day = `${date.getDate()}`.padStart(2, "0");
@@ -112,7 +112,7 @@ const ExpensesScreen = () => {
         setTotalExpenses(0);
         setError(data.message || "Nessun dato disponibile per il periodo selezionato.");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Errore durante il fetch delle spese:", error.response?.data || error.message);
       setError("Errore nel recupero dei dati.");
     } finally {
@@ -137,12 +137,10 @@ const ExpensesScreen = () => {
         headers: { "x-access-token": token },
       });
 
-      console.log("DEBUG response.data:", response.data);
-
       if (response.data && Array.isArray(response.data.expenses)) {
         setTransactions(response.data.expenses);
       } else if (Array.isArray(response.data)) {
-        setTransactions(response.data); // fallback vecchio formato
+        setTransactions(response.data);
       } else {
         setTransactions([]);
         setError("Nessuna transazione trovata per il periodo selezionato.");
@@ -155,8 +153,7 @@ const ExpensesScreen = () => {
     }
   };
 
-
-  const deleteExpense = async (expenseId: number) => {
+  const deleteExpense = async (expenseId) => {
     try {
       const token = await getToken();
       if (!token) {
@@ -169,7 +166,7 @@ const ExpensesScreen = () => {
       });
 
       setTransactions((prev) => prev.filter((t) => t.id !== expenseId));
-    } catch (error: any) {
+    } catch (error) {
       console.error("Errore durante l'eliminazione:", error.response?.data || error.message);
       setError("Errore durante la cancellazione della spesa.");
     }
@@ -212,16 +209,21 @@ const ExpensesScreen = () => {
               style={ExpensesStyles.iconButton}
               onPress={() => navigation.navigate("InsertExpenses")}
             >
-              <Ionicons name="add-circle-outline" size={30} color="#fff" />
+              <MaterialIcons name="add-circle-outline" size={30} color="#fff" />
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={ExpensesStyles.iconButton}
+              style={ExpensesStyles.listButton}
               onPress={() => setModalVisible(true)}
             >
-              <Ionicons name="list-outline" size={30} color="#fff" />
+              <MaterialIcons name="list-alt" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={ExpensesStyles.refreshButton} onPress={resetFilters}>
-              <Ionicons name="refresh" size={30} color="#555" />
+
+            <TouchableOpacity
+              style={ExpensesStyles.refreshButton}
+              onPress={resetFilters}
+            >
+              <MaterialIcons name="refresh" size={28} color="#fff" />
             </TouchableOpacity>
           </View>
 
@@ -233,17 +235,12 @@ const ExpensesScreen = () => {
             filterType="spese"
           />
 
-
           {loading ? (
             <ActivityIndicator size="large" color="#007BFF" />
           ) : error ? (
             <Text style={ExpensesStyles.errorText}>{error}</Text>
           ) : chartData.length > 0 ? (
-            <PieChartGraph
-              data={chartData}
-              total={totalExpenses}
-              userCurrency={userCurrency}
-            />
+            <PieChartGraph data={chartData} total={totalExpenses} userCurrency={userCurrency} />
           ) : (
             <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
           )}

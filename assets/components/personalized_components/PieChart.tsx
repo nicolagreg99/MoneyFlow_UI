@@ -222,16 +222,9 @@ const styles = StyleSheet.create({
   scrollContainer: { alignItems: "center", paddingBottom: 30 },
   chartCard: {
     backgroundColor: "#fff",
-    borderRadius: 24,
     width: screenWidth * 0.9,
     paddingVertical: 24,
     paddingHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 20,
   },
   headerSection: {
     flexDirection: "row",
@@ -346,14 +339,7 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     width: screenWidth * 0.9,
-    backgroundColor: "#fff",
-    borderRadius: 20,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   legendTitle: {
     fontSize: 16,

@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 import IncomesStyle from "../styles/Incomes_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
 import PieChartGraph from "./personalized_components/PieChart";
 import TransactionList from "./personalized_components/TransactionList";
-import { Ionicons } from "@expo/vector-icons";
 import API from "../../config/api";
 import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
 
@@ -20,13 +27,13 @@ const IncomesScreen = () => {
 
   const [fromDate, setFromDate] = useState(firstDayOfMonth);
   const [toDate, setToDate] = useState(today);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [totalIncomes, setTotalIncomes] = useState<number>(0);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [totalIncomes, setTotalIncomes] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [userCurrency, setUserCurrency] = useState("EUR");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
 
   const fixedColors = {
@@ -58,7 +65,7 @@ const IncomesScreen = () => {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     const year = date.getFullYear();
     const month = `${date.getMonth() + 1}`.padStart(2, "0");
     const day = `${date.getDate()}`.padStart(2, "0");
@@ -86,15 +93,25 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`${API.BASE_URL}/api/v1/incomes/total_by_category?${params}`, {
-        headers: { "x-access-token": token },
-      });
+      const response = await axios.get(
+        `${API.BASE_URL}/api/v1/incomes/total_by_category?${params}`,
+        {
+          headers: { "x-access-token": token },
+        }
+      );
 
       const data = response.data;
 
-      if (data && Array.isArray(data.totali_per_categoria) && data.totali_per_categoria.length > 0) {
+      if (
+        data &&
+        Array.isArray(data.totali_per_categoria) &&
+        data.totali_per_categoria.length > 0
+      ) {
         const totali = data.totali_per_categoria;
-        const totalSum = totali.reduce((sum, item) => sum + (parseFloat(item.totale_per_tipo) || 0), 0);
+        const totalSum = totali.reduce(
+          (sum, item) => sum + (parseFloat(item.totale_per_tipo) || 0),
+          0
+        );
 
         setTotalIncomes(totalSum);
         setUserCurrency(data.currency || "EUR");
@@ -109,10 +126,15 @@ const IncomesScreen = () => {
       } else {
         setChartData([]);
         setTotalIncomes(0);
-        setError(data.message || "Nessun dato disponibile per il periodo selezionato.");
+        setError(
+          data.message || "Nessun dato disponibile per il periodo selezionato."
+        );
       }
-    } catch (error: any) {
-      console.error("Errore durante il fetch delle entrate:", error.response?.data || error.message);
+    } catch (error) {
+      console.error(
+        "Errore durante il fetch delle entrate:",
+        error.response?.data || error.message
+      );
       setError("Errore nel recupero dei dati.");
     } finally {
       setLoading(false);
@@ -132,9 +154,12 @@ const IncomesScreen = () => {
       }
 
       const params = buildQueryParams();
-      const response = await axios.get(`${API.BASE_URL}/api/v1/incomes/list?${params}`, {
-        headers: { "x-access-token": token },
-      });
+      const response = await axios.get(
+        `${API.BASE_URL}/api/v1/incomes/list?${params}`,
+        {
+          headers: { "x-access-token": token },
+        }
+      );
 
       if (response.data && Array.isArray(response.data.incomes)) {
         setTransactions(response.data.incomes);
@@ -145,14 +170,17 @@ const IncomesScreen = () => {
         setError("Nessuna transazione trovata per il periodo selezionato.");
       }
     } catch (error) {
-      console.error("Errore nel recupero transazioni:", error.response?.data || error.message);
+      console.error(
+        "Errore nel recupero transazioni:",
+        error.response?.data || error.message
+      );
       setError("Errore durante il recupero delle transazioni.");
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteIncome = async (incomeId: number) => {
+  const deleteIncome = async (incomeId) => {
     try {
       const token = await getToken();
       if (!token) {
@@ -165,8 +193,11 @@ const IncomesScreen = () => {
       });
 
       setTransactions((prev) => prev.filter((t) => t.id !== incomeId));
-    } catch (error: any) {
-      console.error("Errore durante l'eliminazione:", error.response?.data || error.message);
+    } catch (error) {
+      console.error(
+        "Errore durante l'eliminazione:",
+        error.response?.data || error.message
+      );
       setError("Errore durante la cancellazione dell'entrata.");
     }
   };
@@ -199,38 +230,53 @@ const IncomesScreen = () => {
     <>
       <ScrollView contentContainerStyle={IncomesStyle.scrollContainer}>
         <View style={IncomesStyle.container}>
+          {/* Titolo */}
           <View style={IncomesStyle.titleContainer}>
             <Text style={IncomesStyle.title}>Gestione Entrate</Text>
           </View>
 
+          {/* Azioni principali */}
           <View style={IncomesStyle.actionsContainer}>
             <TouchableOpacity
               style={IncomesStyle.iconButton}
               onPress={() => navigation.navigate("InsertIncomes")}
             >
-              <Ionicons name="add-circle-outline" size={30} color="#fff" />
+              <MaterialIcons name="add-circle-outline" size={30} color="#fff" />
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={IncomesStyle.iconButton}
+              style={IncomesStyle.listButton}
               onPress={() => setModalVisible(true)}
             >
-              <Ionicons name="list-outline" size={30} color="#fff" />
+              <MaterialIcons name="list-alt" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={IncomesStyle.refreshButton} onPress={resetFilters}>
-              <Ionicons name="refresh" size={30} color="#555" />
+
+            <TouchableOpacity
+              style={IncomesStyle.refreshButton}
+              onPress={resetFilters}
+            >
+              <MaterialIcons name="refresh" size={28} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          <DateRangePicker fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />
+          {/* Selettore date */}
+          <DateRangePicker
+            fromDate={fromDate}
+            setFromDate={setFromDate}
+            toDate={toDate}
+            setToDate={setToDate}
+          />
 
+          {/* Filtri */}
           <FilterSelector
             selectedFilters={selectedFilters}
             setSelectedFilters={setSelectedFilters}
             filterType="entrate"
           />
 
+          {/* Grafico o messaggio */}
           {loading ? (
-            <ActivityIndicator size="large" color="#007BFF" />
+            <ActivityIndicator size="large" color="#4CAF50" />
           ) : error ? (
             <Text style={IncomesStyle.errorText}>{error}</Text>
           ) : chartData.length > 0 ? (
@@ -240,11 +286,14 @@ const IncomesScreen = () => {
               userCurrency={userCurrency}
             />
           ) : (
-            <Text style={IncomesStyle.noDataText}>Nessun dato disponibile</Text>
+            <Text style={IncomesStyle.noDataText}>
+              Nessun dato disponibile
+            </Text>
           )}
         </View>
       </ScrollView>
 
+      {/* Lista Transazioni */}
       <Modal
         visible={isModalVisible}
         animationType="slide"

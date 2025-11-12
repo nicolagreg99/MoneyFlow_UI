@@ -1,22 +1,27 @@
 import { StyleSheet } from 'react-native';
 
 const ExpensesStyles = StyleSheet.create({
+  /** 🔹 Scroll principale **/
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: '#f5f5f5',
-    paddingBottom: 20,
+    backgroundColor: '#f9f9f9',
+    paddingBottom: 40,
   },
+
+  /** 🔹 Contenitore principale **/
   container: {
     flexGrow: 1,
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 12,
-    marginHorizontal: 10,
+    borderRadius: 16,
+    marginHorizontal: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
+
+  /** 🔹 Titolo **/
   titleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -27,7 +32,9 @@ const ExpensesStyles = StyleSheet.create({
     color: '#2C3E50',
     textAlign: 'center',
     letterSpacing: 0.8,
+    marginBottom: 5,
   },
+
   /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
@@ -70,15 +77,13 @@ const ExpensesStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   dateText: {
     fontSize: 16,
     color: '#333',
   },
+
+  /** 🔹 Filtri **/
   filterBox: {
     backgroundColor: '#fff',
     padding: 14,
@@ -88,10 +93,6 @@ const ExpensesStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   filterBoxActive: {
     backgroundColor: '#2C3E50',
@@ -101,32 +102,8 @@ const ExpensesStyles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  /** 🏆 Totale Spese **/
-  // totalContainer: {
-  //   backgroundColor: '#FF6347',
-  //   paddingVertical: 12,
-  //   paddingHorizontal: 20,
-  //   borderRadius: 12,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   shadowColor: '#000',
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  //   marginBottom: 20,
-  // },
-  // totalText: {
-  //   fontSize: 20,
-  //   color: '#fff',
-  //   fontWeight: 'bold',
-  //   marginBottom: 10,
-  // },
-  // totalAmount: {
-  //   fontSize: 25,
-  //   color: '#fff',
-  //   fontWeight: '700',
-  // },
-  /** 📊 Contenitore del Grafico **/
+
+  /** 📊 Grafico **/
   chartWrapper: {
     width: '100%',
     alignItems: 'center',
@@ -138,25 +115,26 @@ const ExpensesStyles = StyleSheet.create({
     paddingVertical: 10,
   },
   chartContainer: {
-    width: "100%",
+    width: '100%',
     minHeight: 250,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   chartPlaceholder: {
-    width: "100%",
+    width: '100%',
     minHeight: 300,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+
   /** 🔹 Legenda **/
   legendContainer: {
     width: '100%',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 4,
     paddingBottom: 10,
   },
   legendItem: {
@@ -175,22 +153,23 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
-  /** 📌 Modale per la selezione **/
+
+  /** 🔹 Modale filtro / lista **/
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    width: '80%',
+    width: '85%',
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 5,
+    elevation: 4,
   },
   modalTitle: {
     fontSize: 20,
@@ -207,100 +186,81 @@ const ExpensesStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
-  modalCloseButton: {
-    marginTop: 15,
-    backgroundColor: '#16A085',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
   filterOptionText: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
     marginLeft: 10,
   },
-  /** 🔄 Pulsante di Refresh **/
-  refreshButton: {
-    backgroundColor: "#EAEAEA",
-    padding: 12,
-    borderRadius: 8,
+  modalCloseButton: {
+    marginTop: 15,
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
-  /** ➕ Pulsante di Inserimento Spese **/
-  addExpenseButton: {
-    backgroundColor: "#FF6347", // Rosso di Totale Spese
-    padding: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 15,
+  modalCloseText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
-  addExpenseText: {
-    color: "#fff", // Testo bianco
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  /** ❌ Testo di Errore **/
+
+  /** ❌ Testi **/
   errorText: {
-    color: "red",
-    textAlign: "center",
+    color: 'red',
+    textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
   },
   noDataText: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
-    color: "#555",
+    color: '#555',
   },
-  /** 🟠 Modale **/
-  modalButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-  },
-  modalButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "80%",
-  },
-  closeModalButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: "red",
-    borderRadius: 5,
-  },
-  closeModalText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  /** 🔝 Top Bar (Icone) **/
+
+  /** 🔹 Pulsanti della top bar **/
   actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginVertical: 20,
-    gap: 20,
+    gap: 18,
   },
+
   iconButton: {
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#FF6347", // Rosso di Totale Spese
+    backgroundColor: '#FF6347', // rosso moderno
+    padding: 14,
+    borderRadius: 50, // tondo
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  iconButtonText: {
-    color: "#fff", // Testo bianco per le icone
-    fontSize: 16,
+
+  listButton: {
+    backgroundColor: '#439cf6ff', // blu per "visualizza"
+    padding: 14,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+
+  refreshButton: {
+    backgroundColor: '#e2e9ebff',
+    padding: 14,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
 });
 

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import ExpensesStyles from '../../styles/Expenses_style';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import ExpensesStyles from "../../styles/Expenses_style";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import API from "../../../config/api";
 
 const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => {
@@ -14,16 +14,18 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = await AsyncStorage.getItem('authToken');
+        const token = await AsyncStorage.getItem("authToken");
         if (!token) return;
 
         const response = await axios.get(`${API.BASE_URL}/api/v1/me`, {
-          headers: { 'x-access-token': token }
+          headers: { "x-access-token": token },
         });
 
         if (response.data) {
           setFilterOptions(
-            filterType === "entrate" ? response.data.incomes_categories : response.data.expenses_categories
+            filterType === "entrate"
+              ? response.data.incomes_categories
+              : response.data.expenses_categories
           );
         }
       } catch (error) {
@@ -38,7 +40,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
 
   const toggleFilter = (filter) => {
     if (selectedFilters.includes(filter)) {
-      setSelectedFilters(selectedFilters.filter(f => f !== filter));
+      setSelectedFilters(selectedFilters.filter((f) => f !== filter));
     } else {
       setSelectedFilters([...selectedFilters, filter]);
     }
@@ -46,54 +48,73 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
 
   return (
     <View style={ExpensesStyles.filterContainer}>
-      <TouchableOpacity 
-        style={ExpensesStyles.filterBox} 
+      <TouchableOpacity
+        style={ExpensesStyles.filterBox}
         onPress={() => setModalVisible(true)}
+        activeOpacity={0.8}
       >
-        <Text style={ExpensesStyles.filterText}>
-          {selectedFilters.length > 0 ? selectedFilters.join(', ') : "Seleziona Categoria"}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Feather name="filter" size={18} color="#007AFF" style={{ marginRight: 8 }} />
+          <Text style={ExpensesStyles.filterText}>
+            {selectedFilters.length > 0
+              ? selectedFilters.join(", ")
+              : "Seleziona Categoria"}
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={18} color="#007AFF" />
       </TouchableOpacity>
 
-      <Modal 
-        visible={modalVisible} 
-        animationType="slide" 
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={ExpensesStyles.modalOverlay}>
           <View style={ExpensesStyles.modalContainer}>
             <Text style={ExpensesStyles.modalTitle}>
-              {filterType === "entrate" ? "Seleziona Categoria di Entrata" : "Seleziona Categoria di Spesa"}
+              {filterType === "entrate"
+                ? "Categorie di Entrata"
+                : "Categorie di Spesa"}
             </Text>
 
             {loading ? (
-              <ActivityIndicator size="large" color="#16A085" />
+              <ActivityIndicator size="large" color="#007AFF" />
             ) : (
               <FlatList
                 data={filterOptions}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <TouchableOpacity 
-                    style={ExpensesStyles.filterOptionRow} 
+                  <TouchableOpacity
+                    style={ExpensesStyles.filterOptionRow}
                     onPress={() => toggleFilter(item)}
+                    activeOpacity={0.7}
                   >
-                    {selectedFilters.includes(item) ? (
-                      <Feather name="check-square" size={22} color="#16A085" />
-                    ) : (
-                      <Feather name="square" size={22} color="#666" />
-                    )}
-                    <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        flex: 1,
+                      }}
+                    >
+                      {selectedFilters.includes(item) ? (
+                        <Feather name="check-circle" size={22} color="#007AFF" />
+                      ) : (
+                        <Feather name="circle" size={22} color="#ccc" />
+                      )}
+                      <Text style={ExpensesStyles.filterOptionText}>{item}</Text>
+                    </View>
                   </TouchableOpacity>
                 )}
               />
             )}
 
-            <TouchableOpacity 
-              style={ExpensesStyles.modalCloseButton} 
+            <TouchableOpacity
+              style={ExpensesStyles.modalCloseButton}
               onPress={() => setModalVisible(false)}
+              activeOpacity={0.8}
             >
-              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>Chiudi</Text>
+              <Text style={ExpensesStyles.modalCloseText}>Chiudi</Text>
             </TouchableOpacity>
           </View>
         </View>
