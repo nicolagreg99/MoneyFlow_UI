@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
 import IncomesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
@@ -20,6 +26,7 @@ const API_URL = `${API.BASE_URL}/api/v1/incomes/insert`;
 
 const InsertIncomesScreen = () => {
   const navigation = useNavigation();
+
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState([]);
@@ -31,27 +38,29 @@ const InsertIncomesScreen = () => {
   const [userCurrency, setUserCurrency] = useState<string>("EUR");
   const [currency, setCurrency] = useState<string>("EUR");
 
-  const [amountFocused, setAmountFocused] = useState(false);
-  const [descriptionFocused, setDescriptionFocused] = useState(false);
-  const [errorFields, setErrorFields] = useState({
-    amount: false,
-    description: false,
-    selectedType: false,
-  });
+  const [errorFields, setErrorFields] = useState({});
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // 🔹 Recupera user e valuta da AsyncStorage
+  // Effetto fade-in
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 700,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  // Recupero utente
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
         const storedUserData = await AsyncStorage.getItem("userData");
         if (!token || !storedUserData) return;
-
         const user = JSON.parse(storedUserData);
         setAuthToken(token);
         setUserId(user.id);
-
-        const defaultCurrency = user.default_currency || user.currency || "EUR";
+        const defaultCurrency = user.default_currency || "EUR";
         setUserCurrency(defaultCurrency);
         setCurrency(defaultCurrency);
       } catch (error) {
@@ -61,7 +70,7 @@ const InsertIncomesScreen = () => {
     loadUserData();
   }, []);
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
+  const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
@@ -73,29 +82,12 @@ const InsertIncomesScreen = () => {
       description: !description.trim(),
       selectedType: selectedType.length === 0,
     };
-
     setErrorFields(errors);
-
     if (Object.values(errors).some(Boolean)) {
-      if (errors.amount) {
-        Toast.show({
-          type: "error",
-          text1: "Importo non valido",
-          text2: "Inserisci un importo numerico.",
-        });
-      } else if (errors.description) {
-        Toast.show({
-          type: "error",
-          text1: "Descrizione mancante",
-          text2: "Inserisci una breve descrizione dell’entrata.",
-        });
-      } else if (errors.selectedType) {
-        Toast.show({
-          type: "error",
-          text1: "Categoria mancante",
-          text2: "Seleziona una categoria per l’entrata.",
-        });
-      }
+      Toast.show({
+        type: "error",
+        text1: "Compila tutti i campi obbligatori",
+      });
       return;
     }
 
@@ -103,7 +95,6 @@ const InsertIncomesScreen = () => {
       Toast.show({
         type: "error",
         text1: "Utente non autenticato",
-        text2: "Effettua nuovamente il login.",
       });
       return;
     }
@@ -121,30 +112,25 @@ const InsertIncomesScreen = () => {
     try {
       await axios.post(API_URL, incomeData, {
         headers: {
-          Accept: "application/json, text/plain, */*",
+          Accept: "application/json",
           "Content-Type": "application/json",
           "x-access-token": authToken,
         },
       });
-
       Toast.show({
         type: "success",
-        text1: "Entrata registrata con successo!",
-        visibilityTime: 2000,
+        text1: "Entrata registrata!",
       });
-
       setAmount("");
       setDescription("");
       setSelectedType([]);
       setCurrency(userCurrency);
       setDate(new Date());
     } catch (error) {
-      console.error("Errore nell'invio:", error);
+      console.error("Errore:", error);
       Toast.show({
         type: "error",
         text1: "Errore durante l'invio",
-        text2: "Controlla la connessione o riprova più tardi.",
-        visibilityTime: 3000,
       });
     } finally {
       setLoading(false);
@@ -152,129 +138,129 @@ const InsertIncomesScreen = () => {
   };
 
   return (
-    <View style={IncomesStyles.container}>
-      <Text style={IncomesStyles.header}>Inserisci una nuova entrata</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: "#F5F7FB" }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Animated.View style={[IncomesStyles.container, { opacity: fadeAnim }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 15 }}>
+            <Text style={[IncomesStyles.header, { marginLeft: 8 }]}>
+              💰 Aggiungi una nuova entrata
+            </Text>
+          </View>
 
-      {userId === null ? (
-        <ActivityIndicator size="large" color="#3498DB" />
-      ) : (
-        <>
-          {/* Importo */}
-          <View style={[IncomesStyles.inputWrapper, { position: "relative" }]}>
-            {(amount.length > 0 || amountFocused) && (
-              <Text style={IncomesStyles.floatingLabel}>Importo *</Text>
-            )}
+          {userId === null ? (
+            <ActivityIndicator size="large" color="#3498DB" />
+          ) : (
+            <>
+              {/* Importo */}
+              <View style={IncomesStyles.inputWrapper}>
+                <MaterialIcons
+                  name="euro"
+                  size={20}
+                  color="#3498DB"
+                  style={IncomesStyles.iconLeft}
+                />
+                <TextInput
+                  style={[
+                    IncomesStyles.input,
+                    errorFields.amount && IncomesStyles.errorInput,
+                  ]}
+                  keyboardType="numeric"
+                  placeholder={`Importo (${currency}) *`}
+                  placeholderTextColor="#95A5A6"
+                  value={amount}
+                  onChangeText={setAmount}
+                />
+                <View style={IncomesStyles.currencyPickerInside}>
+                  <CurrencyPicker
+                    currency={currency}
+                    setCurrency={setCurrency}
+                    compactMode
+                  />
+                </View>
+              </View>
 
-            <View style={{ position: "relative", justifyContent: "center" }}>
-              <TextInput
-                style={[
-                  IncomesStyles.input,
-                  errorFields.amount && IncomesStyles.errorInput,
-                ]}
-                onFocus={() => setAmountFocused(true)}
-                onBlur={() => setAmountFocused(false)}
-                keyboardType="numeric"
-                value={amount}
-                onChangeText={setAmount}
-                placeholder={
-                  amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
-                }
-                placeholderTextColor="#33a6aeff"
-              />
-
-              {/* Selettore valuta */}
-              <View
-                style={{
-                  position: "absolute",
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  justifyContent: "center",
-                  transform: [{ translateY: -6 }],
-                }}
-              >
-                <CurrencyPicker
-                  currency={currency}
-                  setCurrency={setCurrency}
-                  compactMode
+              {/* Descrizione */}
+              <View style={IncomesStyles.inputWrapper}>
+                <MaterialIcons
+                  name="description"
+                  size={20}
+                  color="#3498DB"
+                  style={IncomesStyles.iconLeft}
+                />
+                <TextInput
+                  style={[
+                    IncomesStyles.input,
+                    errorFields.description && IncomesStyles.errorInput,
+                  ]}
+                  placeholder="Descrizione *"
+                  placeholderTextColor="#95A5A6"
+                  value={description}
+                  onChangeText={setDescription}
                 />
               </View>
-            </View>
-          </View>
 
-          {/* Descrizione */}
-          <View style={IncomesStyles.inputWrapper}>
-            {(description.length > 0 || descriptionFocused) && (
-              <Text style={IncomesStyles.floatingLabel}>Descrizione *</Text>
-            )}
-            <TextInput
-              style={[
-                IncomesStyles.input,
-                errorFields.description && IncomesStyles.errorInput,
-              ]}
-              onFocus={() => setDescriptionFocused(true)}
-              onBlur={() => setDescriptionFocused(false)}
-              value={description}
-              onChangeText={setDescription}
-              placeholder={
-                description.length > 0 || descriptionFocused ? "" : "Descrizione *"
-              }
-              placeholderTextColor="#7F8C8D"
-            />
-          </View>
+              {/* Tipo */}
+              <FilterSelector
+                selectedFilters={selectedType}
+                setSelectedFilters={(filters) =>
+                  setSelectedType([filters[filters.length - 1]])
+                }
+                filterType="entrate"
+              />
 
-          {/* Tipo */}
-          <FilterSelector
-            selectedFilters={selectedType}
-            setSelectedFilters={(filters) =>
-              setSelectedType([filters[filters.length - 1]])
-            }
-            filterType="entrate"
-          />
+              {/* Data */}
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={IncomesStyles.datePickerButton}
+              >
+                <MaterialIcons name="event" size={20} color="#2C3E50" />
+                <Text style={IncomesStyles.datePickerText}>
+                  {date.toLocaleDateString("it-IT")}
+                </Text>
+              </TouchableOpacity>
 
-          {/* Data */}
-          <Text style={IncomesStyles.label}>Data:</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={IncomesStyles.datePickerButton}
-          >
-            <Text style={IncomesStyles.datePickerText}>
-              {date.toLocaleDateString("it-IT")}
-            </Text>
-          </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
 
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-            />
+              {/* Pulsante principale */}
+              <TouchableOpacity onPress={handleSubmit} disabled={loading}>
+                <LinearGradient
+                  colors={["#43e97b", "#38f9d7"]}
+                  start={[0, 0]}
+                  end={[1, 1]}
+                  style={IncomesStyles.gradientButton}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={IncomesStyles.gradientButtonText}>
+                      Inserisci Entrata
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+
+              {/* Pulsante Visualizza Entrate */}
+              <TouchableOpacity
+                style={IncomesStyles.secondaryButton}
+                onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
+              >
+              <Text style={IncomesStyles.secondaryButtonText}>📊 Visualizza le Entrate</Text>
+              </TouchableOpacity>
+            </>
           )}
-
-          {/* Pulsante invio */}
-          <TouchableOpacity
-            style={[IncomesStyles.button, loading && { opacity: 0.6 }]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={IncomesStyles.buttonText}>
-              {loading ? "Invio..." : "Inserisci Entrata"}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Pulsante visualizza entrate */}
-          <TouchableOpacity
-            style={IncomesStyles.linkButton}
-            onPress={() => navigation.navigate("IncomesView")}
-          >
-            <Text style={IncomesStyles.linkButtonText}>
-              📊 Visualizza le Entrate
-            </Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

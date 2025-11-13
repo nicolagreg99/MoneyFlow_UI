@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
 import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
@@ -20,6 +26,7 @@ const API_URL = `${API.BASE_URL}/api/v1/expenses/insert`;
 
 const InsertExpensesScreen = () => {
   const navigation = useNavigation();
+
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState([]);
@@ -31,40 +38,39 @@ const InsertExpensesScreen = () => {
   const [userCurrency, setUserCurrency] = useState<string>("EUR");
   const [currency, setCurrency] = useState<string>("EUR");
 
-  const [amountFocused, setAmountFocused] = useState(false);
-  const [descriptionFocused, setDescriptionFocused] = useState(false);
-  const [errorFields, setErrorFields] = useState({
-    amount: false,
-    description: false,
-    selectedType: false,
-  });
+  const [errorFields, setErrorFields] = useState({});
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // 🔹 Recupera i dati utente da AsyncStorage, come nel Menu
+  // 🔹 Effetto fade-in all'apertura
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 700,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  // 🔹 Recupero dati utente
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
         const storedUserData = await AsyncStorage.getItem("userData");
         if (!token || !storedUserData) return;
-
         const user = JSON.parse(storedUserData);
         setAuthToken(token);
         setUserId(user.id);
-
-        const defaultCurrency = user.default_currency || user.currency || "EUR";
+        const defaultCurrency = user.default_currency || "EUR";
         setUserCurrency(defaultCurrency);
         setCurrency(defaultCurrency);
-
-        console.log("DEBUG userCurrency:", defaultCurrency);
       } catch (error) {
         console.error("Errore nel recupero dati utente:", error);
       }
     };
-
     loadUserData();
   }, []);
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
+  const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
@@ -76,29 +82,12 @@ const InsertExpensesScreen = () => {
       description: !description.trim(),
       selectedType: selectedType.length === 0,
     };
-
     setErrorFields(errors);
-
     if (Object.values(errors).some(Boolean)) {
-      if (errors.amount) {
-        Toast.show({
-          type: "error",
-          text1: "Importo non valido",
-          text2: "Inserisci un importo numerico.",
-        });
-      } else if (errors.description) {
-        Toast.show({
-          type: "error",
-          text1: "Descrizione mancante",
-          text2: "Inserisci una breve descrizione della spesa.",
-        });
-      } else if (errors.selectedType) {
-        Toast.show({
-          type: "error",
-          text1: "Categoria mancante",
-          text2: "Seleziona una categoria per la spesa.",
-        });
-      }
+      Toast.show({
+        type: "error",
+        text1: "Compila tutti i campi obbligatori",
+      });
       return;
     }
 
@@ -106,7 +95,6 @@ const InsertExpensesScreen = () => {
       Toast.show({
         type: "error",
         text1: "Utente non autenticato",
-        text2: "Effettua nuovamente il login.",
       });
       return;
     }
@@ -124,30 +112,25 @@ const InsertExpensesScreen = () => {
     try {
       await axios.post(API_URL, expenseData, {
         headers: {
-          Accept: "application/json, text/plain, */*",
+          Accept: "application/json",
           "Content-Type": "application/json",
           "x-access-token": authToken,
         },
       });
-
       Toast.show({
         type: "success",
-        text1: "Spesa registrata con successo!",
-        visibilityTime: 2000,
+        text1: "Spesa registrata!",
       });
-
       setAmount("");
       setDescription("");
       setSelectedType([]);
       setCurrency(userCurrency);
       setDate(new Date());
     } catch (error) {
-      console.error("Errore nell'invio:", error);
+      console.error("Errore:", error);
       Toast.show({
         type: "error",
         text1: "Errore durante l'invio",
-        text2: "Controlla la connessione o riprova più tardi.",
-        visibilityTime: 3000,
       });
     } finally {
       setLoading(false);
@@ -155,123 +138,126 @@ const InsertExpensesScreen = () => {
   };
 
   return (
-    <View style={ExpensesStyles.container}>
-      <Text style={ExpensesStyles.header}>Inserisci una nuova spesa</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: "#F5F7FB" }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Animated.View style={[ExpensesStyles.container, { opacity: fadeAnim }]}>
 
-      {userId === null ? (
-        <ActivityIndicator size="large" color="#3498DB" />
-      ) : (
-        <>
-          {/* Importo */}
-          <View style={[ExpensesStyles.inputWrapper, { position: "relative" }]}>
-            {(amount.length > 0 || amountFocused) && (
-              <Text style={ExpensesStyles.floatingLabel}>Importo *</Text>
-            )}
+          <Text style={ExpensesStyles.header}> 💸 Aggiungi una nuova spesa</Text>
 
-            <View style={{ position: "relative", justifyContent: "center" }}>
-              <TextInput
-                style={[
-                  ExpensesStyles.input,
-                  errorFields.amount && ExpensesStyles.errorInput,
-                ]}
-                onFocus={() => setAmountFocused(true)}
-                onBlur={() => setAmountFocused(false)}
-                keyboardType="numeric"
-                value={amount}
-                onChangeText={setAmount}
-                placeholder={
-                  amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
+          {userId === null ? (
+            <ActivityIndicator size="large" color="#3498DB" />
+          ) : (
+            <>
+              {/* Campo importo */}
+              <View style={ExpensesStyles.inputWrapper}>
+                <MaterialIcons
+                  name="euro"
+                  size={20}
+                  color="#3498DB"
+                  style={ExpensesStyles.iconLeft}
+                />
+                <TextInput
+                  style={[
+                    ExpensesStyles.input,
+                    errorFields.amount && ExpensesStyles.errorInput,
+                  ]}
+                  keyboardType="numeric"
+                  placeholder={`Importo (${currency}) *`}
+                  placeholderTextColor="#95A5A6"
+                  value={amount}
+                  onChangeText={setAmount}
+                />
+                <View style={ExpensesStyles.currencyPickerInside}>
+                  <CurrencyPicker
+                    currency={currency}
+                    setCurrency={setCurrency}
+                    compactMode
+                  />
+                </View>
+              </View>
+
+              {/* Campo descrizione */}
+              <View style={ExpensesStyles.inputWrapper}>
+                <MaterialIcons
+                  name="description"
+                  size={20}
+                  color="#3498DB"
+                  style={ExpensesStyles.iconLeft}
+                />
+                <TextInput
+                  style={[
+                    ExpensesStyles.input,
+                    errorFields.description && ExpensesStyles.errorInput,
+                  ]}
+                  placeholder="Descrizione *"
+                  placeholderTextColor="#95A5A6"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+              </View>
+
+              {/* Categoria */}
+              <FilterSelector
+                selectedFilters={selectedType}
+                setSelectedFilters={(filters) =>
+                  setSelectedType([filters[filters.length - 1]])
                 }
-                placeholderTextColor="#7F8C8D"
+                filterType="spese"
               />
 
-              {/* Selettore valuta dentro la cella */}
-              <View
-                style={{
-                  position: "absolute",
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  justifyContent: "center",
-                  transform: [{ translateY: -6 }],
-                }}
+              {/* Data */}
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={ExpensesStyles.datePickerButton}
               >
-                <CurrencyPicker currency={currency} setCurrency={setCurrency} compactMode />
-              </View>
-            </View>
-          </View>
+                <MaterialIcons name="event" size={20} color="#2C3E50" />
+                <Text style={ExpensesStyles.datePickerText}>
+                  {date.toLocaleDateString("it-IT")}
+                </Text>
+              </TouchableOpacity>
 
-          {/* Descrizione */}
-          <View style={ExpensesStyles.inputWrapper}>
-            {(description.length > 0 || descriptionFocused) && (
-              <Text style={ExpensesStyles.floatingLabel}>Descrizione *</Text>
-            )}
-            <TextInput
-              style={[
-                ExpensesStyles.input,
-                errorFields.description && ExpensesStyles.errorInput,
-              ]}
-              onFocus={() => setDescriptionFocused(true)}
-              onBlur={() => setDescriptionFocused(false)}
-              value={description}
-              onChangeText={setDescription}
-              placeholder={
-                description.length > 0 || descriptionFocused ? "" : "Descrizione *"
-              }
-              placeholderTextColor="#7F8C8D"
-            />
-          </View>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
 
-          {/* Tipo */}
-          <FilterSelector
-            selectedFilters={selectedType}
-            setSelectedFilters={(filters) =>
-              setSelectedType([filters[filters.length - 1]])
-            }
-            filterType="spese"
-          />
+              {/* Pulsante principale */}
+              <TouchableOpacity onPress={handleSubmit} disabled={loading}>
+                <LinearGradient
+                  colors={["#36D1DC", "#5B86E5"]}
+                  start={[0, 0]}
+                  end={[1, 1]}
+                  style={ExpensesStyles.gradientButton}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={ExpensesStyles.gradientButtonText}>
+                      Inserisci Spesa
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
 
-          {/* Data */}
-          <Text style={ExpensesStyles.label}>Data:</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={ExpensesStyles.datePickerButton}
-          >
-            <Text style={ExpensesStyles.datePickerText}>
-              {date.toLocaleDateString("it-IT")}
-            </Text>
-          </TouchableOpacity>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-            />
+              {/* Pulsante secondario */}
+            <TouchableOpacity
+              style={ExpensesStyles.secondaryButton}
+              onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
+            >
+              <Text style={ExpensesStyles.secondaryButtonText}>📊 Visualizza le Spese</Text>
+            </TouchableOpacity>
+            </>
           )}
-
-          {/* Pulsante invio */}
-          <TouchableOpacity
-            style={[ExpensesStyles.button, loading && { opacity: 0.6 }]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={ExpensesStyles.buttonText}>
-              {loading ? "Invio..." : "Inserisci Spesa"}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Pulsante per visualizzare le spese */}
-          <TouchableOpacity
-            style={ExpensesStyles.linkButton}
-            onPress={() => navigation.navigate("ExpensesView")}
-          >
-            <Text style={ExpensesStyles.linkButtonText}>📊 Visualizza le Spese</Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

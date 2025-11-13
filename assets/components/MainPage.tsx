@@ -30,11 +30,13 @@ const MainPage = () => {
     const oggi = new Date();
     let mesiDinamici: string[] = [];
 
-    for (let i = 11; i >= 0; i--) {
+    // Da mese corrente a 11 mesi fa (ordine decrescente)
+    for (let i = 0; i < 12; i++) {
       let data = new Date(oggi.getFullYear(), oggi.getMonth() - i, 1);
       mesiDinamici.push(`${mesi[data.getMonth()]} ${data.getFullYear()}`);
     }
-    return mesiDinamici;
+
+    return mesiDinamici; // Già in ordine: [Nov 2025, Ott 2025, ...]
   };
 
   const fetchData = async () => {
@@ -82,7 +84,7 @@ const MainPage = () => {
       setSpese(speseMapped);
       setEntrate(entrateMapped);
       setBalances(balanceData);
-      setUserCurrency(speseData.currency || "EUR");
+      setUserCurrency(balanceData?.[0]?.currency || speseData.currency || "EUR");
     } catch (error: any) {
       console.error("Errore:", error);
       showToast("Errore durante il caricamento dei dati", "error");
@@ -116,8 +118,6 @@ const MainPage = () => {
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled={true}
     >
-
-      {/* Widgets statistiche */}
       <View style={MainStyles.statsSection}>
         <Text style={MainStyles.sectionTitle}>💰 Riepilogo Annuale</Text>
         <View style={MainStyles.widgetsContainer}>
@@ -139,31 +139,29 @@ const MainPage = () => {
         </View>
       </View>
 
-      {/* Grafico */}
       <LineChartComponent
-        labels={labels}
-        entrate={entrate}
-        spese={spese}
+        labels={[...labels].reverse()} // grafico da vecchio → nuovo (più leggibile)
+        entrate={[...entrate].reverse()}
+        spese={[...spese].reverse()}
         currency={userCurrency}
       />
 
-      {/* Tabella mensile */}
       <View style={MainStyles.tableSection}>
         <Text style={MainStyles.sectionTitle}>📋 Dettaglio Mensile</Text>
         <View>
           <MonthlyBalanceTable
-            balances={labels.map((mese) => ({
+            balances={labels.map((mese, index) => ({
               mese,
-              entrate: entrate[labels.indexOf(mese)] || 0,
-              spese: spese[labels.indexOf(mese)] || 0,
-              valore: (entrate[labels.indexOf(mese)] || 0) - (spese[labels.indexOf(mese)] || 0),
+              entrate: entrate[index] || 0,
+              spese: spese[index] || 0,
+              valore: (entrate[index] || 0) - (spese[index] || 0),
+              currency: userCurrency,
             }))}
             currency={userCurrency}
           />
         </View>
       </View>
 
-      {/* Spazio finale */}
       <View style={{ height: 24 }} />
     </ScrollView>
   );

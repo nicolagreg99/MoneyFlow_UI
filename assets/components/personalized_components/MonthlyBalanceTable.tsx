@@ -19,9 +19,10 @@ interface BalanceItem {
 
 interface MonthlyBalanceTableProps {
   balances: BalanceItem[];
+  currency: string;
 }
 
-const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances }) => {
+const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, currency }) => {
   const [sortedData, setSortedData] = useState<BalanceItem[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortKey, setSortKey] = useState<SortKey>('mese');
@@ -100,17 +101,23 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances }) =
           renderItem={({ item, index }) => (
             <View style={[styles.row, index % 2 === 0 && styles.rowAlternate]}>
               <Text style={styles.cell}>{item.mese}</Text>
-              <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>€{item.entrate.toFixed(2)}</Text>
-              <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>€{item.spese.toFixed(2)}</Text>
-              <Text style={[
-                styles.cell,
-                {
-                  textAlign: 'right',
-                  color: item.valore >= 0 ? '#27ae60' : '#c0392b',
-                  fontWeight: 'bold',
-                }
-              ]}>
-                €{item.valore.toFixed(2)}
+              <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>
+                {currency} {item.entrate.toFixed(2)}
+              </Text>
+              <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>
+                {currency} {item.spese.toFixed(2)}
+              </Text>
+              <Text
+                style={[
+                  styles.cell,
+                  {
+                    textAlign: 'right',
+                    color: item.valore >= 0 ? '#27ae60' : '#c0392b',
+                    fontWeight: 'bold',
+                  },
+                ]}
+              >
+                {currency} {item.valore.toFixed(2)}
               </Text>
             </View>
           )}

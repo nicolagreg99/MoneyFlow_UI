@@ -1,14 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 const ExpensesStyles = StyleSheet.create({
-  /** 🔹 Scroll principale **/
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#f9f9f9',
     paddingBottom: 40,
   },
 
-  /** 🔹 Contenitore principale **/
   container: {
     flexGrow: 1,
     backgroundColor: '#fff',
@@ -21,7 +19,6 @@ const ExpensesStyles = StyleSheet.create({
     elevation: 2,
   },
 
-  /** 🔹 Titolo **/
   titleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -35,7 +32,6 @@ const ExpensesStyles = StyleSheet.create({
     marginBottom: 5,
   },
 
-  /** 📅 Date Picker **/
   accordionContainer: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -83,7 +79,6 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
   },
 
-  /** 🔹 Filtri **/
   filterBox: {
     backgroundColor: '#fff',
     padding: 14,
@@ -103,7 +98,6 @@ const ExpensesStyles = StyleSheet.create({
     color: '#333',
   },
 
-  /** 📊 Grafico **/
   chartWrapper: {
     width: '100%',
     alignItems: 'center',
@@ -130,7 +124,6 @@ const ExpensesStyles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  /** 🔹 Legenda **/
   legendContainer: {
     width: '100%',
     alignItems: 'center',
@@ -154,7 +147,6 @@ const ExpensesStyles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  /** 🔹 Modale filtro / lista **/
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
