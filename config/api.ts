@@ -1,5 +1,5 @@
 // config/api.ts
-const BASE_URL = "http://192.168.1.10:5000";
+const BASE_URL = "https://backend.money-app-api.com";
 
 export default {
   BASE_URL,
