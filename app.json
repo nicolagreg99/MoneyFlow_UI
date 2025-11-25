@@ -29,7 +29,8 @@
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "ndkVersion": "26.1.10755232"
     },
     "web": {
       "favicon": "./assets/favicon.png"
