@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -10,68 +11,57 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// --- Lista valute ---
+// Lista delle valute con i relativi codici e bandiere
 export const currencies = [
-  { code: "AED", name: "Dirham degli Emirati Arabi", flag: "🇦🇪" },
-  { code: "ALL", name: "Lek Albanese", flag: "🇦🇱" },
-  { code: "ARS", name: "Peso Argentino", flag: "🇦🇷" },
-  { code: "AUD", name: "Dollaro Australiano", flag: "🇦🇺" },
-  { code: "BGN", name: "Lev Bulgaro", flag: "🇧🇬" },
-  { code: "BRL", name: "Real Brasiliano", flag: "🇧🇷" },
-  { code: "CAD", name: "Dollaro Canadese", flag: "🇨🇦" },
-  { code: "CHF", name: "Franco Svizzero", flag: "🇨🇭" },
-  { code: "CNY", name: "Yuan Cinese", flag: "🇨🇳" },
-  { code: "CZK", name: "Corona Ceca", flag: "🇨🇿" },
-  { code: "DKK", name: "Corona Danese", flag: "🇩🇰" },
-  { code: "DZD", name: "Dinaro Algerino", flag: "🇩🇿" },
-  { code: "EGP", name: "Sterlina Egiziana", flag: "🇪🇬" },
-  { code: "EUR", name: "Euro", flag: "🇪🇺" },
-  { code: "GBP", name: "Sterlina Britannica", flag: "🇬🇧" },
-  { code: "HRK", name: "Kuna Croata", flag: "🇭🇷" },
-  { code: "HUF", name: "Fiorino Ungherese", flag: "🇭🇺" },
-  { code: "INR", name: "Rupia Indiana", flag: "🇮🇳" },
-  { code: "ISK", name: "Corona Islandese", flag: "🇮🇸" },
-  { code: "JPY", name: "Yen Giapponese", flag: "🇯🇵" },
-  { code: "MAD", name: "Dirham Marocchino", flag: "🇲🇦" },
-  { code: "MXN", name: "Peso Messicano", flag: "🇲🇽" },
-  { code: "NOK", name: "Corona Norvegese", flag: "🇳🇴" },
-  { code: "PLN", name: "Zloty Polacco", flag: "🇵🇱" },
-  { code: "RON", name: "Leu Rumeno", flag: "🇷🇴" },
-  { code: "RSD", name: "Dinaro Serbo", flag: "🇷🇸" },
-  { code: "RUB", name: "Rublo Russo", flag: "🇷🇺" },
-  { code: "SAR", name: "Riyal Saudita", flag: "🇸🇦" },
-  { code: "SEK", name: "Corona Svedese", flag: "🇸🇪" },
-  { code: "TRY", name: "Lira Turca", flag: "🇹🇷" },
-  { code: "USD", name: "Dollaro Statunitense", flag: "🇺🇸" },
-  { code: "ZAR", name: "Rand Sudafricano", flag: "🇿🇦" },
+  { code: "AED", flag: "🇦🇪" },
+  { code: "ALL", flag: "🇦🇱" },
+  { code: "ARS", flag: "🇦🇷" },
+  { code: "AUD", flag: "🇦🇺" },
+  { code: "BGN", flag: "🇧🇬" },
+  { code: "BRL", flag: "🇧🇷" },
+  { code: "CAD", flag: "🇨🇦" },
+  { code: "CHF", flag: "🇨🇭" },
+  { code: "CNY", flag: "🇨🇳" },
+  { code: "CZK", flag: "🇨🇿" },
+  { code: "DKK", flag: "🇩🇰" },
+  { code: "DZD", flag: "🇩🇿" },
+  { code: "EGP", flag: "🇪🇬" },
+  { code: "EUR", flag: "🇪🇺" },
+  { code: "GBP", flag: "🇬🇧" },
+  { code: "HRK", flag: "🇭🇷" },
+  { code: "HUF", flag: "🇭🇺" },
+  { code: "INR", flag: "🇮🇳" },
+  { code: "ISK", flag: "🇮🇸" },
+  { code: "JPY", flag: "🇯🇵" },
+  { code: "MAD", flag: "🇲🇦" },
+  { code: "MXN", flag: "🇲🇽" },
+  { code: "NOK", flag: "🇳🇴" },
+  { code: "PLN", flag: "🇵🇱" },
+  { code: "RON", flag: "🇷🇴" },
+  { code: "RSD", flag: "🇷🇸" },
+  { code: "RUB", flag: "🇷🇺" },
+  { code: "SAR", flag: "🇸🇦" },
+  { code: "SEK", flag: "🇸🇪" },
+  { code: "TRY", flag: "🇹🇷" },
+  { code: "USD", flag: "🇺🇸" },
+  { code: "ZAR", flag: "🇿🇦" },
 ].sort((a, b) => a.code.localeCompare(b.code));
 
+// Funzione esportata per ottenere la bandiera di una valuta
 export const getCurrencyFlag = (code: string): string => {
   const currency = currencies.find((c) => c.code === code);
   return currency ? currency.flag : "💱";
 };
 
-// --- Props ---
-interface CurrencyPickerProps {
-  currency: string;
-  setCurrency: (code: string) => void;
-  label?: string;
-  compactMode?: boolean; // ✅ nuova prop per modalità compatta
-}
-
-// --- Componente ---
-const CurrencyPicker: React.FC<CurrencyPickerProps> = ({
-  currency,
-  setCurrency,
-  label = "Valuta",
-  compactMode = false,
-}) => {
+const CurrencyPicker = ({ currency, setCurrency, label = "Valuta", compactMode = false }) => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Filtro le valute in base alla ricerca
   const filteredCurrencies = currencies.filter(
     (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      t(`currency_${c.code}`).toLowerCase().includes(search.toLowerCase()) ||
       c.code.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -103,11 +93,11 @@ const CurrencyPicker: React.FC<CurrencyPickerProps> = ({
       <Modal visible={visible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Seleziona valuta</Text>
+            <Text style={styles.modalTitle}>{t("select_currency")}</Text>
 
             <TextInput
               style={styles.searchInput}
-              placeholder="Cerca..."
+              placeholder={t("search_placeholder")}
               value={search}
               onChangeText={setSearch}
             />
@@ -126,7 +116,7 @@ const CurrencyPicker: React.FC<CurrencyPickerProps> = ({
                   }}
                 >
                   <Text style={styles.currencyItemText}>
-                    {item.flag} {item.name} ({item.code})
+                    {item.flag} {t(`currency_${item.code}`)} ({item.code})
                   </Text>
                 </TouchableOpacity>
               )}
@@ -139,7 +129,7 @@ const CurrencyPicker: React.FC<CurrencyPickerProps> = ({
                 setSearch("");
               }}
             >
-              <Text style={styles.modalCloseText}>Chiudi</Text>
+              <Text style={styles.modalCloseText}>{t("close")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -150,7 +140,6 @@ const CurrencyPicker: React.FC<CurrencyPickerProps> = ({
 
 // --- Stili ---
 const styles = StyleSheet.create({
-  // --- MODAL ---
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -209,8 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  // --- VERSIONE STANDARD ---
-    currencyContainerSmall: {
+  currencyContainerSmall: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -221,7 +209,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e1e5e9",
     marginTop: 10,
-    },
+  },
   currencyLabelSmall: {
     fontSize: 13,
     color: "#666",
@@ -236,7 +224,6 @@ const styles = StyleSheet.create({
     color: "#16A085",
     fontWeight: "bold",
   },
-  // --- VERSIONE COMPATTA ---
   compactButton: {
     flexDirection: "row",
     alignItems: "center",

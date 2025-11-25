@@ -14,7 +14,9 @@ import Toast from "react-native-toast-message";
 import EditUserStyles from "../styles/EditUser_style";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
+// 🔹 COMPONENTE SEZIONE CATEGORIE
 const CategorySection = ({
   title,
   value,
@@ -24,46 +26,60 @@ const CategorySection = ({
   onRemove,
   color,
   chipStyle,
-}) => (
-  <View style={[EditUserStyles.sectionBox, { borderLeftColor: color }]}>
-    <Text style={EditUserStyles.sectionTitle}>{`Categorie di ${title}`}</Text>
+}) => {
+  const { t } = useTranslation();
 
-    <View style={EditUserStyles.addRow}>
-      <TextInput
-        style={EditUserStyles.categoryInput}
-        placeholder={`Aggiungi categoria di ${title.toLowerCase()}`}
-        value={value}
-        onChangeText={onChangeText}
-      />
-      <TouchableOpacity
-        style={[EditUserStyles.addButton, { backgroundColor: color }]}
-        onPress={onAdd}
-      >
-        <Text style={EditUserStyles.addButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
+  return (
+    <View style={[EditUserStyles.sectionBox, { borderLeftColor: color }]}>
+      <Text style={EditUserStyles.sectionTitle}>
+        {t(title === "Spese" ? "expense_categories" : "income_categories")}
+      </Text>
 
-    <View style={EditUserStyles.chipsContainer}>
-      {data.length > 0 ? (
-        data.map((item, index) => (
-          <View key={index} style={[EditUserStyles.chip, chipStyle]}>
-            <Text style={EditUserStyles.chipText}>{item}</Text>
-            <TouchableOpacity onPress={() => onRemove(index)}>
-              <Text style={{ color: "#fff" }}>✕</Text>
-            </TouchableOpacity>
-          </View>
-        ))
-      ) : (
-        <Text style={EditUserStyles.emptyText}>
-          Nessuna categoria di {title.toLowerCase()}
-        </Text>
-      )}
+      <View style={EditUserStyles.addRow}>
+        <TextInput
+          style={EditUserStyles.categoryInput}
+          placeholder={
+            title === "Spese"
+              ? t("add_expense_category_placeholder")
+              : t("add_income_category_placeholder")
+          }
+          value={value}
+          onChangeText={onChangeText}
+        />
+        <TouchableOpacity
+          style={[EditUserStyles.addButton, { backgroundColor: color }]}
+          onPress={onAdd}
+        >
+          <Text style={EditUserStyles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={EditUserStyles.chipsContainer}>
+        {data.length > 0 ? (
+          data.map((item, index) => (
+            <View key={index} style={[EditUserStyles.chip, chipStyle]}>
+              <Text style={EditUserStyles.chipText}>{item}</Text>
+              <TouchableOpacity onPress={() => onRemove(index)}>
+                <Text style={{ color: "#fff" }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={EditUserStyles.emptyText}>
+            {title === "Spese"
+              ? t("no_expense_categories")
+              : t("no_income_categories")}
+          </Text>
+        )}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const EditUser = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [userData, setUserData] = useState({ first_name: "", last_name: "" });
@@ -71,7 +87,6 @@ const EditUser = () => {
   const [incomes, setIncomes] = useState([]);
   const [currency, setCurrency] = useState("EUR");
 
-  // Stati per le nuove categorie
   const [newExpenseCategory, setNewExpenseCategory] = useState("");
   const [newIncomeCategory, setNewIncomeCategory] = useState("");
 
@@ -96,7 +111,7 @@ const EditUser = () => {
       } catch {
         Toast.show({
           type: "error",
-          text1: "Errore nel caricamento del profilo",
+          text1: t("profile_load_error"),
           position: "bottom",
         });
       } finally {
@@ -106,15 +121,15 @@ const EditUser = () => {
     fetchUserData();
   }, []);
 
-  // ➕ Aggiunta e rimozione categorie
+  // 🔹 Aggiungi categorie
   const handleAddExpenseCategory = () => {
     const trimmed = newExpenseCategory.trim();
     if (!trimmed) {
-      Toast.show({ type: "info", text1: "Inserisci un nome valido", position: "bottom" });
+      Toast.show({ type: "info", text1: t("insert_valid_name"), position: "bottom" });
       return;
     }
     if (expenses.includes(trimmed)) {
-      Toast.show({ type: "info", text1: "Categoria già presente", position: "bottom" });
+      Toast.show({ type: "info", text1: t("category_exists"), position: "bottom" });
       return;
     }
     setExpenses([...expenses, trimmed]);
@@ -128,11 +143,11 @@ const EditUser = () => {
   const handleAddIncomeCategory = () => {
     const trimmed = newIncomeCategory.trim();
     if (!trimmed) {
-      Toast.show({ type: "info", text1: "Inserisci un nome valido", position: "bottom" });
+      Toast.show({ type: "info", text1: t("insert_valid_name"), position: "bottom" });
       return;
     }
     if (incomes.includes(trimmed)) {
-      Toast.show({ type: "info", text1: "Categoria già presente", position: "bottom" });
+      Toast.show({ type: "info", text1: t("category_exists"), position: "bottom" });
       return;
     }
     setIncomes([...incomes, trimmed]);
@@ -143,7 +158,6 @@ const EditUser = () => {
     setIncomes(incomes.filter((_, i) => i !== index));
   };
 
-  // 🔄 Aggiornamento dati utente
   const handleUpdate = async () => {
     const payload = {
       ...userData,
@@ -171,18 +185,16 @@ const EditUser = () => {
       };
       await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
 
-      console.log("AsyncStorage aggiornato:", updatedUserData);
-
       Toast.show({
         type: "success",
-        text1: "Profilo aggiornato con successo!",
+        text1: t("profile_updated_success"),
         position: "bottom",
       });
       navigation.navigate("Menu", { refresh: true });
     } catch {
       Toast.show({
         type: "error",
-        text1: "Errore durante l'aggiornamento",
+        text1: t("update_error"),
         position: "bottom",
       });
     } finally {
@@ -196,7 +208,7 @@ const EditUser = () => {
         <ActivityIndicator size="large" color="#16A085" />
       ) : (
         <>
-          <Text style={EditUserStyles.title}>Modifica Profilo</Text>
+          <Text style={EditUserStyles.title}>{t("edit_profile")}</Text>
 
           <View style={EditUserStyles.profileCard}>
             <View style={EditUserStyles.profileIconContainer}>
@@ -207,10 +219,12 @@ const EditUser = () => {
 
             <View style={EditUserStyles.profileDetailsContainer}>
               <View style={EditUserStyles.nameContainerSmall}>
-                <Text style={EditUserStyles.nameLabelSmall}>Nome</Text>
+                <Text style={EditUserStyles.nameLabelSmall}>
+                  {t("first_name")}
+                </Text>
                 <TextInput
                   style={EditUserStyles.profileNameInput}
-                  placeholder="Nome"
+                  placeholder={t("first_name")}
                   value={userData.first_name}
                   onChangeText={(text) =>
                     setUserData({ ...userData, first_name: text })
@@ -218,16 +232,13 @@ const EditUser = () => {
                 />
               </View>
 
-              <View
-                style={[
-                  EditUserStyles.nameContainerSmall,
-                  { marginTop: 10 },
-                ]}
-              >
-                <Text style={EditUserStyles.nameLabelSmall}>Cognome</Text>
+              <View style={[EditUserStyles.nameContainerSmall, { marginTop: 10 }]}>
+                <Text style={EditUserStyles.nameLabelSmall}>
+                  {t("last_name")}
+                </Text>
                 <TextInput
                   style={EditUserStyles.profileNameInput}
-                  placeholder="Cognome"
+                  placeholder={t("last_name")}
                   value={userData.last_name}
                   onChangeText={(text) =>
                     setUserData({ ...userData, last_name: text })
@@ -238,7 +249,7 @@ const EditUser = () => {
               <CurrencyPicker
                 currency={currency}
                 setCurrency={setCurrency}
-                label="Valuta predefinita"
+                label={t("default_currency")}
               />
             </View>
           </View>
@@ -273,7 +284,7 @@ const EditUser = () => {
             {updating ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={EditUserStyles.buttonText}>Salva Modifiche</Text>
+              <Text style={EditUserStyles.buttonText}>{t("save_changes")}</Text>
             )}
           </TouchableOpacity>
         </>

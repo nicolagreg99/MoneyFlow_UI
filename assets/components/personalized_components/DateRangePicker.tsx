@@ -3,8 +3,10 @@ import { View, Text, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Feather } from "@expo/vector-icons";
 import ExpensesStyles from "../../styles/Expenses_style";
+import { useTranslation } from "react-i18next";
 
 const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
@@ -41,7 +43,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Feather name="calendar" size={20} color="#007AFF" style={{ marginRight: 8 }} />
-          <Text style={ExpensesStyles.accordionTitle}>Seleziona intervallo date</Text>
+          <Text style={ExpensesStyles.accordionTitle}> {t("select_interval_date")}</Text>
         </View>
         <Feather
           name={expanded ? "chevron-up" : "chevron-down"}

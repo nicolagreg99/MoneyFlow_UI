@@ -21,10 +21,12 @@ import IncomesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
+import { useTranslation } from 'react-i18next';
 
 const API_URL = `${API.BASE_URL}/api/v1/incomes/insert`;
 
 const InsertIncomesScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
 
   const [amount, setAmount] = useState("");
@@ -41,7 +43,6 @@ const InsertIncomesScreen = () => {
   const [errorFields, setErrorFields] = useState({});
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Effetto fade-in
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -50,8 +51,7 @@ const InsertIncomesScreen = () => {
     }).start();
   }, []);
 
-  // Recupero utente
-  useEffect(() => {
+ useEffect(() => {
     const loadUserData = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
@@ -86,7 +86,7 @@ const InsertIncomesScreen = () => {
     if (Object.values(errors).some(Boolean)) {
       Toast.show({
         type: "error",
-        text1: "Compila tutti i campi obbligatori",
+        text1: t("fill_required_fields"),
       });
       return;
     }
@@ -94,7 +94,7 @@ const InsertIncomesScreen = () => {
     if (!userId || !authToken) {
       Toast.show({
         type: "error",
-        text1: "Utente non autenticato",
+        text1: t("user_not_authenticated"),
       });
       return;
     }
@@ -119,7 +119,7 @@ const InsertIncomesScreen = () => {
       });
       Toast.show({
         type: "success",
-        text1: "Entrata registrata!",
+        text1: t("income_registered"),
       });
       setAmount("");
       setDescription("");
@@ -130,7 +130,7 @@ const InsertIncomesScreen = () => {
       console.error("Errore:", error);
       Toast.show({
         type: "error",
-        text1: "Errore durante l'invio",
+        text1: t("error_sending"),
       });
     } finally {
       setLoading(false);
@@ -146,7 +146,7 @@ const InsertIncomesScreen = () => {
         <Animated.View style={[IncomesStyles.container, { opacity: fadeAnim }]}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 15 }}>
             <Text style={[IncomesStyles.header, { marginLeft: 8 }]}>
-              💰 Aggiungi una nuova entrata
+              💰 {t("add_new_income")}
             </Text>
           </View>
 
@@ -168,7 +168,7 @@ const InsertIncomesScreen = () => {
                     errorFields.amount && IncomesStyles.errorInput,
                   ]}
                   keyboardType="numeric"
-                  placeholder={`Importo (${currency}) *`}
+                  placeholder={`${t("amount_label")} (${currency}) *`}
                   placeholderTextColor="#95A5A6"
                   value={amount}
                   onChangeText={setAmount}
@@ -195,7 +195,7 @@ const InsertIncomesScreen = () => {
                     IncomesStyles.input,
                     errorFields.description && IncomesStyles.errorInput,
                   ]}
-                  placeholder="Descrizione *"
+                  placeholder={t("description_label")}
                   placeholderTextColor="#95A5A6"
                   value={description}
                   onChangeText={setDescription}
@@ -243,7 +243,7 @@ const InsertIncomesScreen = () => {
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text style={IncomesStyles.gradientButtonText}>
-                      Inserisci Entrata
+                      {t("insert_income")}
                     </Text>
                   )}
                 </LinearGradient>
@@ -254,7 +254,9 @@ const InsertIncomesScreen = () => {
                 style={IncomesStyles.secondaryButton}
                 onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
               >
-              <Text style={IncomesStyles.secondaryButtonText}>📊 Visualizza le Entrate</Text>
+                <Text style={IncomesStyles.secondaryButtonText}>
+                  📊 {t("view_incomes")}
+                </Text>
               </TouchableOpacity>
             </>
           )}

@@ -15,8 +15,10 @@ import FilterSelector from "./personalized_components/FilterSelector";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 import API from "../../config/api";
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
 
 const EditIncomeScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
   const { income } = route.params || {};
@@ -102,7 +104,7 @@ const EditIncomeScreen = () => {
 
       Toast.show({
         type: "success",
-        text1: "Entrata modificata con successo",
+        text1: t("success_income_updated"),
         position: "bottom",
       });
 
@@ -111,7 +113,7 @@ const EditIncomeScreen = () => {
       console.error("Errore aggiornamento:", error);
       Toast.show({
         type: "error",
-        text1: "Errore durante la modifica",
+        text1: t("error_updating"),
         position: "bottom",
       });
     } finally {
@@ -121,11 +123,13 @@ const EditIncomeScreen = () => {
 
   return (
     <View style={IncomesStyles.container}>
-      <Text style={IncomesStyles.header}>Modifica Entrata</Text>
+      <Text style={IncomesStyles.header}>{t("edit_income")}</Text>
 
       <View style={[IncomesStyles.inputWrapper, { position: "relative" }]}>
         {(amount.length > 0 || amountFocused) && (
-          <Text style={IncomesStyles.floatingLabel}>Importo *</Text>
+          <Text style={IncomesStyles.floatingLabel}>
+            {t("amount_label")} *
+          </Text>
         )}
 
         <View style={{ position: "relative", justifyContent: "center" }}>
@@ -140,7 +144,9 @@ const EditIncomeScreen = () => {
             value={amount}
             onChangeText={setAmount}
             placeholder={
-              amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
+              amount.length > 0 || amountFocused
+                ? ""
+                : `${t("amount_label")} (${currency}) *`
             }
             placeholderTextColor="#7F8C8D"
           />
@@ -164,12 +170,14 @@ const EditIncomeScreen = () => {
         </View>
       </View>
       {errorFields.amount && (
-        <Text style={IncomesStyles.errorText}>Inserisci un importo!</Text>
+        <Text style={IncomesStyles.errorText}>{t("amount_required")}</Text>
       )}
 
       <View style={IncomesStyles.inputWrapper}>
         {(description.length > 0 || descriptionFocused) && (
-          <Text style={IncomesStyles.floatingLabel}>Descrizione *</Text>
+          <Text style={IncomesStyles.floatingLabel}>
+            {t("description_label")} *
+          </Text>
         )}
         <TextInput
           style={[
@@ -181,16 +189,18 @@ const EditIncomeScreen = () => {
           value={description}
           onChangeText={setDescription}
           placeholder={
-            description.length > 0 || descriptionFocused ? "" : "Descrizione *"
+            description.length > 0 || descriptionFocused
+              ? ""
+              : `${t("description_label")} *`
           }
           placeholderTextColor="#7F8C8D"
         />
       </View>
       {errorFields.description && (
-        <Text style={IncomesStyles.errorText}>Inserisci una descrizione!</Text>
+        <Text style={IncomesStyles.errorText}>{t("description_required")}</Text>
       )}
 
-      <Text style={IncomesStyles.label}>Tipo *</Text>
+      <Text style={IncomesStyles.label}>{t("type_label")} *</Text>
       <FilterSelector
         selectedFilters={selectedType}
         setSelectedFilters={(filters) =>
@@ -199,10 +209,10 @@ const EditIncomeScreen = () => {
         filterType="entrate"
       />
       {errorFields.selectedType && (
-        <Text style={IncomesStyles.errorText}>Seleziona un tipo!</Text>
+        <Text style={IncomesStyles.errorText}>{t("type_required")}</Text>
       )}
 
-      <Text style={IncomesStyles.label}>Data:</Text>
+      <Text style={IncomesStyles.label}>{t("date")}:</Text>
       <TouchableOpacity
         onPress={() => setShowDatePicker(true)}
         style={IncomesStyles.datePickerButton}
@@ -227,7 +237,7 @@ const EditIncomeScreen = () => {
         disabled={loading}
       >
         <Text style={IncomesStyles.buttonText}>
-          {loading ? "Salvataggio..." : "Salva Modifiche"}
+          {loading ? t("saving") : t("save_changes")}
         </Text>
       </TouchableOpacity>
     </View>

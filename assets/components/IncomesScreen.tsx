@@ -18,8 +18,10 @@ import PieChartGraph from "./personalized_components/PieChart";
 import TransactionList from "./personalized_components/TransactionList";
 import API from "../../config/api";
 import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 const IncomesScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
 
   const today = new Date();
@@ -87,7 +89,7 @@ const IncomesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         setLoading(false);
         return;
       }
@@ -126,16 +128,14 @@ const IncomesScreen = () => {
       } else {
         setChartData([]);
         setTotalIncomes(0);
-        setError(
-          data.message || "Nessun dato disponibile per il periodo selezionato."
-        );
+        setError(t("no_data_selected"));
       }
     } catch (error) {
       console.error(
         "Errore durante il fetch delle entrate:",
         error.response?.data || error.message
       );
-      setError("Errore nel recupero dei dati.");
+      setError(t("data_fetch_error"));
     } finally {
       setLoading(false);
     }
@@ -148,7 +148,7 @@ const IncomesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         setLoading(false);
         return;
       }
@@ -167,14 +167,14 @@ const IncomesScreen = () => {
         setTransactions(response.data);
       } else {
         setTransactions([]);
-        setError("Nessuna transazione trovata per il periodo selezionato.");
+        setError(t("no_transactions_found"));
       }
     } catch (error) {
       console.error(
         "Errore nel recupero transazioni:",
         error.response?.data || error.message
       );
-      setError("Errore durante il recupero delle transazioni.");
+      setError(t("transaction_fetch_error"));
     } finally {
       setLoading(false);
     }
@@ -184,7 +184,7 @@ const IncomesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         return;
       }
 
@@ -198,7 +198,7 @@ const IncomesScreen = () => {
         "Errore durante l'eliminazione:",
         error.response?.data || error.message
       );
-      setError("Errore durante la cancellazione dell'entrata.");
+      setError(t("delete_error"));
     }
   };
 
@@ -230,12 +230,11 @@ const IncomesScreen = () => {
     <>
       <ScrollView contentContainerStyle={IncomesStyle.scrollContainer}>
         <View style={IncomesStyle.container}>
-          {/* Titolo */}
+        
           <View style={IncomesStyle.titleContainer}>
-            <Text style={IncomesStyle.title}>Gestione Entrate</Text>
+            <Text style={IncomesStyle.title}>{t("incomes_management")}</Text>
           </View>
 
-          {/* Azioni principali */}
           <View style={IncomesStyle.actionsContainer}>
             <TouchableOpacity
               style={IncomesStyle.iconButton}
@@ -259,7 +258,6 @@ const IncomesScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Selettore date */}
           <DateRangePicker
             fromDate={fromDate}
             setFromDate={setFromDate}
@@ -267,18 +265,16 @@ const IncomesScreen = () => {
             setToDate={setToDate}
           />
 
-          {/* Filtri */}
           <FilterSelector
             selectedFilters={selectedFilters}
             setSelectedFilters={setSelectedFilters}
             filterType="entrate"
           />
 
-          {/* Grafico o messaggio */}
           {loading ? (
             <ActivityIndicator size="large" color="#4CAF50" />
           ) : error ? (
-            <Text style={IncomesStyle.errorText}>{error}</Text>
+            <Text style={IncomesStyle.errorText}>{t(error)}</Text>
           ) : chartData.length > 0 ? (
             <PieChartGraph
               data={chartData}
@@ -287,13 +283,12 @@ const IncomesScreen = () => {
             />
           ) : (
             <Text style={IncomesStyle.noDataText}>
-              Nessun dato disponibile
+              {t("no_data")}
             </Text>
           )}
         </View>
       </ScrollView>
 
-      {/* Lista Transazioni */}
       <Modal
         visible={isModalVisible}
         animationType="slide"

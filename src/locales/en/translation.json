@@ -1,0 +1,41 @@
+{
+  "welcome": "Welcome to MoneyFlow",
+  "total_income": "Total Income",
+  "total_expense": "Total Expense",
+  "net_balance": "Net Balance",
+  "annual_summary": "Annual Summary",
+  "monthly_details": "Monthly Details",
+  "loading": "Loading data...",
+  "login_session_expired": "Session expired. Please login again.",
+
+  "login_title": "Welcome",
+  "login_subtitle": "Enter your credentials to access your personal dashboard",
+  "input_username": "Username",
+  "input_password": "Password",
+  "show_password": "Show Password",
+  "hide_password": "Hide Password",
+
+  "button_login": "Login",
+  "login_redirect_success": "Login successful! Redirecting...",
+  "login_token_invalid": "Invalid token. Try again.",
+  "login_credentials_error": "Connection error or invalid credentials",
+
+  "footer_copy": "© 2025 Money App",
+  "create_account": "Create new account",
+  "forgot_password": "Forgot Password?",
+
+  "register_title": "Register",
+  "register_subtitle": "Fill in the required fields",
+
+  "input_confirm_password": "Confirm Password *",
+  "input_first_name": "First Name",
+  "input_last_name": "Last Name",
+
+  "error_field_required": "This field is required",
+  "error_invalid_email": "Invalid email",
+  "error_min_password": "Minimum 6 characters",
+  "error_password_mismatch": "Passwords do not match",
+
+  "button_next": "Next",
+  "login_redirect": "Already have an account? Login"
+}

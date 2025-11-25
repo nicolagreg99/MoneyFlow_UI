@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { 
-  View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert, Animated 
+  View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -11,6 +11,7 @@ import MenuStyles from "../styles/Menu_style";
 import appJson from "../../app.json";
 import API from "../../config/api";
 import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 type RootStackParamList = {
   Menu: undefined;
@@ -25,6 +26,8 @@ type NavigationProp = StackNavigationProp<RootStackParamList, "Menu">;
 
 const MenuScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const { t } = useTranslation();
+
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showExpensesSubMenu, setShowExpensesSubMenu] = useState(false);
@@ -40,7 +43,7 @@ const MenuScreen = () => {
         }
         setUserData(JSON.parse(storedUserData));
       } catch (error) {
-        console.error("Errore nel recupero dei dati utente:", error);
+        console.error("Error loading user:", error);
         navigation.navigate("Login");
       } finally {
         setLoading(false);
@@ -67,15 +70,19 @@ const MenuScreen = () => {
       await AsyncStorage.multiRemove(["authToken", "userData"]);
       navigation.navigate("Login");
     } catch (error) {
-      console.error("Errore nel logout:", error);
+      console.error("Logout error:", error);
     }
   };
 
   const confirmLogout = () => {
-    Alert.alert("Conferma Logout", "Vuoi davvero uscire?", [
-      { text: "Annulla", style: "cancel" },
-      { text: "Esci", style: "destructive", onPress: handleLogout },
-    ]);
+    Alert.alert(
+      t("logout_confirm_title"),
+      t("logout_confirm_message"),
+      [
+        { text: t("cancel"), style: "cancel" },
+        { text: t("exit"), style: "destructive", onPress: handleLogout },
+      ]
+    );
   };
 
   return (
@@ -120,20 +127,20 @@ const MenuScreen = () => {
               onPress={() => navigation.navigate("Main")}
             >
               <FontAwesome name="home" size={20} color="#3498DB" />
-              <Text style={MenuStyles.menuLabel}>Home</Text>
+              <Text style={MenuStyles.menuLabel}>{t("home")}</Text>
             </TouchableOpacity>
 
-            {/* Spese */}
+            {/* SPESE */}
             <TouchableOpacity 
               style={MenuStyles.menuItem}
               onPress={() => setShowExpensesSubMenu(!showExpensesSubMenu)}
             >
               <MaterialIcons name="attach-money" size={20} color="#3498DB" />
-              <Text style={MenuStyles.menuLabel}>Spese</Text>
+              <Text style={MenuStyles.menuLabel}>{t("expenses")}</Text>
               <MaterialIcons 
                 name={showExpensesSubMenu ? "expand-less" : "expand-more"} 
                 size={22} 
-                color="#3498DB" 
+                color="#3498DB"
                 style={{ marginLeft: "auto" }}
               />
             </TouchableOpacity>
@@ -145,7 +152,7 @@ const MenuScreen = () => {
                   onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
                 >
                   <FontAwesome name="list" size={16} color="#3498DB" />
-                  <Text style={MenuStyles.subText}>Visualizza Spese</Text>
+                  <Text style={MenuStyles.subText}>{t("view_expenses")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -153,22 +160,22 @@ const MenuScreen = () => {
                   onPress={() => navigation.navigate("InsertExpenses")}
                 >
                   <MaterialIcons name="add" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subText}>Aggiungi Spesa</Text>
+                  <Text style={MenuStyles.subText}>{t("add_expense")}</Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            {/* Entrate */}
+            {/* ENTRATE */}
             <TouchableOpacity 
               style={MenuStyles.menuItem}
               onPress={() => setShowIncomesSubMenu(!showIncomesSubMenu)}
             >
               <MaterialIcons name="account-balance-wallet" size={20} color="#3498DB" />
-              <Text style={MenuStyles.menuLabel}>Entrate</Text>
+              <Text style={MenuStyles.menuLabel}>{t("incomes")}</Text>
               <MaterialIcons 
                 name={showIncomesSubMenu ? "expand-less" : "expand-more"} 
                 size={22} 
-                color="#3498DB" 
+                color="#3498DB"
                 style={{ marginLeft: "auto" }}
               />
             </TouchableOpacity>
@@ -180,7 +187,7 @@ const MenuScreen = () => {
                   onPress={() => navigation.navigate("Main", { screen: "Incomes" })}
                 >
                   <FontAwesome name="list" size={16} color="#3498DB" />
-                  <Text style={MenuStyles.subText}>Visualizza Entrate</Text>
+                  <Text style={MenuStyles.subText}>{t("view_incomes")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -188,24 +195,29 @@ const MenuScreen = () => {
                   onPress={() => navigation.navigate("InsertIncomes")}
                 >
                   <MaterialIcons name="add" size={18} color="#3498DB" />
-                  <Text style={MenuStyles.subText}>Aggiungi Entrata</Text>
+                  <Text style={MenuStyles.subText}>{t("add_income")}</Text>
                 </TouchableOpacity>
               </View>
             )}
 
+            {/* LOGOUT */}
             <TouchableOpacity 
               style={[MenuStyles.menuItem, MenuStyles.logoutButton]} 
               onPress={confirmLogout}
             >
               <FontAwesome name="sign-out" size={20} color="#fff" />
-              <Text style={MenuStyles.logoutText}>Logout</Text>
+              <Text style={MenuStyles.logoutText}>{t("logout")}</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={MenuStyles.versionText}>Versione {appJson.expo.version}</Text>
+          {/* App Version */}
+          <Text style={MenuStyles.versionText}>
+            {t("app_version")} {appJson.expo.version}
+          </Text>
+
         </ScrollView>
       ) : (
-        <Text>Errore nel caricamento dei dati utente</Text>
+        <Text>{t("error_loading_user")}</Text>
       )}
     </View>
   );

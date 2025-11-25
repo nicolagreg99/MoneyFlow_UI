@@ -12,6 +12,8 @@ const LoginStyles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20
   },
   logo: {
     width: 130,

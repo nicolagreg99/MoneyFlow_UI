@@ -21,10 +21,12 @@ import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 const API_URL = `${API.BASE_URL}/api/v1/expenses/insert`;
 
 const InsertExpensesScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
 
   const [amount, setAmount] = useState("");
@@ -86,7 +88,7 @@ const InsertExpensesScreen = () => {
     if (Object.values(errors).some(Boolean)) {
       Toast.show({
         type: "error",
-        text1: "Compila tutti i campi obbligatori",
+        text1: t("fill_required_fields"),
       });
       return;
     }
@@ -94,7 +96,7 @@ const InsertExpensesScreen = () => {
     if (!userId || !authToken) {
       Toast.show({
         type: "error",
-        text1: "Utente non autenticato",
+        text1: t("user_not_authenticated"),
       });
       return;
     }
@@ -119,7 +121,7 @@ const InsertExpensesScreen = () => {
       });
       Toast.show({
         type: "success",
-        text1: "Spesa registrata!",
+        text1: t("expense_registered"),
       });
       setAmount("");
       setDescription("");
@@ -130,7 +132,7 @@ const InsertExpensesScreen = () => {
       console.error("Errore:", error);
       Toast.show({
         type: "error",
-        text1: "Errore durante l'invio",
+        text1: t("error_sending"),
       });
     } finally {
       setLoading(false);
@@ -145,7 +147,7 @@ const InsertExpensesScreen = () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Animated.View style={[ExpensesStyles.container, { opacity: fadeAnim }]}>
 
-          <Text style={ExpensesStyles.header}> 💸 Aggiungi una nuova spesa</Text>
+          <Text style={ExpensesStyles.header}> 💸 {t("add_new_expense")}</Text>
 
           {userId === null ? (
             <ActivityIndicator size="large" color="#3498DB" />
@@ -165,7 +167,7 @@ const InsertExpensesScreen = () => {
                     errorFields.amount && ExpensesStyles.errorInput,
                   ]}
                   keyboardType="numeric"
-                  placeholder={`Importo (${currency}) *`}
+                  placeholder={`${t("amount_label")} (${currency}) *`}
                   placeholderTextColor="#95A5A6"
                   value={amount}
                   onChangeText={setAmount}
@@ -192,7 +194,7 @@ const InsertExpensesScreen = () => {
                     ExpensesStyles.input,
                     errorFields.description && ExpensesStyles.errorInput,
                   ]}
-                  placeholder="Descrizione *"
+                  placeholder={t("description_label")}
                   placeholderTextColor="#95A5A6"
                   value={description}
                   onChangeText={setDescription}
@@ -240,7 +242,7 @@ const InsertExpensesScreen = () => {
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text style={ExpensesStyles.gradientButtonText}>
-                      Inserisci Spesa
+                      {t("insert_expense")}
                     </Text>
                   )}
                 </LinearGradient>
@@ -251,7 +253,7 @@ const InsertExpensesScreen = () => {
               style={ExpensesStyles.secondaryButton}
               onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
             >
-              <Text style={ExpensesStyles.secondaryButtonText}>📊 Visualizza le Spese</Text>
+              <Text style={ExpensesStyles.secondaryButtonText}>📊 {t("view_expenses")}</Text>
             </TouchableOpacity>
             </>
           )}

@@ -8,6 +8,7 @@ import {
   VictoryScatter,
 } from "victory-native";
 import { getCurrencyFlag } from "./CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
@@ -24,14 +25,14 @@ const LineChartComponent: React.FC<Props> = ({
   spese, 
   currency = "EUR" 
 }) => {
-  // Formatta le label in formato MM/YY
+  const { t } = useTranslation();
   const formatLabel = (label: string) => {
     const mesi: { [key: string]: string } = {
       "january": "01", "february": "02", "march": "03", "april": "04",
       "may": "05", "june": "06", "july": "07", "august": "08",
       "september": "09", "october": "10", "november": "11", "december": "12"
     };
-    
+   
     const parts = label.toLowerCase().split(" ");
     if (parts.length === 2) {
       const mese = mesi[parts[0]] || parts[0];
@@ -55,8 +56,8 @@ const LineChartComponent: React.FC<Props> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>📊 Andamento Finanziario</Text>
-          <Text style={styles.subtitle}>Ultimi 12 mesi</Text>
+          <Text style={styles.title}>📊 {t("financial_trend")}</Text>
+          <Text style={styles.subtitle}>{t("last_12_months")}</Text>
         </View>
         <View style={styles.currencyBadge}>
           <Text style={styles.currencyFlag}>{getCurrencyFlag(currency)}</Text>
@@ -68,11 +69,11 @@ const LineChartComponent: React.FC<Props> = ({
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: "#10b981" }]} />
-          <Text style={styles.legendText}>Entrate</Text>
+          <Text style={styles.legendText}>{t("incomes")}</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: "#ef4444" }]} />
-          <Text style={styles.legendText}>Spese</Text>
+          <Text style={styles.legendText}>{t("expenses")}</Text>
         </View>
       </View>
 

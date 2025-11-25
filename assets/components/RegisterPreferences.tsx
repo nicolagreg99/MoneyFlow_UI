@@ -1,170 +1,242 @@
 import React, { useState } from "react";
-import { 
-  View, Text, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActivityIndicator
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons"; 
+import Toast from "react-native-toast-message";
 import axios from "axios";
-import RegisterStyles from "../styles/Register_style";
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import API from "../../config/api";
+import EditUserStyles from "../styles/EditUser_style";
+import CurrencyPicker from "./personalized_components/CurrencyPicker";
+import LoginStyles from "../styles/Login_style";
+
+const CategorySection = ({
+  title,
+  value,
+  onChangeText,
+  onAdd,
+  data,
+  onRemove,
+  color,
+  chipStyle
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <View style={[EditUserStyles.sectionBox, { borderLeftColor: color }]}>
+      <Text style={EditUserStyles.sectionTitle}>
+        {title === "Spese" ? t("expense_categories") : t("income_categories")}
+      </Text>
+
+      <View style={EditUserStyles.addRow}>
+        <TextInput
+          style={EditUserStyles.categoryInput}
+          placeholder={
+            title === "Spese"
+              ? t("add_expense_category_placeholder")
+              : t("add_income_category_placeholder")
+          }
+          value={value}
+          onChangeText={onChangeText}
+        />
+        <TouchableOpacity
+          style={[EditUserStyles.addButton, { backgroundColor: color }]}
+          onPress={onAdd}
+        >
+          <Text style={EditUserStyles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={EditUserStyles.chipsContainer}>
+        {data.length > 0 ? (
+          data.map((item, index) => (
+            <View key={index} style={[EditUserStyles.chip, chipStyle]}>
+              <Text style={EditUserStyles.chipText}>{item}</Text>
+              <TouchableOpacity onPress={() => onRemove(index)}>
+                <Text style={{ color: "#fff" }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={EditUserStyles.emptyText}>
+            {title === "Spese"
+              ? t("no_expense_categories")
+              : t("no_income_categories")}
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
 
 const RegisterPreferences = () => {
-  const route = useRoute();
-  const { formData } = route.params as { formData: any };
+  const { t } = useTranslation();
   const navigation = useNavigation();
+  const route = useRoute();
+  const { userData } = route.params;
 
-  const [expenses, setExpenses] = useState(["Cibo", "Trasporto", "Abbigliamento", 'Extra']);
-  const [incomes, setIncomes] = useState(["Stipendio", "Regalo", 'Extra']);
+  const [expenses, setExpenses] = useState([
+    t("expense_food"),
+    t("expense_transport"),
+    t("expense_clothing"),
+    t("extra")
+  ]);
+  const [incomes, setIncomes] = useState([
+    t("income_salary"),
+    t("income_gift"),
+    t("extra")
+  ]);
+
+  const [currency, setCurrency] = useState("EUR");
+
   const [newExpense, setNewExpense] = useState("");
   const [newIncome, setNewIncome] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const addExpense = () => {
-    if (newExpense.trim() && !expenses.includes(newExpense)) {
-      setExpenses([...expenses, newExpense]);
-      setNewExpense("");
-    } else {
-      Alert.alert("Errore", "Preferenza già presente o campo vuoto.");
+  const handleAddExpense = () => {
+    const trimmed = newExpense.trim();
+    if (!trimmed) {
+      Toast.show({ type: "info", text1: t("insert_valid_name") });
+      return;
     }
+    if (expenses.includes(trimmed)) {
+      Toast.show({ type: "info", text1: t("category_exists") });
+      return;
+    }
+    setExpenses([...expenses, trimmed]);
+    setNewExpense("");
   };
 
-  const addIncome = () => {
-    if (newIncome.trim() && !incomes.includes(newIncome)) {
-      setIncomes([...incomes, newIncome]);
-      setNewIncome("");
-    } else {
-      Alert.alert("Errore", "Preferenza già presente o campo vuoto.");
-    }
+  const handleRemoveExpense = (index) => {
+    setExpenses(expenses.filter((_, i) => i !== index));
   };
 
-  const removeExpense = (index: number) => {
-    if (expenses.length > 1) {
-      setExpenses(expenses.filter((_, i) => i !== index));
-    } else {
-      Alert.alert("Errore", "Devi avere almeno una preferenza.");
+  const handleAddIncome = () => {
+    const trimmed = newIncome.trim();
+    if (!trimmed) {
+      Toast.show({ type: "info", text1: t("insert_valid_name") });
+      return;
     }
+    if (incomes.includes(trimmed)) {
+      Toast.show({ type: "info", text1: t("category_exists") });
+      return;
+    }
+    setIncomes([...incomes, trimmed]);
+    setNewIncome("");
   };
 
-  const removeIncome = (index: number) => {
-    if (incomes.length > 1) {
-      setIncomes(incomes.filter((_, i) => i !== index));
-    } else {
-      Alert.alert("Errore", "Devi avere almeno una preferenza.");
-    }
+  const handleRemoveIncome = (index) => {
+    setIncomes(incomes.filter((_, i) => i !== index));
   };
 
   const handleRegister = async () => {
+    if (loading) return;
+    setLoading(true);
+
     try {
       const payload = {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        expenses: expenses.map(item => item.trim()),
-        incomes: incomes.map(item => item.trim()),
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        expenses,
+        incomes,
+        default_currency: currency,
+        first_name: userData.first_name || "",
+        last_name: userData.last_name || ""
       };
-  
-      if (formData.first_name) payload["first_name"] = formData.first_name;
-      if (formData.last_name) payload["last_name"] = formData.last_name;
-  
-      console.log("Payload inviato:", JSON.stringify(payload, null, 2));
-  
+
       const response = await axios.post(`${API.BASE_URL}/api/v1/register`, payload);
-  
+
       if (response.data.success) {
-        Alert.alert("Successo", "Registrazione completata!");
+        Toast.show({
+          type: "info",
+          text1: t("account_created"),
+          text2: t("check_email")
+        });
         navigation.navigate("Login");
       } else {
-        Alert.alert("Errore", response.data.message || "Registrazione fallita.");
+        Toast.show({
+          type: "error",
+          text1: response.data.message || t("error_generic")
+        });
       }
-    } catch (error: any) {
-      console.error("Errore nella registrazione:", error.response?.data || error.message);
-  
-      if (error.response) {
-        const statusCode = error.response.status;
-        const errorMessage = error.response.data.message || "Errore sconosciuto";
-  
-        if (statusCode === 400) {
-          if (errorMessage.toLowerCase().includes("email")) {
-            Alert.alert("Errore", "L'email è già in uso. Prova con un'altra.");
-          } else if (errorMessage.toLowerCase().includes("username")) {
-            Alert.alert("Errore", "Questo username è già stato preso. Scegline un altro.");
-          } else {
-            Alert.alert("Errore", errorMessage);
-          }
-        } else if (statusCode === 500) {
-          Alert.alert("Errore", "Errore del server. Riprova più tardi.");
-        } else {
-          Alert.alert("Errore", "Errore sconosciuto. Contatta il supporto.");
-        }
-      } else {
-        Alert.alert("Errore", "Impossibile completare la registrazione. Verifica la connessione.");
-      }
+    } catch (e) {
+      Toast.show({ type: "error", text1: t("error_generic") });
+    } finally {
+      setLoading(false);
     }
   };
-  
-  
-  
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={[RegisterStyles.scrollContainer, { paddingHorizontal: 20, paddingTop: 40 }]}>
-          <Text style={RegisterStyles.header}>Preferenze</Text>
+          <ScrollView contentContainerStyle={[LoginStyles.scrollContainer]}>
+          <Text style={EditUserStyles.title}>{t("preferences_title")}</Text>
 
-          {/* Contenitore Spese */}
-          <View style={RegisterStyles.sectionContainer}>
-            <Text style={RegisterStyles.subHeader}>Categorie di spesa</Text>
-            {expenses.map((item, index) => (
-              <View key={index} style={RegisterStyles.listItemContainer}>
-                <Text style={RegisterStyles.listItem}>{item}</Text>
-                <TouchableOpacity onPress={() => removeExpense(index)}>
-                  <Ionicons name="trash-outline" size={20} color="red" />
-                </TouchableOpacity>
-              </View>
-            ))}
-            <View style={RegisterStyles.inputContainer}>
-              <TextInput 
-                style={RegisterStyles.input} 
-                placeholder="Aggiungi nuova preferenza" 
-                placeholderTextColor="#7F8C8D"
-                value={newExpense} 
-                onChangeText={setNewExpense} 
+          <View style={EditUserStyles.profileCard}>
+            <View style={EditUserStyles.profileIconContainer}>
+              <Text style={EditUserStyles.profileIconText}>
+                {userData.first_name?.[0]?.toUpperCase() || "U"}
+              </Text>
+            </View>
+
+            <View style={EditUserStyles.profileDetailsContainer}>
+              <CurrencyPicker
+                currency={currency}
+                setCurrency={setCurrency}
+                label={t("default_currency")}
               />
-              <TouchableOpacity style={RegisterStyles.addButton} onPress={addExpense}>
-                <Text style={RegisterStyles.buttonText}>+</Text>
-              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Contenitore Entrate */}
-          <View style={RegisterStyles.sectionContainer}>
-          <Text style={RegisterStyles.subHeader}>Categorie di entrate</Text>
-            {incomes.map((item, index) => (
-              <View key={index} style={RegisterStyles.listItemContainer}>
-                <Text style={RegisterStyles.listItem}>{item}</Text>
-                <TouchableOpacity onPress={() => removeIncome(index)}>
-                  <Ionicons name="trash-outline" size={20} color="red" />
-                </TouchableOpacity>
-              </View>
-            ))}
-            <View style={RegisterStyles.inputContainer}>
-              <TextInput 
-                style={RegisterStyles.input} 
-                placeholder="Aggiungi nuova preferenza" 
-                value={newIncome} 
-                onChangeText={setNewIncome} 
-              />
-              <TouchableOpacity style={RegisterStyles.addButton} onPress={addIncome}>
-                <Text style={RegisterStyles.buttonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <CategorySection
+            title="Spese"
+            value={newExpense}
+            onChangeText={setNewExpense}
+            onAdd={handleAddExpense}
+            data={expenses}
+            onRemove={handleRemoveExpense}
+            color="#e74c3c"
+            chipStyle={EditUserStyles.expenseChip}
+          />
 
-          <TouchableOpacity style={RegisterStyles.button} onPress={handleRegister}>
-            <Text style={RegisterStyles.buttonText}>Completa Registrazione</Text>
-          </TouchableOpacity>
+          <CategorySection
+            title="Entrate"
+            value={newIncome}
+            onChangeText={setNewIncome}
+            onAdd={handleAddIncome}
+            data={incomes}
+            onRemove={handleRemoveIncome}
+            color="#2ecc71"
+            chipStyle={EditUserStyles.incomeChip}
+          />
 
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={RegisterStyles.link}>Hai già un account?</Text>
+          <TouchableOpacity
+            style={EditUserStyles.button}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={EditUserStyles.buttonText}>
+                {t("complete_registration")}
+              </Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
       </TouchableWithoutFeedback>

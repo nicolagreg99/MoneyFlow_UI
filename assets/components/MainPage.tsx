@@ -8,6 +8,7 @@ import StatsWidget from "./personalized_components/StatsWidget";
 import MonthlyBalanceTable from "./personalized_components/MonthlyBalanceTable";
 import { showToast } from "../config/toastConfig";
 import API from "../../config/api";
+import { useTranslation } from "react-i18next";
 
 const API_SPESA = `${API.BASE_URL}/api/v1/expenses/total_by_month`;
 const API_ENTRATE = `${API.BASE_URL}/api/v1/incomes/total_by_month`;
@@ -21,6 +22,7 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [userCurrency, setUserCurrency] = useState("EUR");
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const getLast12Months = () => {
     const mesi = [
@@ -30,13 +32,12 @@ const MainPage = () => {
     const oggi = new Date();
     let mesiDinamici: string[] = [];
 
-    // Da mese corrente a 11 mesi fa (ordine decrescente)
     for (let i = 0; i < 12; i++) {
       let data = new Date(oggi.getFullYear(), oggi.getMonth() - i, 1);
       mesiDinamici.push(`${mesi[data.getMonth()]} ${data.getFullYear()}`);
     }
 
-    return mesiDinamici; // Già in ordine: [Nov 2025, Ott 2025, ...]
+    return mesiDinamici;
   };
 
   const fetchData = async () => {
@@ -44,7 +45,7 @@ const MainPage = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        showToast("Sessione scaduta. Effettua nuovamente il login.", "error");
+        showToast(t("login_session_expired"), "error");
         navigation.navigate("Login");
         return;
       }
@@ -58,7 +59,7 @@ const MainPage = () => {
       ]);
 
       if (speseRes.status === 401 || entrateRes.status === 401 || balanceRes.status === 401) {
-        showToast("Sessione scaduta. Effettua nuovamente il login.", "error");
+        showToast(t("login_session_expired"), "error");
         await AsyncStorage.removeItem("authToken");
         navigation.navigate("Login");
         return;
@@ -73,7 +74,6 @@ const MainPage = () => {
       const balanceData = await balanceRes.json();
 
       const mesiDinamici = getLast12Months();
-
       const speseMonthly = speseData.monthly_totals || {};
       const entrateMonthly = entrateData.monthly_totals || {};
 
@@ -87,7 +87,7 @@ const MainPage = () => {
       setUserCurrency(balanceData?.[0]?.currency || speseData.currency || "EUR");
     } catch (error: any) {
       console.error("Errore:", error);
-      showToast("Errore durante il caricamento dei dati", "error");
+      showToast(t("data_loading_error"), "error");
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ const MainPage = () => {
     return (
       <View style={MainStyles.loadingContainer}>
         <ActivityIndicator size="large" color="#3b82f6" />
-        <Text style={MainStyles.loadingText}>Caricamento dati...</Text>
+        <Text style={MainStyles.loadingText}>{t("loading")}</Text>
       </View>
     );
   }
@@ -119,20 +119,20 @@ const MainPage = () => {
       nestedScrollEnabled={true}
     >
       <View style={MainStyles.statsSection}>
-        <Text style={MainStyles.sectionTitle}>💰 Riepilogo Annuale</Text>
+        <Text style={MainStyles.sectionTitle}>💰 {t("annual_summary")}</Text>
         <View style={MainStyles.widgetsContainer}>
           <StatsWidget
-            title="Totale Entrate"
+            title={t("total_income")}
             value={`${totalEntrate.toFixed(2)} ${userCurrency}`}
             icon="📈"
           />
           <StatsWidget
-            title="Totale Spese"
+            title={t("total_expense")}
             value={`${totalSpese.toFixed(2)} ${userCurrency}`}
             icon="💸"
           />
           <StatsWidget
-            title="Bilancio Netto"
+            title={t("net_balance")}
             value={`${bilancioNetto.toFixed(2)} ${userCurrency}`}
             icon={bilancioNetto >= 0 ? "✅" : "⚠️"}
           />
@@ -140,14 +140,14 @@ const MainPage = () => {
       </View>
 
       <LineChartComponent
-        labels={[...labels].reverse()} // grafico da vecchio → nuovo (più leggibile)
+        labels={[...labels].reverse()}
         entrate={[...entrate].reverse()}
         spese={[...spese].reverse()}
         currency={userCurrency}
       />
 
       <View style={MainStyles.tableSection}>
-        <Text style={MainStyles.sectionTitle}>📋 Dettaglio Mensile</Text>
+        <Text style={MainStyles.sectionTitle}>📋 {t("monthly_details")}</Text>
         <View>
           <MonthlyBalanceTable
             balances={labels.map((mese, index) => ({

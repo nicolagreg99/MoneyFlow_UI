@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { VictoryPie } from "victory-native";
 import { getCurrencyFlag } from "./CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -30,11 +31,12 @@ const lightenColor = (hex: string, amount: number) => {
 
 const PieChartGraph = ({ data = [], total = 0, userCurrency = "EUR" }) => {
   const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   if (!Array.isArray(data) || data.length === 0 || total <= 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Nessun dato disponibile</Text>
+        <Text style={styles.emptyText}>{t("no_data")}</Text>
       </View>
     );
   }
@@ -68,8 +70,8 @@ const PieChartGraph = ({ data = [], total = 0, userCurrency = "EUR" }) => {
       <View style={styles.chartCard}>
         <View style={styles.headerSection}>
           <View>
-            <Text style={styles.title}>📊 Distribuzione  </Text>
-            <Text style={styles.subtitle}>Tocca una sezione per i dettagli</Text>
+            <Text style={styles.title}>📊 {t("distribution")} </Text>
+            <Text style={styles.subtitle}>{t("pie_subtitle")}</Text>
           </View>
           <View style={styles.currencyBadge}>
             <Text style={styles.currencyFlag}>{userFlag}</Text>
@@ -121,7 +123,7 @@ const PieChartGraph = ({ data = [], total = 0, userCurrency = "EUR" }) => {
 
             {selectedSlice === null && (
               <View style={styles.centerTotal}>
-                <Text style={styles.totalLabel}>Totale</Text>
+                <Text style={styles.totalLabel}>{t("total")}</Text>
                 <View style={styles.totalValueContainer}>
                   <Text style={styles.totalFlag}>{userFlag}</Text>
                   <Text
@@ -180,7 +182,7 @@ const PieChartGraph = ({ data = [], total = 0, userCurrency = "EUR" }) => {
       </View>
 
       <View style={styles.legendContainer}>
-        <Text style={styles.legendTitle}>📋 Categorie</Text>
+        <Text style={styles.legendTitle}>📋 {t("categories")}</Text>
         {chartData.map((item, index) => (
           <TouchableOpacity
             key={index}

@@ -3,6 +3,7 @@ import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Modal } fr
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import ExpensesStyles from "../styles/Expenses_style";
 import DateRangePicker from "./personalized_components/DateRangePicker";
 import FilterSelector from "./personalized_components/FilterSelector";
@@ -14,6 +15,7 @@ import { getCurrencyFlag } from "./personalized_components/CurrencyPicker";
 
 const ExpensesScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -42,7 +44,7 @@ const ExpensesScreen = () => {
     try {
       return await AsyncStorage.getItem("authToken");
     } catch (error) {
-      console.error("Errore nel recupero del token:", error);
+      console.error("Token fetch error:", error);
       return null;
     }
   };
@@ -55,7 +57,7 @@ const ExpensesScreen = () => {
         setUserCurrency(userData.default_currency || "EUR");
       }
     } catch (error) {
-      console.error("Errore nel recupero valuta utente:", error);
+      console.error("Currency fetch error:", error);
     }
   };
 
@@ -81,7 +83,7 @@ const ExpensesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         setLoading(false);
         return;
       }
@@ -101,7 +103,7 @@ const ExpensesScreen = () => {
         setUserCurrency(data.currency || "EUR");
 
         const formattedData = totali.map((item) => ({
-          name: item.tipo,
+          name: t(item.tipo) || item.tipo,
           value: parseFloat(item.totale_per_tipo) || 0,
           color: fixedColors[item.tipo] || fixedColors["Altro"],
         }));
@@ -110,11 +112,11 @@ const ExpensesScreen = () => {
       } else {
         setChartData([]);
         setTotalExpenses(0);
-        setError(data.message || "Nessun dato disponibile per il periodo selezionato.");
+        setError(t("no_data_selected"));
       }
     } catch (error) {
-      console.error("Errore durante il fetch delle spese:", error.response?.data || error.message);
-      setError("Errore nel recupero dei dati.");
+      console.error("Expenses fetch error:", error.response?.data || error.message);
+      setError(t("fetch_error"));
     } finally {
       setLoading(false);
     }
@@ -127,7 +129,7 @@ const ExpensesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         setLoading(false);
         return;
       }
@@ -139,15 +141,13 @@ const ExpensesScreen = () => {
 
       if (response.data && Array.isArray(response.data.expenses)) {
         setTransactions(response.data.expenses);
-      } else if (Array.isArray(response.data)) {
-        setTransactions(response.data);
       } else {
         setTransactions([]);
-        setError("Nessuna transazione trovata per il periodo selezionato.");
+        setError(t("no_transactions"));
       }
     } catch (error) {
-      console.error("Errore nel recupero transazioni:", error.response?.data || error.message);
-      setError("Errore durante il recupero delle transazioni.");
+      console.error("Transactions fetch error:", error.response?.data || error.message);
+      setError(t("fetch_transactions_error"));
     } finally {
       setLoading(false);
     }
@@ -157,7 +157,7 @@ const ExpensesScreen = () => {
     try {
       const token = await getToken();
       if (!token) {
-        setError("Token non trovato. Effettua nuovamente il login.");
+        setError(t("token_missing"));
         return;
       }
 
@@ -167,8 +167,8 @@ const ExpensesScreen = () => {
 
       setTransactions((prev) => prev.filter((t) => t.id !== expenseId));
     } catch (error) {
-      console.error("Errore durante l'eliminazione:", error.response?.data || error.message);
-      setError("Errore durante la cancellazione della spesa.");
+      console.error("Delete error:", error.response?.data || error.message);
+      setError(t("delete_error"));
     }
   };
 
@@ -201,7 +201,7 @@ const ExpensesScreen = () => {
       <ScrollView contentContainerStyle={ExpensesStyles.scrollContainer}>
         <View style={ExpensesStyles.container}>
           <View style={ExpensesStyles.titleContainer}>
-            <Text style={ExpensesStyles.title}>Gestione Spese</Text>
+            <Text style={ExpensesStyles.title}>{t("expenses_management")}</Text>
           </View>
 
           <View style={ExpensesStyles.actionsContainer}>
@@ -242,7 +242,7 @@ const ExpensesScreen = () => {
           ) : chartData.length > 0 ? (
             <PieChartGraph data={chartData} total={totalExpenses} userCurrency={userCurrency} />
           ) : (
-            <Text style={ExpensesStyles.noDataText}>Nessun dato disponibile</Text>
+            <Text style={ExpensesStyles.noDataText}>{t("no_data")}</Text>
           )}
         </View>
       </ScrollView>

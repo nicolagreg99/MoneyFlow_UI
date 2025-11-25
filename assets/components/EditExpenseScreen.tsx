@@ -15,8 +15,10 @@ import FilterSelector from "./personalized_components/FilterSelector";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
 
 const EditExpenseScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
   const { expense } = route.params || {};
@@ -102,7 +104,7 @@ const EditExpenseScreen = () => {
 
       Toast.show({
         type: "success",
-        text1: "Spesa modificata con successo",
+        text1: t("success_expense_updated"),
         position: "bottom",
       });
 
@@ -111,7 +113,7 @@ const EditExpenseScreen = () => {
       console.error("Errore aggiornamento:", error);
       Toast.show({
         type: "error",
-        text1: "Errore durante la modifica",
+        text1: t("error_updating"),
         position: "bottom",
       });
     } finally {
@@ -121,11 +123,13 @@ const EditExpenseScreen = () => {
 
   return (
     <View style={ExpensesStyles.container}>
-      <Text style={ExpensesStyles.header}>Modifica Spesa</Text>
+      <Text style={ExpensesStyles.header}>{t("edit_expense")}</Text>
 
       <View style={[ExpensesStyles.inputWrapper, { position: "relative" }]}>
         {(amount.length > 0 || amountFocused) && (
-          <Text style={ExpensesStyles.floatingLabel}>Importo *</Text>
+          <Text style={ExpensesStyles.floatingLabel}>
+            {t("amount_label")} *
+          </Text>
         )}
 
         <View style={{ position: "relative", justifyContent: "center" }}>
@@ -140,7 +144,9 @@ const EditExpenseScreen = () => {
             value={amount}
             onChangeText={setAmount}
             placeholder={
-              amount.length > 0 || amountFocused ? "" : `Importo (${currency}) *`
+              amount.length > 0 || amountFocused
+                ? ""
+                : `${t("amount_label")} (${currency}) *`
             }
             placeholderTextColor="#7F8C8D"
           />
@@ -160,12 +166,14 @@ const EditExpenseScreen = () => {
         </View>
       </View>
       {errorFields.amount && (
-        <Text style={ExpensesStyles.errorText}>Inserisci un importo!</Text>
+        <Text style={ExpensesStyles.errorText}>{t("amount_required")}</Text>
       )}
 
       <View style={ExpensesStyles.inputWrapper}>
         {(description.length > 0 || descriptionFocused) && (
-          <Text style={ExpensesStyles.floatingLabel}>Descrizione *</Text>
+          <Text style={ExpensesStyles.floatingLabel}>
+            {t("description_label")} *
+          </Text>
         )}
         <TextInput
           style={[
@@ -177,16 +185,18 @@ const EditExpenseScreen = () => {
           value={description}
           onChangeText={setDescription}
           placeholder={
-            description.length > 0 || descriptionFocused ? "" : "Descrizione *"
+            description.length > 0 || descriptionFocused
+              ? ""
+              : `${t("description_label")} *`
           }
           placeholderTextColor="#7F8C8D"
         />
       </View>
       {errorFields.description && (
-        <Text style={ExpensesStyles.errorText}>Inserisci una descrizione!</Text>
+        <Text style={ExpensesStyles.errorText}>{t("description_required")}</Text>
       )}
 
-      <Text style={ExpensesStyles.label}>Tipo *</Text>
+      <Text style={ExpensesStyles.label}>{t("type_label")} *</Text>
       <FilterSelector
         selectedFilters={selectedType}
         setSelectedFilters={(filters) =>
@@ -195,10 +205,10 @@ const EditExpenseScreen = () => {
         filterType="spese"
       />
       {errorFields.selectedType && (
-        <Text style={ExpensesStyles.errorText}>Seleziona un tipo!</Text>
+        <Text style={ExpensesStyles.errorText}>{t("type_required")}</Text>
       )}
 
-      <Text style={ExpensesStyles.label}>Data:</Text>
+      <Text style={ExpensesStyles.label}>{t("date")}:</Text>
       <TouchableOpacity
         onPress={() => setShowDatePicker(true)}
         style={ExpensesStyles.datePickerButton}
@@ -223,7 +233,7 @@ const EditExpenseScreen = () => {
         disabled={loading}
       >
         <Text style={ExpensesStyles.buttonText}>
-          {loading ? "Salvataggio..." : "Salva Modifiche"}
+          {loading ? t("saving") : t("save_changes")}
         </Text>
       </TouchableOpacity>
     </View>

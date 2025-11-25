@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert } from 'react-native';
 import { useLinking } from '@react-navigation/native';
 import API from "../../config/api";
+import { useTranslation } from "react-i18next";
 
 const UpdatePasswordScreen = ({ route, navigation }: any) => {
+  const { t } = useTranslation();
+
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
   const { getInitialURL } = useLinking();
-  
+
   useEffect(() => {
     const checkDeepLink = async () => {
       const url = await getInitialURL();
@@ -18,28 +21,28 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
         if (tokenFromUrl) {
           setToken(tokenFromUrl);
         } else {
-          Alert.alert('Errore', 'Token non valido nel link profondo.');
+          Alert.alert(t("error_title"), t("reset_invalid_token"));
           navigation.navigate('Login');
         }
       } else if (route.params?.token) {
-        setToken(route.params.token); 
+        setToken(route.params.token);
       } else {
-        Alert.alert('Errore', 'Token non trovato.');
-        navigation.navigate('Login'); 
+        Alert.alert(t("error_title"), t("reset_token_not_found"));
+        navigation.navigate('Login');
       }
     };
 
     checkDeepLink();
-  }, [route.params, getInitialURL, navigation]);
+  }, [route.params, getInitialURL, navigation, t]);
 
   const handlePasswordUpdate = async () => {
     if (!password) {
-      Alert.alert('Errore', 'Per favore inserisci una nuova password.');
+      Alert.alert(t("error_title"), t("reset_empty_password_error"));
       return;
     }
 
     if (!token) {
-      Alert.alert('Errore', 'Token non valido.');
+      Alert.alert(t("error_title"), t("reset_invalid_token"));
       return;
     }
 
@@ -49,19 +52,19 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
       const response = await fetch(`${API.BASE_URL}/reset_password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }), 
+        body: JSON.stringify({ token, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Successo', 'Password aggiornata con successo!');
-        navigation.navigate('Login'); // Naviga al login dopo un aggiornamento della password riuscito
+        Alert.alert(t("success_title"), t("reset_success"));
+        navigation.navigate('Login');
       } else {
-        Alert.alert('Errore', data.message || 'Si è verificato un errore.');
+        Alert.alert(t("error_title"), data.message || t("reset_error_generic"));
       }
     } catch (error) {
-      Alert.alert('Errore', 'Si è verificato un errore durante l’aggiornamento della password.');
+      Alert.alert(t("error_title"), t("reset_error_request"));
     } finally {
       setLoading(false);
     }
@@ -72,7 +75,7 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
       <TextInput
         value={password}
         onChangeText={setPassword}
-        placeholder="Nuova password"
+        placeholder={t("reset_new_password_placeholder")}
         secureTextEntry
         style={{
           height: 40,
@@ -83,7 +86,7 @@ const UpdatePasswordScreen = ({ route, navigation }: any) => {
         }}
       />
       <Button
-        title={loading ? "Caricamento..." : "Aggiorna Password"}
+        title={loading ? t("loading") : t("reset_update_button")}
         onPress={handlePasswordUpdate}
         disabled={loading}
       />

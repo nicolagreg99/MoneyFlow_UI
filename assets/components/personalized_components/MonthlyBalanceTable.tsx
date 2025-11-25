@@ -7,11 +7,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useTranslation } from "react-i18next";
 
 type SortKey = 'mese' | 'valore' | 'entrate' | 'spese';
 
 interface BalanceItem {
-  mese: string;
+  mese: string;  // Il mese viene passato in formato "January 2025" ad esempio
   entrate: number;
   spese: number;
   valore: number;
@@ -23,6 +24,7 @@ interface MonthlyBalanceTableProps {
 }
 
 const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, currency }) => {
+  const { t } = useTranslation();
   const [sortedData, setSortedData] = useState<BalanceItem[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortKey, setSortKey] = useState<SortKey>('mese');
@@ -32,20 +34,25 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, cur
     setSortedData(sorted);
   }, [balances, sortKey, sortOrder]);
 
+  // Funzione per tradurre e parsare la data (mese e anno)
   const parseDateKey = (str: string): Date => {
     const [mese, anno] = str.split(" ");
+    
+    // Lista dei mesi tradotti dinamicamente
     const mesi = [
-      "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-      "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+      t("january"), t("february"), t("march"), t("april"), t("may"), t("june"),
+      t("july"), t("august"), t("september"), t("october"), t("november"), t("december")
     ];
-    return new Date(parseInt(anno), mesi.indexOf(mese));
+    
+    // Restituisce un oggetto Date con il mese tradotto
+    return new Date(parseInt(anno), mesi.indexOf(mese));  // Trova il mese tradotto e restituisce la data
   };
 
   const sortBalances = (data: BalanceItem[], key: SortKey, order: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
       if (key === 'mese') {
-        const dateA = parseDateKey(a.mese);
-        const dateB = parseDateKey(b.mese);
+        const dateA = parseDateKey(a.mese);  // Traduci la stringa mese/anno
+        const dateB = parseDateKey(b.mese);  // Traduci la stringa mese/anno
         return order === 'asc'
           ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
@@ -77,50 +84,66 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, cur
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📅 Bilanci Mensili</Text>
+      <Text style={styles.title}>📅 {t("monthly_balances")}</Text>
 
       <View style={styles.table}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('mese')}>
-            <Text style={styles.headerText}>Mese {renderSortIcon('mese')}</Text>
+            <Text style={styles.headerText}>
+              {t("month")} {renderSortIcon('mese')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('entrate')}>
-            <Text style={styles.headerText}>Entrate {renderSortIcon('entrate')}</Text>
+            <Text style={styles.headerText}>
+              {t("incomes")} {renderSortIcon('entrate')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('spese')}>
-            <Text style={styles.headerText}>Spese {renderSortIcon('spese')}</Text>
+            <Text style={styles.headerText}>
+              {t("expenses")} {renderSortIcon('spese')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('valore')}>
-            <Text style={styles.headerText}>Bilancio {renderSortIcon('valore')}</Text>
+            <Text style={styles.headerText}>
+              {t("balance")} {renderSortIcon('valore')}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <FlatList
           data={sortedData}
           keyExtractor={(item) => item.mese}
-          renderItem={({ item, index }) => (
-            <View style={[styles.row, index % 2 === 0 && styles.rowAlternate]}>
-              <Text style={styles.cell}>{item.mese}</Text>
-              <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>
-                {currency} {item.entrate.toFixed(2)}
-              </Text>
-              <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>
-                {currency} {item.spese.toFixed(2)}
-              </Text>
-              <Text
-                style={[
-                  styles.cell,
-                  {
-                    textAlign: 'right',
-                    color: item.valore >= 0 ? '#27ae60' : '#c0392b',
-                    fontWeight: 'bold',
-                  },
-                ]}
-              >
-                {currency} {item.valore.toFixed(2)}
-              </Text>
-            </View>
-          )}
+          renderItem={({ item, index }) => {
+            // Aggiungi il log qui per vedere i dati in console
+            console.log('Mese:', item.mese);
+            console.log('Entrate:', item.entrate);
+            console.log('Spese:', item.spese);
+            console.log('Bilancio (valore):', item.valore);
+
+            return (
+              <View style={[styles.row, index % 2 === 0 && styles.rowAlternate]}>
+                <Text style={styles.cell}>{item.mese}</Text>
+                <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>
+                  {currency} {item.entrate.toFixed(2)}
+                </Text>
+                <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>
+                  {currency} {item.spese.toFixed(2)}
+                </Text>
+                <Text
+                  style={[
+                    styles.cell,
+                    {
+                      textAlign: 'right',
+                      color: item.valore >= 0 ? '#27ae60' : '#c0392b',
+                      fontWeight: 'bold',
+                    },
+                  ]}
+                >
+                  {currency} {item.valore.toFixed(2)}
+                </Text>
+              </View>
+            );
+          }}
         />
       </View>
     </View>

@@ -10,6 +10,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { getCurrencyFlag } from "../personalized_components/CurrencyPicker";
+import { useTranslation } from "react-i18next";
 
 const TransactionList = ({
   transactions,
@@ -18,6 +19,7 @@ const TransactionList = ({
   onEdit,
   transactionType,
 }) => {
+  const { t } = useTranslation();
   const [sortedTransactions, setSortedTransactions] = useState([]);
   const [sortKey, setSortKey] = useState("giorno");
   const [sortOrder, setSortOrder] = useState("desc");
@@ -34,28 +36,24 @@ const TransactionList = ({
       let valueA = a[key] ?? "";
       let valueB = b[key] ?? "";
 
-      // Se l'ordinamento è per "valore", usiamo sempre il valore convertito
       if (key === "valore") {
         valueA = parseFloat(a.converted_value ?? a.valore ?? 0);
         valueB = parseFloat(b.converted_value ?? b.valore ?? 0);
         return order === "asc" ? valueA - valueB : valueB - valueA;
       }
 
-      // Se si ordina per "converted_value", stesso comportamento
       if (key === "converted_value") {
         valueA = parseFloat(valueA) || 0;
         valueB = parseFloat(valueB) || 0;
         return order === "asc" ? valueA - valueB : valueB - valueA;
       }
 
-      // Se si ordina per data
       if (key === "giorno") {
         const dateA = new Date(a.giorno);
         const dateB = new Date(b.giorno);
         return order === "asc" ? dateA - dateB : dateB - dateA;
       }
 
-      // Altri campi testuali (descrizione, tipo, ecc.)
       valueA = valueA.toString().toLowerCase();
       valueB = valueB.toString().toLowerCase();
       return order === "asc"
@@ -75,19 +73,19 @@ const TransactionList = ({
 
   const handleDelete = (id, descrizione, valore, tipo, currency) => {
     const message = `
-Descrizione: ${descrizione || "Senza descrizione"}
-Valore: ${valore} ${currency || ""}
-Tipo: ${tipo || "N/D"}
+${t("description")}: ${descrizione || t("not_available")}
+${t("value")}: ${valore} ${currency || ""}
+${t("type")}: ${tipo || t("not_available")}
 
-❗ Questa operazione è irreversibile. Procedere con l'eliminazione?
+${t("delete_warning")}
     `.trim();
 
     Alert.alert(
-      "Conferma Eliminazione",
+      t("delete_confirm_title"),
       message,
       [
-        { text: "Annulla", style: "cancel" },
-        { text: "Elimina", onPress: () => onDelete(id), style: "destructive" },
+        { text: t("cancel"), style: "cancel" },
+        { text: t("delete"), onPress: () => onDelete(id), style: "destructive" },
       ],
       { cancelable: true }
     );
@@ -105,9 +103,9 @@ Tipo: ${tipo || "N/D"}
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/D";
+    if (!dateString) return t("not_available");
     const date = new Date(dateString);
-    if (isNaN(date)) return "N/D";
+    if (isNaN(date)) return t("not_available");
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear().toString().slice(-2);
@@ -125,29 +123,35 @@ Tipo: ${tipo || "N/D"}
 
   return (
     <View style={styles.modalContent}>
-      <Text style={styles.title}>Lista Transazioni</Text>
+      <Text style={styles.title}>{t("transaction_list")}</Text>
 
       {sortedTransactions.length === 0 ? (
-        <Text style={styles.noTransactionsText}>Nessuna transazione trovata.</Text>
+        <Text style={styles.noTransactionsText}>{t("no_transactions_found")}</Text>
       ) : (
         <FlatList
           data={sortedTransactions}
           keyExtractor={(item) => item.id?.toString()}
           ListHeaderComponent={() => (
             <View style={styles.headerRow}>
-              {["descrizione", "tipo", "valore", "giorno"].map((key, index) => (
+              {[
+                { key: "descrizione", label: t("description") },
+                { key: "tipo", label: t("type") },
+                { key: "valore", label: t("value") },
+                { key: "giorno", label: t("date") },
+              ].map((col, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={[styles.headerCell, { flex: key === "valore" ? 2 : 2 }]}
-                  onPress={() => handleSort(key)}
+                  style={[styles.headerCell, { flex: col.key === "valore" ? 2 : 2 }]}
+                  onPress={() => handleSort(col.key)}
                 >
                   <Text style={styles.headerText}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)} {renderSortIcon(key)}
+                    {col.label} {renderSortIcon(col.key)}
                   </Text>
                 </TouchableOpacity>
               ))}
+
               <View style={[styles.headerCell, { flex: 1 }]}>
-                <Text style={styles.headerText}>Azioni</Text>
+                <Text style={styles.headerText}>{t("actions")}</Text>
               </View>
             </View>
           )}
@@ -158,10 +162,10 @@ Tipo: ${tipo || "N/D"}
             return (
               <View style={styles.row}>
                 <Text style={[styles.cell, { flex: 2 }]}>
-                  {item.descrizione || "N/D"}
+                  {item.descrizione || t("not_available")}
                 </Text>
                 <Text style={[styles.cell, { flex: 2 }]}>
-                  {item.tipo || "N/D"}
+                  {item.tipo || t("not_available")}
                 </Text>
 
                 <View style={[styles.valueContainer, { flex: 2 }]}>
@@ -204,7 +208,7 @@ Tipo: ${tipo || "N/D"}
       )}
 
       <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-        <Text style={styles.closeButtonText}>Chiudi</Text>
+        <Text style={styles.closeButtonText}>{t("close")}</Text>
       </TouchableOpacity>
     </View>
   );

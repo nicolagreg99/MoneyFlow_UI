@@ -49,8 +49,7 @@ const ExpensesStyles = StyleSheet.create({
     alignItems: 'center',
   },
   accordionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
     color: '#333',
   },
   datePickerContainer: {

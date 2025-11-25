@@ -5,8 +5,10 @@ import ExpensesStyles from "../../styles/Expenses_style";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API from "../../../config/api";
+import { useTranslation } from "react-i18next";
 
 const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => {
+  const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const [filterOptions, setFilterOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
           );
         }
       } catch (error) {
-        console.error("Errore nel recupero delle categorie:", error);
+        console.error(t("fetch_error"), error);
       } finally {
         setLoading(false);
       }
@@ -47,7 +49,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
   };
 
   return (
-    <View style={ExpensesStyles.filterContainer}>
+    <View>
       <TouchableOpacity
         style={ExpensesStyles.filterBox}
         onPress={() => setModalVisible(true)}
@@ -58,7 +60,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
           <Text style={ExpensesStyles.filterText}>
             {selectedFilters.length > 0
               ? selectedFilters.join(", ")
-              : "Seleziona Categoria"}
+              : t("select_category")}
           </Text>
         </View>
         <Feather name="chevron-right" size={18} color="#007AFF" />
@@ -74,8 +76,8 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
           <View style={ExpensesStyles.modalContainer}>
             <Text style={ExpensesStyles.modalTitle}>
               {filterType === "entrate"
-                ? "Categorie di Entrata"
-                : "Categorie di Spesa"}
+                ? t("income_categories")
+                : t("expense_categories")}
             </Text>
 
             {loading ? (
@@ -114,7 +116,7 @@ const FilterSelector = ({ selectedFilters, setSelectedFilters, filterType }) => 
               onPress={() => setModalVisible(false)}
               activeOpacity={0.8}
             >
-              <Text style={ExpensesStyles.modalCloseText}>Chiudi</Text>
+              <Text style={ExpensesStyles.modalCloseText}>{t("close")}</Text>
             </TouchableOpacity>
           </View>
         </View>

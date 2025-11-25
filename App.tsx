@@ -8,6 +8,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "./assets/config/toastConfig";
+import { useTranslation } from "react-i18next";
 
 // Screens
 import LoginForm from "./assets/components/LoginForm";
@@ -60,28 +61,46 @@ const MenuButton = ({ navigation }: any) => (
   </TouchableOpacity>
 );
 
-// Navigatore per la parte bassa (Home, Spese, Entrate)
-const MainTabs = ({ navigation }: any) => (
-  <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ color, size }) => {
-        let iconName = "home";
-        if (route.name === "Expenses") iconName = "money-off";
-        if (route.name === "Incomes") iconName = "attach-money";
-        return <MaterialIcons name={iconName} size={size} color={color} />;
-      },
-      headerRight: () => <MenuButton navigation={navigation} />,
-    })}
-  >
-    <Tab.Screen name="Home" component={MainPage} />
-    <Tab.Screen name="Expenses" component={ExpensesScreen} />
-    <Tab.Screen name="Incomes" component={IncomesScreen} />
-  </Tab.Navigator>
-);
+const MainTabs = ({ navigation }: any) => {
+  const { t } = useTranslation();
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName = "home";
+          if (route.name === "Expenses") iconName = "money-off";
+          if (route.name === "Incomes") iconName = "attach-money";
+          return <MaterialIcons name={iconName} size={size} color={color} />;
+        },
+        headerRight: () => <MenuButton navigation={navigation} />,
+      })}
+    >
+      <Tab.Screen
+        name="Home"
+        component={MainPage}
+        options={{ tabBarLabel: t("home"), title: t("home")}}
+      />
+
+      <Tab.Screen
+        name="Expenses"
+        component={ExpensesScreen}
+        options={{ tabBarLabel: t("expenses"), title: t("expenses") }}
+      />
+
+      <Tab.Screen
+        name="Incomes"
+        component={IncomesScreen}
+        options={{ tabBarLabel: t("incomes"), title: t("incomes") }}
+      />
+    </Tab.Navigator>
+  );
+};
+
 
 // App principale
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -107,45 +126,45 @@ const App = () => {
         <Stack.Screen 
           name="InsertExpenses" 
           component={InsertExpensesScreen} 
-          options={({ navigation }) => ({ title: "Inserisci Spesa", headerRight: () => <MenuButton navigation={navigation} /> })}
+          options={({ navigation }) => ({ title: t("insert_expense"), headerRight: () => <MenuButton navigation={navigation} /> })}
         />
         <Stack.Screen 
           name="InsertIncomes" 
           component={InsertIncomesScreen} 
-          options={({ navigation }) => ({ title: "Inserisci Entrata", headerRight: () => <MenuButton navigation={navigation} /> })}
+          options={({ navigation }) => ({ title: t("insert_income"), headerRight: () => <MenuButton navigation={navigation} /> })}
         />
         <Stack.Screen 
           name="UpdatePassword" 
           component={UpdatePasswordScreen} 
-          options={({ route }) => ({ headerShown: true, title: "Reset Password" })}
+          options={({ route }) => ({ headerShown: true, title: t("reset_password") })}
         />
         <Stack.Screen 
           name="ExpensesView" 
           component={ExpensesScreen} 
-          options={({ navigation }) => ({ title: "Expenses", headerRight: () => <MenuButton navigation={navigation} /> })}
+          options={({ navigation }) => ({ title: t("expenses"), headerRight: () => <MenuButton navigation={navigation} /> })}
         />
         <Stack.Screen 
           name="IncomesView" 
           component={IncomesScreen} 
-          options={({ navigation }) => ({ title: "Incomes", headerRight: () => <MenuButton navigation={navigation} /> })}
+          options={({ navigation }) => ({ title: t("incomes"), headerRight: () => <MenuButton navigation={navigation} /> })}
         />
         <Stack.Screen 
           name="EditUser" 
           component={EditUser} 
           options={({ navigation }) => ({ 
-            title: "Modifica Profilo", 
+            title: t("edit_profile"), 
             headerRight: () => <MenuButton navigation={navigation} /> 
           })}
         />
         <Stack.Screen 
           name="EditExpenses" 
           component={EditExpenseScreen} 
-          options={{ presentation: "modal", title: "Modifica Spesa" }} 
+          options={{ presentation: "modal", title: t("edit_expense") }} 
         />
         <Stack.Screen 
           name="EditIncomes" 
           component={EditIncomeScreen} 
-          options={{ presentation: "modal", title: "Modifica Entrata" }} 
+          options={{ presentation: "modal", title: t("edit_income") }} 
         />
       </Stack.Navigator>
       <Toast config={toastConfig} />
