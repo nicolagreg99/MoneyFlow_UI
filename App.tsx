@@ -8,6 +8,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "./assets/config/toastConfig";
+import "./src/i18n";
 import { useTranslation } from "react-i18next";
 
 // Screens
