@@ -156,7 +156,7 @@ const InsertExpensesScreen = () => {
               {/* Campo importo */}
               <View style={ExpensesStyles.inputWrapper}>
                 <MaterialIcons
-                  name="euro"
+                  name="monetization-on"
                   size={20}
                   color="#3498DB"
                   style={ExpensesStyles.iconLeft}

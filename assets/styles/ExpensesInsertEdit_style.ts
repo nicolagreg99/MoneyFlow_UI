@@ -45,7 +45,7 @@ const ExpensesStyles = StyleSheet.create({
 
   iconLeft: {
     position: "absolute",
-    top: Platform.OS === "ios" ? 14 : 12,
+    top: Platform.OS === "ios" ? 14 : 15,
     left: 12,
     zIndex: 5,
   },
