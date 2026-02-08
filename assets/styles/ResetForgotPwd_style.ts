@@ -26,6 +26,7 @@ const ResetForgotPwd = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#BDC3C7',
+    color: '#000000',
     marginBottom: 15,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -42,6 +43,7 @@ const ResetForgotPwd = StyleSheet.create({
   inputPassword: {
     borderWidth: 1,
     borderColor: '#BDC3C7',
+    color: '#000000',
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,

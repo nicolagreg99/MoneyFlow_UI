@@ -19,6 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import IncomesStyles from "../styles/IncomesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
+import AssetPicker from "./personalized_components/AssetPicker";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 import { useTranslation } from 'react-i18next';
@@ -39,9 +40,11 @@ const InsertIncomesScreen = () => {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [userCurrency, setUserCurrency] = useState<string>("EUR");
   const [currency, setCurrency] = useState<string>("EUR");
+  const [selectedAsset, setSelectedAsset] = useState<number | null>(null);
 
   const [errorFields, setErrorFields] = useState({});
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const assetPickerRef = useRef(null);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -51,7 +54,7 @@ const InsertIncomesScreen = () => {
     }).start();
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     const loadUserData = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
@@ -81,8 +84,10 @@ const InsertIncomesScreen = () => {
       amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
       selectedType: selectedType.length === 0,
+      selectedAsset: !selectedAsset,
     };
     setErrorFields(errors);
+
     if (Object.values(errors).some(Boolean)) {
       Toast.show({
         type: "error",
@@ -103,8 +108,9 @@ const InsertIncomesScreen = () => {
       tipo: selectedType[0],
       valore: parseFloat(formattedAmount),
       giorno: date.toISOString().split("T")[0],
-      descrizione: description.trim(),
       currency,
+      payment_asset_id: selectedAsset,
+      descrizione: description.trim(),
       user_id: userId,
     };
 
@@ -121,11 +127,18 @@ const InsertIncomesScreen = () => {
         type: "success",
         text1: t("income_registered"),
       });
+
+      // Reset form
       setAmount("");
       setDescription("");
       setSelectedType([]);
       setCurrency(userCurrency);
       setDate(new Date());
+
+      // Ricarica gli asset
+      if (assetPickerRef.current?.reloadAssets) {
+        assetPickerRef.current.reloadAssets();
+      }
     } catch (error) {
       console.error("Errore:", error);
       Toast.show({
@@ -154,7 +167,7 @@ const InsertIncomesScreen = () => {
             <ActivityIndicator size="large" color="#3498DB" />
           ) : (
             <>
-              {/* Importo */}
+              {/* Campo importo */}
               <View style={IncomesStyles.inputWrapper}>
                 <MaterialIcons
                   name="euro"
@@ -182,7 +195,7 @@ const InsertIncomesScreen = () => {
                 </View>
               </View>
 
-              {/* Descrizione */}
+              {/* Campo descrizione */}
               <View style={IncomesStyles.inputWrapper}>
                 <MaterialIcons
                   name="description"
@@ -202,13 +215,22 @@ const InsertIncomesScreen = () => {
                 />
               </View>
 
-              {/* Tipo */}
+              {/* Categoria */}
               <FilterSelector
                 selectedFilters={selectedType}
                 setSelectedFilters={(filters) =>
                   setSelectedType([filters[filters.length - 1]])
                 }
                 filterType="entrate"
+              />
+
+              {/* Asset Picker */}
+              <AssetPicker
+                ref={assetPickerRef}
+                selectedAsset={selectedAsset}
+                setSelectedAsset={setSelectedAsset}
+                hasError={errorFields.selectedAsset}
+                authToken={authToken}
               />
 
               {/* Data */}
@@ -249,7 +271,7 @@ const InsertIncomesScreen = () => {
                 </LinearGradient>
               </TouchableOpacity>
 
-              {/* Pulsante Visualizza Entrate */}
+              {/* Pulsante secondario */}
               <TouchableOpacity
                 style={IncomesStyles.secondaryButton}
                 onPress={() => navigation.navigate("Main", { screen: "Incomes" })}

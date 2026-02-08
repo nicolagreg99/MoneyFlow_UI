@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+} from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 
-type SortKey = 'mese' | 'valore' | 'entrate' | 'spese';
+type SortKey = "mese" | "valore" | "entrate" | "spese";
 
 interface BalanceItem {
-  mese: string;  // Il mese viene passato in formato "January 2025" ad esempio
+  mese: string; // es: "January 2025"
   entrate: number;
   spese: number;
   valore: number;
@@ -23,61 +22,86 @@ interface MonthlyBalanceTableProps {
   currency: string;
 }
 
-const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, currency }) => {
+const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
+  balances,
+  currency,
+}) => {
   const { t } = useTranslation();
   const [sortedData, setSortedData] = useState<BalanceItem[]>([]);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [sortKey, setSortKey] = useState<SortKey>('mese');
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortKey, setSortKey] = useState<SortKey>("mese");
 
   useEffect(() => {
     const sorted = sortBalances(balances, sortKey, sortOrder);
     setSortedData(sorted);
   }, [balances, sortKey, sortOrder]);
 
-  // Funzione per tradurre e parsare la data (mese e anno)
+  // Parsing mese + anno (basato sulle traduzioni correnti)
   const parseDateKey = (str: string): Date => {
     const [mese, anno] = str.split(" ");
-    
-    // Lista dei mesi tradotti dinamicamente
+
     const mesi = [
-      t("january"), t("february"), t("march"), t("april"), t("may"), t("june"),
-      t("july"), t("august"), t("september"), t("october"), t("november"), t("december")
+      t("january"),
+      t("february"),
+      t("march"),
+      t("april"),
+      t("may"),
+      t("june"),
+      t("july"),
+      t("august"),
+      t("september"),
+      t("october"),
+      t("november"),
+      t("december"),
     ];
-    
-    // Restituisce un oggetto Date con il mese tradotto
-    return new Date(parseInt(anno), mesi.indexOf(mese));  // Trova il mese tradotto e restituisce la data
+
+    const monthIndex = mesi.indexOf(mese);
+
+    return new Date(
+      parseInt(anno, 10),
+      monthIndex === -1 ? 0 : monthIndex
+    );
   };
 
-  const sortBalances = (data: BalanceItem[], key: SortKey, order: 'asc' | 'desc') => {
+  const sortBalances = (
+    data: BalanceItem[],
+    key: SortKey,
+    order: "asc" | "desc"
+  ) => {
     return [...data].sort((a, b) => {
-      if (key === 'mese') {
-        const dateA = parseDateKey(a.mese);  // Traduci la stringa mese/anno
-        const dateB = parseDateKey(b.mese);  // Traduci la stringa mese/anno
-        return order === 'asc'
+      if (key === "mese") {
+        const dateA = parseDateKey(a.mese);
+        const dateB = parseDateKey(b.mese);
+
+        return order === "asc"
           ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
-      } else {
-        return order === 'asc'
-          ? a[key] - b[key]
-          : b[key] - a[key];
       }
+
+      return order === "asc" ? a[key] - b[key] : b[key] - a[key];
     });
   };
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortKey(key);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
   const renderSortIcon = (key: SortKey) => (
     <Icon
-      name={sortKey === key ? (sortOrder === 'asc' ? 'sort-up' : 'sort-down') : 'sort'}
+      name={
+        sortKey === key
+          ? sortOrder === "asc"
+            ? "sort-up"
+            : "sort-down"
+          : "sort"
+      }
       size={14}
-      color={sortKey === key ? '#007bff' : '#ccc'}
+      color={sortKey === key ? "#007bff" : "#ccc"}
       style={{ marginLeft: 6 }}
     />
   );
@@ -87,64 +111,85 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, cur
       <Text style={styles.title}>📅 {t("monthly_balances")}</Text>
 
       <View style={styles.table}>
+        {/* Header */}
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('mese')}>
+          <TouchableOpacity
+            style={styles.headerCell}
+            onPress={() => handleSort("mese")}
+          >
             <Text style={styles.headerText}>
-              {t("month")} {renderSortIcon('mese')}
+              {t("month")} {renderSortIcon("mese")}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('entrate')}>
+
+          <TouchableOpacity
+            style={styles.headerCell}
+            onPress={() => handleSort("entrate")}
+          >
             <Text style={styles.headerText}>
-              {t("incomes")} {renderSortIcon('entrate')}
+              {t("incomes")} {renderSortIcon("entrate")}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('spese')}>
+
+          <TouchableOpacity
+            style={styles.headerCell}
+            onPress={() => handleSort("spese")}
+          >
             <Text style={styles.headerText}>
-              {t("expenses")} {renderSortIcon('spese')}
+              {t("expenses")} {renderSortIcon("spese")}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerCell} onPress={() => handleSort('valore')}>
+
+          <TouchableOpacity
+            style={styles.headerCell}
+            onPress={() => handleSort("valore")}
+          >
             <Text style={styles.headerText}>
-              {t("balance")} {renderSortIcon('valore')}
+              {t("balance")} {renderSortIcon("valore")}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <FlatList
-          data={sortedData}
-          keyExtractor={(item) => item.mese}
-          renderItem={({ item, index }) => {
-            // Aggiungi il log qui per vedere i dati in console
-            console.log('Mese:', item.mese);
-            console.log('Entrate:', item.entrate);
-            console.log('Spese:', item.spese);
-            console.log('Bilancio (valore):', item.valore);
+        {/* Rows */}
+        {sortedData.map((item, index) => (
+          <View
+            key={`${item.mese}-${index}`}
+            style={[styles.row, index % 2 === 0 && styles.rowAlternate]}
+          >
+            <Text style={styles.cell}>{item.mese}</Text>
 
-            return (
-              <View style={[styles.row, index % 2 === 0 && styles.rowAlternate]}>
-                <Text style={styles.cell}>{item.mese}</Text>
-                <Text style={[styles.cell, { color: '#27ae60', textAlign: 'right' }]}>
-                  {currency} {item.entrate.toFixed(2)}
-                </Text>
-                <Text style={[styles.cell, { color: '#c0392b', textAlign: 'right' }]}>
-                  {currency} {item.spese.toFixed(2)}
-                </Text>
-                <Text
-                  style={[
-                    styles.cell,
-                    {
-                      textAlign: 'right',
-                      color: item.valore >= 0 ? '#27ae60' : '#c0392b',
-                      fontWeight: 'bold',
-                    },
-                  ]}
-                >
-                  {currency} {item.valore.toFixed(2)}
-                </Text>
-              </View>
-            );
-          }}
-        />
+            <Text
+              style={[
+                styles.cell,
+                { color: "#27ae60", textAlign: "right" },
+              ]}
+            >
+              {currency} {item.entrate.toFixed(2)}
+            </Text>
+
+            <Text
+              style={[
+                styles.cell,
+                { color: "#c0392b", textAlign: "right" },
+              ]}
+            >
+              {currency} {item.spese.toFixed(2)}
+            </Text>
+
+            <Text
+              style={[
+                styles.cell,
+                {
+                  textAlign: "right",
+                  fontWeight: "bold",
+                  color: item.valore >= 0 ? "#27ae60" : "#c0392b",
+                },
+              ]}
+            >
+              {currency} {item.valore.toFixed(2)}
+            </Text>
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -152,57 +197,57 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({ balances, cur
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
   },
   title: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
     marginBottom: 12,
-    textAlign: 'center',
-    color: '#2c3e50',
+    textAlign: "center",
+    color: "#2c3e50",
   },
   table: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    overflow: "hidden",
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 4,
   },
   headerRow: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f4f7',
+    flexDirection: "row",
+    backgroundColor: "#f0f4f7",
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
   },
   headerCell: {
     flex: 1,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
     paddingVertical: 10,
   },
   headerText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#34495e',
+    fontWeight: "600",
+    color: "#34495e",
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 10,
     paddingHorizontal: 8,
     borderBottomWidth: 0.5,
-    borderColor: '#eee',
-    alignItems: 'center',
+    borderColor: "#eee",
+    alignItems: "center",
   },
   rowAlternate: {
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
   },
   cell: {
     flex: 1,
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

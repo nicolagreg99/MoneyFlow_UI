@@ -42,13 +42,13 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
         activeOpacity={0.7}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Feather name="calendar" size={20} color="#007AFF" style={{ marginRight: 8 }} />
+          <Feather name="calendar" size={20} color="#3498DB" style={{ marginRight: 8 }} />
           <Text style={ExpensesStyles.accordionTitle}> {t("select_interval_date")}</Text>
         </View>
         <Feather
           name={expanded ? "chevron-up" : "chevron-down"}
           size={20}
-          color="#007AFF"
+          color="#3498DB"
         />
       </TouchableOpacity>
 
@@ -60,7 +60,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
               onPress={() => setShowFromPicker(true)}
               activeOpacity={0.7}
             >
-              <Feather name="arrow-right-circle" size={18} color="#007AFF" />
+              <Feather name="arrow-right-circle" size={18} color="#3498DB" />
               <Text style={ExpensesStyles.dateText}> {formatDate(fromDate)}</Text>
             </TouchableOpacity>
 
@@ -69,7 +69,7 @@ const DateRangePicker = ({ fromDate, setFromDate, toDate, setToDate }) => {
               onPress={() => setShowToPicker(true)}
               activeOpacity={0.7}
             >
-              <Feather name="arrow-left-circle" size={18} color="#007AFF" />
+              <Feather name="arrow-left-circle" size={18} color="#3498DB" />
               <Text style={ExpensesStyles.dateText}> {formatDate(toDate)}</Text>
             </TouchableOpacity>
           </View>

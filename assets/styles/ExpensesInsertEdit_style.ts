@@ -111,7 +111,6 @@ const ExpensesStyles = StyleSheet.create({
     backgroundColor: "#EEF7FF",
     borderWidth: 1,
     borderColor: INPUT_BORDER,
-    marginTop: 17,
     marginBottom: 8,
   },
   datePickerText: {

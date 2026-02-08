@@ -19,6 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
+import AssetPicker from "./personalized_components/AssetPicker";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 import { useTranslation } from "react-i18next";
@@ -39,11 +40,13 @@ const InsertExpensesScreen = () => {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [userCurrency, setUserCurrency] = useState<string>("EUR");
   const [currency, setCurrency] = useState<string>("EUR");
+  const [selectedAsset, setSelectedAsset] = useState<number | null>(null);
 
   const [errorFields, setErrorFields] = useState({});
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const assetPickerRef = useRef(null);
 
-  // 🔹 Effetto fade-in all'apertura
+  // Effetto fade-in all'apertura
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -52,7 +55,7 @@ const InsertExpensesScreen = () => {
     }).start();
   }, []);
 
-  // 🔹 Recupero dati utente
+  // Recupero dati utente
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -83,8 +86,10 @@ const InsertExpensesScreen = () => {
       amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
       selectedType: selectedType.length === 0,
+      selectedAsset: !selectedAsset,
     };
     setErrorFields(errors);
+
     if (Object.values(errors).some(Boolean)) {
       Toast.show({
         type: "error",
@@ -105,9 +110,9 @@ const InsertExpensesScreen = () => {
       tipo: selectedType[0],
       valore: parseFloat(formattedAmount),
       giorno: date.toISOString().split("T")[0],
-      descrizione: description.trim(),
       currency,
-      user_id: userId,
+      payment_asset_id: selectedAsset,
+      descrizione: description.trim(),
     };
 
     setLoading(true);
@@ -123,11 +128,18 @@ const InsertExpensesScreen = () => {
         type: "success",
         text1: t("expense_registered"),
       });
+
+      // Reset form
       setAmount("");
       setDescription("");
       setSelectedType([]);
       setCurrency(userCurrency);
       setDate(new Date());
+
+      // Ricarica gli asset
+      if (assetPickerRef.current?.reloadAssets) {
+        assetPickerRef.current.reloadAssets();
+      }
     } catch (error) {
       console.error("Errore:", error);
       Toast.show({
@@ -146,7 +158,6 @@ const InsertExpensesScreen = () => {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Animated.View style={[ExpensesStyles.container, { opacity: fadeAnim }]}>
-
           <Text style={ExpensesStyles.header}> 💸 {t("add_new_expense")}</Text>
 
           {userId === null ? (
@@ -210,6 +221,15 @@ const InsertExpensesScreen = () => {
                 filterType="spese"
               />
 
+              {/* Asset Picker */}
+              <AssetPicker
+                ref={assetPickerRef}
+                selectedAsset={selectedAsset}
+                setSelectedAsset={setSelectedAsset}
+                hasError={errorFields.selectedAsset}
+                authToken={authToken}
+              />
+
               {/* Data */}
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
@@ -249,12 +269,14 @@ const InsertExpensesScreen = () => {
               </TouchableOpacity>
 
               {/* Pulsante secondario */}
-            <TouchableOpacity
-              style={ExpensesStyles.secondaryButton}
-              onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
-            >
-              <Text style={ExpensesStyles.secondaryButtonText}>📊 {t("view_expenses")}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={ExpensesStyles.secondaryButton}
+                onPress={() => navigation.navigate("Main", { screen: "Expenses" })}
+              >
+                <Text style={ExpensesStyles.secondaryButtonText}>
+                  📊 {t("view_expenses")}
+                </Text>
+              </TouchableOpacity>
             </>
           )}
         </Animated.View>

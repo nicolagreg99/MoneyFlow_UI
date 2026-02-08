@@ -26,6 +26,10 @@ import UpdatePasswordScreen from "./assets/components/UpdatePassword";
 import EditUser from "./assets/components/EditUser";
 import EditExpenseScreen from "./assets/components/EditExpenseScreen";
 import EditIncomeScreen from "./assets/components/EditIncomeScreen";
+import AssetScreen from "./assets/components/AssetScreen";
+import InsertAssetScreen from "./assets/components/InsertAssetScreen";
+import TransferAssetScreen from "./assets/components/TransferAssetScreen";
+import AssetDetailsScreen from "./assets/components/AssetDetailsScreen";
 
 
 // Parametri delle schermate
@@ -44,12 +48,14 @@ export type RootStackParamList = {
   EditUser: undefined;
   EditTransaction: { transaction: any };
   EditExpenses: { transaction: any };
+  AssetView: undefined;
 };
 
 export type BottomTabParamList = {
   Home: undefined;
   Expenses: undefined;
   Incomes: undefined;
+  Asset: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -71,6 +77,7 @@ const MainTabs = ({ navigation }: any) => {
           let iconName = "home";
           if (route.name === "Expenses") iconName = "money-off";
           if (route.name === "Incomes") iconName = "attach-money";
+          if (route.name === "Asset") iconName = "account-balance-wallet";
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
         headerRight: () => <MenuButton navigation={navigation} />,
@@ -93,8 +100,28 @@ const MainTabs = ({ navigation }: any) => {
         component={IncomesScreen}
         options={{ tabBarLabel: t("incomes"), title: t("incomes") }}
       />
+
+      <Tab.Screen
+        name="Asset"
+        component={AssetScreen}
+        options={{ tabBarLabel: t("asset"), title: t("asset") }}
+      />
     </Tab.Navigator>
   );
+};
+
+const linking = {
+  prefixes: ['moneyapp://'],
+  config: {
+    screens: {
+      UpdatePassword: {
+        path: 'reset_password',
+        parse: {
+          token: (token: string) => token,
+        },
+      },
+    },
+  },
 };
 
 
@@ -116,7 +143,7 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName={isAuthenticated ? "Main" : "Login"}>
         <Stack.Screen name="Login" component={LoginForm} options={{ headerShown: false }} />
         <Stack.Screen name="RegisterPersonalInfo" component={RegisterPersonalInfo} options={{ headerShown: false }} />
@@ -150,6 +177,11 @@ const App = () => {
           options={({ navigation }) => ({ title: t("incomes"), headerRight: () => <MenuButton navigation={navigation} /> })}
         />
         <Stack.Screen 
+          name="AssetView" 
+          component={AssetScreen} 
+          options={({ navigation }) => ({ title: t("asset"), headerRight: () => <MenuButton navigation={navigation} /> })}
+        />
+        <Stack.Screen 
           name="EditUser" 
           component={EditUser} 
           options={({ navigation }) => ({ 
@@ -166,6 +198,21 @@ const App = () => {
           name="EditIncomes" 
           component={EditIncomeScreen} 
           options={{ presentation: "modal", title: t("edit_income") }} 
+        />
+        <Stack.Screen 
+          name="InsertAsset" 
+          component={InsertAssetScreen}
+          options={{ title: "Aggiungi Asset" }}
+        />
+        <Stack.Screen 
+          name="TransferAsset" 
+          component={TransferAssetScreen}
+          options={{ title: "Trasferisci Asset" }}
+        />
+        <Stack.Screen 
+          name="AssetDetails" 
+          component={AssetDetailsScreen}
+          options={{ title: "Dettagli Asset" }}
         />
       </Stack.Navigator>
       <Toast config={toastConfig} />

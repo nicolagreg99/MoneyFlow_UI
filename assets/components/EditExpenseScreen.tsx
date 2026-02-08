@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Platform,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 import ExpensesStyles from "../styles/ExpensesInsertEdit_style";
 import FilterSelector from "./personalized_components/FilterSelector";
+import AssetPicker from "./personalized_components/AssetPicker";
 import API from "../../config/api";
 import CurrencyPicker from "./personalized_components/CurrencyPicker";
 import Toast from "react-native-toast-message";
@@ -31,6 +35,7 @@ const EditExpenseScreen = () => {
   const [date, setDate] = useState(new Date());
   const [currency, setCurrency] = useState("EUR");
   const [userCurrency, setUserCurrency] = useState("EUR");
+  const [selectedAsset, setSelectedAsset] = useState<number | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -38,7 +43,10 @@ const EditExpenseScreen = () => {
     amount: false,
     description: false,
     selectedType: false,
+    selectedAsset: false,
   });
+
+  const assetPickerRef = useRef(null);
 
   useEffect(() => {
     if (!expense) {
@@ -51,6 +59,7 @@ const EditExpenseScreen = () => {
     setSelectedType([expense.tipo]);
     setDate(new Date(expense.giorno));
     setCurrency(expense.currency || "EUR");
+    setSelectedAsset(expense.payment_asset_id || null);
 
     const fetchUserData = async () => {
       const token = await AsyncStorage.getItem("authToken");
@@ -77,11 +86,18 @@ const EditExpenseScreen = () => {
       amount: !formattedAmount.trim() || isNaN(formattedAmount),
       description: !description.trim(),
       selectedType: selectedType.length === 0,
+      selectedAsset: !selectedAsset,
     };
 
     setErrorFields(errors);
 
-    if (Object.values(errors).some(Boolean) || !authToken) return;
+    if (Object.values(errors).some(Boolean) || !authToken) {
+      Toast.show({
+        type: "error",
+        text1: t("fill_required_fields"),
+      });
+      return;
+    }
 
     const payload = {
       tipo: selectedType[0],
@@ -89,6 +105,7 @@ const EditExpenseScreen = () => {
       giorno: date.toISOString().split("T")[0],
       descrizione: description.trim(),
       currency,
+      payment_asset_id: selectedAsset,
     };
 
     const PATCH_URL = `${API.BASE_URL}/api/v1/edit_expense/${expense.id}`;
@@ -122,121 +139,150 @@ const EditExpenseScreen = () => {
   };
 
   return (
-    <View style={ExpensesStyles.container}>
-      <Text style={ExpensesStyles.header}>{t("edit_expense")}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1, backgroundColor: "#F5F7FB" }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={ExpensesStyles.container}>
+          <Text style={ExpensesStyles.header}>✏️ {t("edit_expense")}</Text>
 
-      <View style={[ExpensesStyles.inputWrapper, { position: "relative" }]}>
-        {(amount.length > 0 || amountFocused) && (
-          <Text style={ExpensesStyles.floatingLabel}>
-            {t("amount_label")} *
-          </Text>
-        )}
+          {/* Campo importo */}
+          <View style={[ExpensesStyles.inputWrapper, { position: "relative" }]}>
+            {(amount.length > 0 || amountFocused) && (
+              <Text style={ExpensesStyles.floatingLabel}>
+                {t("amount_label")} *
+              </Text>
+            )}
 
-        <View style={{ position: "relative", justifyContent: "center" }}>
-          <TextInput
-            style={[
-              ExpensesStyles.input,
-              errorFields.amount && ExpensesStyles.errorInput,
-            ]}
-            onFocus={() => setAmountFocused(true)}
-            onBlur={() => setAmountFocused(false)}
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-            placeholder={
-              amount.length > 0 || amountFocused
-                ? ""
-                : `${t("amount_label")} (${currency}) *`
+            <View style={{ position: "relative", justifyContent: "center" }}>
+              <MaterialIcons
+                name="monetization-on"
+                size={20}
+                color="#3498DB"
+                style={ExpensesStyles.iconLeft}
+              />
+              <TextInput
+                style={[
+                  ExpensesStyles.input,
+                  errorFields.amount && ExpensesStyles.errorInput,
+                ]}
+                onFocus={() => setAmountFocused(true)}
+                onBlur={() => setAmountFocused(false)}
+                keyboardType="numeric"
+                value={amount}
+                onChangeText={setAmount}
+                placeholder={
+                  amount.length > 0 || amountFocused
+                    ? ""
+                    : `${t("amount_label")} (${currency}) *`
+                }
+                placeholderTextColor="#7F8C8D"
+              />
+
+              <View style={ExpensesStyles.currencyPickerInside}>
+                <CurrencyPicker
+                  currency={currency}
+                  setCurrency={setCurrency}
+                  compactMode
+                />
+              </View>
+            </View>
+          </View>
+          {errorFields.amount && (
+            <Text style={ExpensesStyles.errorText}>{t("amount_required")}</Text>
+          )}
+
+          {/* Campo descrizione */}
+          <View style={ExpensesStyles.inputWrapper}>
+            {(description.length > 0 || descriptionFocused) && (
+              <Text style={ExpensesStyles.floatingLabel}>
+                {t("description_label")} *
+              </Text>
+            )}
+            <MaterialIcons
+              name="description"
+              size={20}
+              color="#3498DB"
+              style={ExpensesStyles.iconLeft}
+            />
+            <TextInput
+              style={[
+                ExpensesStyles.input,
+                errorFields.description && ExpensesStyles.errorInput,
+              ]}
+              onFocus={() => setDescriptionFocused(true)}
+              onBlur={() => setDescriptionFocused(false)}
+              value={description}
+              onChangeText={setDescription}
+              placeholder={
+                description.length > 0 || descriptionFocused
+                  ? ""
+                  : `${t("description_label")} *`
+              }
+              placeholderTextColor="#7F8C8D"
+            />
+          </View>
+          {errorFields.description && (
+            <Text style={ExpensesStyles.errorText}>
+              {t("description_required")}
+            </Text>
+          )}
+
+          {/* Categoria */}
+          <FilterSelector
+            selectedFilters={selectedType}
+            setSelectedFilters={(filters) =>
+              setSelectedType([filters[filters.length - 1]])
             }
-            placeholderTextColor="#7F8C8D"
+            filterType="spese"
+          />
+          {errorFields.selectedType && (
+            <Text style={ExpensesStyles.errorText}>{t("type_required")}</Text>
+          )}
+
+          {/* Asset Picker */}
+          <AssetPicker
+            ref={assetPickerRef}
+            selectedAsset={selectedAsset}
+            setSelectedAsset={setSelectedAsset}
+            hasError={errorFields.selectedAsset}
+            authToken={authToken}
           />
 
-          <View
-            style={{
-              position: "absolute",
-              right: 10,
-              top: 0,
-              bottom: 0,
-              justifyContent: "center",
-              transform: [{ translateY: -6 }],
-            }}
+          {/* Data */}
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={ExpensesStyles.datePickerButton}
           >
-            <CurrencyPicker currency={currency} setCurrency={setCurrency} compactMode />
-          </View>
+            <MaterialIcons name="event" size={20} color="#2C3E50" />
+            <Text style={ExpensesStyles.datePickerText}>
+              {date.toLocaleDateString("it-IT")}
+            </Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={handleDateChange}
+            />
+          )}
+
+          {/* Pulsante salva */}
+          <TouchableOpacity
+            style={[ExpensesStyles.button, loading && { opacity: 0.6 }]}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            <Text style={ExpensesStyles.buttonText}>
+              {loading ? t("saving") : t("save_changes")}
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
-      {errorFields.amount && (
-        <Text style={ExpensesStyles.errorText}>{t("amount_required")}</Text>
-      )}
-
-      <View style={ExpensesStyles.inputWrapper}>
-        {(description.length > 0 || descriptionFocused) && (
-          <Text style={ExpensesStyles.floatingLabel}>
-            {t("description_label")} *
-          </Text>
-        )}
-        <TextInput
-          style={[
-            ExpensesStyles.input,
-            errorFields.description && ExpensesStyles.errorInput,
-          ]}
-          onFocus={() => setDescriptionFocused(true)}
-          onBlur={() => setDescriptionFocused(false)}
-          value={description}
-          onChangeText={setDescription}
-          placeholder={
-            description.length > 0 || descriptionFocused
-              ? ""
-              : `${t("description_label")} *`
-          }
-          placeholderTextColor="#7F8C8D"
-        />
-      </View>
-      {errorFields.description && (
-        <Text style={ExpensesStyles.errorText}>{t("description_required")}</Text>
-      )}
-
-      <Text style={ExpensesStyles.label}>{t("type_label")} *</Text>
-      <FilterSelector
-        selectedFilters={selectedType}
-        setSelectedFilters={(filters) =>
-          setSelectedType([filters[filters.length - 1]])
-        }
-        filterType="spese"
-      />
-      {errorFields.selectedType && (
-        <Text style={ExpensesStyles.errorText}>{t("type_required")}</Text>
-      )}
-
-      <Text style={ExpensesStyles.label}>{t("date")}:</Text>
-      <TouchableOpacity
-        onPress={() => setShowDatePicker(true)}
-        style={ExpensesStyles.datePickerButton}
-      >
-        <Text style={ExpensesStyles.datePickerText}>
-          {date.toLocaleDateString("it-IT")}
-        </Text>
-      </TouchableOpacity>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={handleDateChange}
-        />
-      )}
-
-      <TouchableOpacity
-        style={[ExpensesStyles.button, loading && { opacity: 0.6 }]}
-        onPress={handleSubmit}
-        disabled={loading}
-      >
-        <Text style={ExpensesStyles.buttonText}>
-          {loading ? t("saving") : t("save_changes")}
-        </Text>
-      </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

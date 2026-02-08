@@ -50,6 +50,7 @@ const LoginStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     height: 50,
+    color: '#000000',
     width: '100%',
   },
   inputPassword: {
@@ -57,6 +58,7 @@ const LoginStyles = StyleSheet.create({
     borderColor: '#BDC3C7',
     paddingHorizontal: 15,
     paddingVertical: 12,
+    color: '#000000',
     fontSize: 16,
     borderRadius: 10,
     backgroundColor: '#fff',

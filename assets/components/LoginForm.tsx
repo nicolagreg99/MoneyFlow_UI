@@ -40,6 +40,8 @@ type FormValues = {
 
 const { width } = Dimensions.get("window");
 
+const currentYear = new Date().getFullYear();
+
 const LoginForm = () => {
   const { t } = useTranslation();
   const [formValues, setFormValues] = useState<FormValues>({
@@ -178,8 +180,8 @@ const LoginForm = () => {
             <Button title={t("button_login")} onPress={handleSubmit} />
 
             <View style={LoginStyles.footer}>
-              <Text style={LoginStyles.footerText}>{t("footer_copy")}</Text>
-
+              <Text style={LoginStyles.footerText}> {t("footer_copy", { year: currentYear })} </Text>
+              
               <TouchableOpacity
                 onPress={() => navigation.navigate("RegisterPersonalInfo")}
               >
