@@ -60,6 +60,8 @@ const bankLogos: { [key: string]: any } = {
   traderepublic: require("../../../assets/banks/trade_republic.png"),
   bbva: require("../../../assets/banks/bbva.png"),
   poste: require("../../../assets/banks/poste.png"),
+  bancoposta: require("../../../assets/banks/poste.png"),
+  postepay: require("../../../assets/banks/poste.png"),
   intesa: require("../../../assets/banks/intesa.png"),
 };
 

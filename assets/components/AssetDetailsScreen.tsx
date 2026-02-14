@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, ActivityIndicator, FlatList } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, ActivityIndicator, FlatList, Modal } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -53,22 +53,53 @@ const AssetDetailsScreen = () => {
   const { asset } = route.params;
 
   const [isEditing, setIsEditing] = useState(false);
+  const [editedBank, setEditedBank] = useState(asset.bank);
+  const [editedAssetType, setEditedAssetType] = useState(asset.asset_type);
   const [editedAmount, setEditedAmount] = useState(asset.amount.toString());
+  const [showAssetTypeModal, setShowAssetTypeModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
   const [summary, setSummary] = useState({ total_inflow: 0, total_outflow: 0, net_flow: 0 });
 
+  // Lista dei tipi di asset
+  const assetTypes = [
+    { value: "BONDS", icon: "insert-chart", color: "#795548" },
+    { value: "BUONI_POSTALI", icon: "local-post-office", color: "#FFB300" },
+    { value: "COMMODITIES", icon: "grain", color: "#FFC107" },
+    { value: "CRYPTO", icon: "currency-bitcoin", color: "#9C27B0" },
+    { value: "DEPOSIT_ACCOUNT", icon: "lock", color: "#81C784" },
+    { value: "ETF", icon: "pie-chart", color: "#42A5F5" },
+    { value: "GOLD", icon: "star", color: "#FFD54F" },
+    { value: "GOVERNMENT_BONDS", icon: "account-balance", color: "#8D6E63" },
+    { value: "LIBRETTO_POSTALE", icon: "book", color: "#FFA726" },
+    { value: "LIFE_INSURANCE", icon: "favorite-border", color: "#E91E63" },
+    { value: "LIQUIDITY", icon: "account-balance-wallet", color: "#4CAF50" },
+    { value: "MUTUAL_FUND", icon: "account-balance", color: "#64B5F6" },
+    { value: "OTHER", icon: "category", color: "#9E9E9E" },
+    { value: "PENSION_FUND", icon: "elderly", color: "#00897B" },
+    { value: "PIP", icon: "security", color: "#00ACC1" },
+    { value: "REAL_ESTATE", icon: "home", color: "#607D8B" },
+    { value: "SAVINGS_ACCOUNT", icon: "savings", color: "#66BB6A" },
+    { value: "STOCKS", icon: "show-chart", color: "#2196F3" },
+  ];
+
+  const getAssetTypeInfo = (type) => {
+    return assetTypes.find(t => t.value === type) || assetTypes[assetTypes.length - 1];
+  };
+
   useEffect(() => {
     // Reset editing state when screen is focused
     const unsubscribe = navigation.addListener('focus', () => {
       setIsEditing(false);
+      setEditedBank(asset.bank);
+      setEditedAssetType(asset.asset_type);
       setEditedAmount(asset.amount.toString());
       fetchTransactionHistory();
     });
 
     return unsubscribe;
-  }, [navigation, asset.amount]);
+  }, [navigation, asset.amount, asset.bank, asset.asset_type]);
 
   useEffect(() => {
     fetchTransactionHistory();
@@ -117,6 +148,25 @@ const AssetDetailsScreen = () => {
   };
 
   const handleUpdate = async () => {
+    // Validazione del nome della banca
+    if (!editedBank || editedBank.trim() === "") {
+      Toast.show({
+        type: "error",
+        text1: t("bank_required"),
+      });
+      return;
+    }
+
+    // Validazione del tipo di asset
+    if (!editedAssetType) {
+      Toast.show({
+        type: "error",
+        text1: t("asset_type_required"),
+      });
+      return;
+    }
+
+    // Validazione dell'importo
     if (!editedAmount || parseFloat(editedAmount) < 0) {
       Toast.show({
         type: "error",
@@ -139,6 +189,8 @@ const AssetDetailsScreen = () => {
       }
 
       const payload = {
+        bank: editedBank.trim(),
+        asset_type: editedAssetType,
         amount: parseFloat(editedAmount),
       };
 
@@ -302,6 +354,8 @@ const AssetDetailsScreen = () => {
     );
   };
 
+  const selectedAssetTypeInfo = getAssetTypeInfo(editedAssetType);
+
   return (
     <ScrollView contentContainerStyle={AssetsStyles.scrollContainer}>
       <View style={AssetsStyles.container}>
@@ -315,7 +369,17 @@ const AssetDetailsScreen = () => {
             <MaterialIcons name="account-balance" size={24} color="#007BFF" />
             <View style={AssetsStyles.detailContent}>
               <Text style={AssetsStyles.detailLabel}>{t("bank")}</Text>
-              <Text style={AssetsStyles.detailValue}>{asset.bank}</Text>
+              {isEditing ? (
+                <TextInput
+                  style={AssetsStyles.editInput}
+                  value={editedBank}
+                  onChangeText={setEditedBank}
+                  placeholder={t("enter_bank_name")}
+                  placeholderTextColor="#999"
+                />
+              ) : (
+                <Text style={AssetsStyles.detailValue}>{asset.bank}</Text>
+              )}
             </View>
           </View>
 
@@ -324,7 +388,22 @@ const AssetDetailsScreen = () => {
             <MaterialIcons name="category" size={24} color="#007BFF" />
             <View style={AssetsStyles.detailContent}>
               <Text style={AssetsStyles.detailLabel}>{t("asset_type")}</Text>
-              <Text style={AssetsStyles.detailValue}>{t(asset.asset_type)}</Text>
+              {isEditing ? (
+                <TouchableOpacity
+                  style={AssetsStyles.editableField}
+                  onPress={() => setShowAssetTypeModal(true)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={[AssetsStyles.smallIcon, { backgroundColor: selectedAssetTypeInfo.color }]}>
+                      <MaterialIcons name={selectedAssetTypeInfo.icon} size={16} color="#fff" />
+                    </View>
+                    <Text style={AssetsStyles.editableFieldText}>{t(editedAssetType)}</Text>
+                  </View>
+                  <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+                </TouchableOpacity>
+              ) : (
+                <Text style={AssetsStyles.detailValue}>{t(asset.asset_type)}</Text>
+              )}
             </View>
           </View>
 
@@ -421,6 +500,8 @@ const AssetDetailsScreen = () => {
                 style={AssetsStyles.cancelButton}
                 onPress={() => {
                   setIsEditing(false);
+                  setEditedBank(asset.bank);
+                  setEditedAssetType(asset.asset_type);
                   setEditedAmount(asset.amount.toString());
                 }}
               >
@@ -453,6 +534,54 @@ const AssetDetailsScreen = () => {
             </>
           )}
         </View>
+
+        {/* Asset Type Modal */}
+        <Modal
+          visible={showAssetTypeModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowAssetTypeModal(false)}
+        >
+          <View style={AssetsStyles.modalOverlay}>
+            <View style={AssetsStyles.modalContainer}>
+              <View style={AssetsStyles.modalHeader}>
+                <Text style={AssetsStyles.modalTitle}>{t("select_asset_type")}</Text>
+                <TouchableOpacity onPress={() => setShowAssetTypeModal(false)}>
+                  <MaterialIcons name="close" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView 
+                style={AssetsStyles.modalContent}
+                contentContainerStyle={{ paddingBottom: 40 }}
+              >
+                {assetTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type.value}
+                    style={[
+                      AssetsStyles.modalOption,
+                      editedAssetType === type.value && AssetsStyles.modalOptionSelected,
+                    ]}
+                    onPress={() => {
+                      setEditedAssetType(type.value);
+                      setShowAssetTypeModal(false);
+                    }}
+                  >
+                    <View style={AssetsStyles.modalOptionContent}>
+                      <View style={[AssetsStyles.modalOptionIcon, { backgroundColor: type.color }]}>
+                        <MaterialIcons name={type.icon} size={24} color="#fff" />
+                      </View>
+                      <Text style={AssetsStyles.modalOptionText}>{t(type.value)}</Text>
+                    </View>
+                    {editedAssetType === type.value && (
+                      <MaterialIcons name="check" size={24} color="#007BFF" />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
 
         {/* Transaction History */}
         <View style={AssetsStyles.transactionHistorySection}>

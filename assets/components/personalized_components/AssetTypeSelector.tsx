@@ -9,13 +9,39 @@ const AssetTypeSelector = ({ selectedType, onSelectType }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const assetTypes = [
+    // Liquidità
     { value: "LIQUIDITY", icon: "account-balance-wallet", color: "#4CAF50" },
-    { value: "STOCK", icon: "trending-up", color: "#2196F3" },
-    { value: "ETF", icon: "pie-chart", color: "#FF9800" },
+    { value: "SAVINGS_ACCOUNT", icon: "savings", color: "#66BB6A" },
+    { value: "DEPOSIT_ACCOUNT", icon: "lock", color: "#81C784" },
+    
+    // Investimenti azionari
+    { value: "STOCK", icon: "show-chart", color: "#E91E63" },
+    { value: "ETF", icon: "pie-chart", color: "#42A5F5" },
+    { value: "MUTUAL_FUND", icon: "account-balance", color: "#64B5F6" },
+    
+    // Obbligazioni e Titoli
+    { value: "BONDS", icon: "insert-chart", color: "#795548" },
+    { value: "GOVERNMENT_BONDS", icon: "account-balance", color: "#8D6E63" },
+    
+    // Prodotti Postali
+    { value: "BUONI_POSTALI", icon: "local-post-office", color: "#FFB300" },
+    { value: "LIBRETTO_POSTALE", icon: "book", color: "#FFA726" },
+    
+    // Previdenza
+    { value: "PENSION_FUND", icon: "elderly", color: "#00897B" },
+    { value: "PIP", icon: "security", color: "#00ACC1" },
+    
+    // Criptovalute
     { value: "CRYPTO", icon: "currency-bitcoin", color: "#9C27B0" },
-    { value: "BOND", icon: "insert-chart", color: "#795548" },
+    
+    // Immobili
     { value: "REAL_ESTATE", icon: "home", color: "#607D8B" },
-    { value: "COMMODITY", icon: "grain", color: "#FFC107" },
+    
+    // Materie Prime
+    { value: "COMMODITIES", icon: "grain", color: "#FFC107" },
+    { value: "GOLD", icon: "star", color: "#FFD54F" },
+
+    // Altro
     { value: "OTHER", icon: "category", color: "#9E9E9E" },
   ];
 
@@ -64,7 +90,10 @@ const AssetTypeSelector = ({ selectedType, onSelectType }) => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={AssetsStyles.modalContent}>
+            <ScrollView 
+              style={AssetsStyles.modalContent}
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
               {assetTypes.map((type) => (
                 <TouchableOpacity
                   key={type.value}

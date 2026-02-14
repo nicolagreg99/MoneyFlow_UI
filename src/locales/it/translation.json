@@ -66,7 +66,7 @@
   "reset_token_not_found": "Token non trovato.",
   "reset_empty_password_error": "Per favore inserisci una nuova password.",
   "reset_error_generic": "Si è verificato un errore.",
-  "reset_error_request": "Errore durante l’aggiornamento della password.",
+  "reset_error_request": "Errore durante l'aggiornamento della password.",
   "reset_success": "Password aggiornata con successo!",
   "reset_new_password_placeholder": "Nuova password",
   "reset_update_button": "Aggiorna Password",
@@ -242,12 +242,22 @@
   "exchange_rate": "Tasso di Cambio",
   
   "LIQUIDITY": "Liquidità",
+  "SAVINGS_ACCOUNT": "Conto risparmio",
+  "DEPOSIT_ACCOUNT": "Conto deposito",
   "STOCK": "Azioni",
   "ETF": "ETF",
-  "CRYPTO": "Crypto",
-  "BOND": "Obbligazioni",
-  "REAL_ESTATE": "Immobili",
-  "COMMODITY": "Materie Prime",
+  "MUTUAL_FUND": "Fondi comuni",
+  "BONDS": "Obbligazioni",
+  "GOVERNMENT_BONDS": "Titoli di Stato",
+  "BUONI_POSTALI": "Buoni postali",
+  "LIBRETTO_POSTALE": "Libretto postale",
+  "PENSION_FUND": "Fondo pensione",
+  "PIP": "Piano Individuale Pensionistico",
+  "CRYPTO": "Criptovalute",
+  "REAL_ESTATE": "Immobiliare",
+  "COMMODITIES": "Materie prime",
+  "GOLD": "Oro",
+  "LIFE_INSURANCE": "Assicurazione vita",
   "OTHER": "Altro",
   
   "add": "Aggiungi",
@@ -305,5 +315,6 @@
   "total_outflow": "Uscite Totali",
   "loading_transactions": "Caricamento transazioni...",
   "no_transactions_description": "Non ci sono ancora transazioni per questo conto",
-  "tap_to_select": "Clicca per selezionare"
+  "tap_to_select": "Clicca per selezionare",
+  "no_payable_assets": "Nessun conto disponibile"
 }

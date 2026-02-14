@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView, Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import AssetsStyles from "../../styles/Assets_style";
@@ -67,7 +67,10 @@ const BankSelector = ({ selectedBank, onSelectBank }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={AssetsStyles.modalOverlay}>
-          <View style={AssetsStyles.modalContainer}>
+          <View style={[
+            AssetsStyles.modalContainer,
+            { marginBottom: Platform.OS === 'android' ? 20 : 0 }
+          ]}>
             <View style={AssetsStyles.modalHeader}>
               <Text style={AssetsStyles.modalTitle}>{t("select_bank")}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -75,7 +78,10 @@ const BankSelector = ({ selectedBank, onSelectBank }) => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={AssetsStyles.modalContent}>
+            <ScrollView 
+              style={AssetsStyles.modalContent}
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
               {/* Common Banks */}
               {commonBanks.map((bank) => (
                 <TouchableOpacity

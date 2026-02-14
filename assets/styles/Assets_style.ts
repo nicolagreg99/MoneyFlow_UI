@@ -1123,6 +1123,33 @@ const AssetsStyles = StyleSheet.create({
   actionsSection: {
     gap: 10,
   },
+  // Campo editabile con dropdown
+  editableField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F5F7FB',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    marginTop: 4,
+  },
+  
+  editableFieldText: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 8,
+  },
+
+  // Icona piccola per il tipo di asset
+  smallIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // Transaction History Section
   transactionHistorySection: {

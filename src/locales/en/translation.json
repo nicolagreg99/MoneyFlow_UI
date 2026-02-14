@@ -241,12 +241,22 @@
   "exchange_rate": "Exchange Rate",
   
   "LIQUIDITY": "Liquidity",
-  "STOCK": "Stocks",
+  "SAVINGS_ACCOUNT": "Savings Account",
+  "DEPOSIT_ACCOUNT": "Deposit Account",
+  "STOCK": "STOCK",
   "ETF": "ETF",
-  "CRYPTO": "Crypto",
-  "BOND": "Bonds",
+  "MUTUAL_FUND": "Mutual Funds",
+  "BONDS": "Bonds",
+  "GOVERNMENT_BONDS": "Government Bonds",
+  "BUONI_POSTALI": "Postal Bonds",
+  "LIBRETTO_POSTALE": "Postal Booklet",
+  "PENSION_FUND": "Pension Fund",
+  "PIP": "Individual Pension Plan",
+  "CRYPTO": "Cryptocurrencies",
   "REAL_ESTATE": "Real Estate",
-  "COMMODITY": "Commodities",
+  "COMMODITIES": "Commodities",
+  "GOLD": "Gold",
+  "LIFE_INSURANCE": "Life Insurance",
   "OTHER": "Other",
   
   "add": "Add",
@@ -304,5 +314,6 @@
   "total_outflow": "Total Outflows",
   "loading_transactions": "Loading transactions...",
   "no_transactions_description": "There are no transactions yet for this account",
-  "tap_to_select": "Tap to select"
+  "tap_to_select": "Tap to select",
+  "no_payable_assets": "No payable assets"
 }

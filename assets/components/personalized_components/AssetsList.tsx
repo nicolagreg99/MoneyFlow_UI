@@ -21,12 +21,21 @@ const AssetsList = ({
   const getAssetIcon = (assetType) => {
     const icons = {
       LIQUIDITY: "account-balance-wallet",
-      STOCK: "trending-up",
+      SAVINGS_ACCOUNT: "savings",
+      DEPOSIT_ACCOUNT: "lock",
+      STOCK: "show-chart",
       ETF: "pie-chart",
+      MUTUAL_FUND: "account-balance",
+      BONDS: "insert-chart",
+      GOVERNMENT_BONDS: "account-balance",
+      BUONI_POSTALI: "local-post-office",
+      LIBRETTO_POSTALE: "book",
+      PENSION_FUND: "elderly",
+      PIP: "security",
       CRYPTO: "currency-bitcoin",
-      BOND: "insert-chart",
       REAL_ESTATE: "home",
-      COMMODITY: "grain",
+      COMMODITIES: "grain",
+      GOLD: "star",
       OTHER: "category",
     };
     return icons[assetType] || "category";
@@ -35,12 +44,21 @@ const AssetsList = ({
   const getAssetColor = (assetType) => {
     const colors = {
       LIQUIDITY: "#4CAF50",
-      STOCK: "#2196F3",
-      ETF: "#FF9800",
+      SAVINGS_ACCOUNT: "#66BB6A",
+      DEPOSIT_ACCOUNT: "#81C784",
+      STOCK: "#E91E63",
+      ETF: "#42A5F5",
+      MUTUAL_FUND: "#64B5F6",
+      BONDS: "#795548",
+      GOVERNMENT_BONDS: "#8D6E63",
+      BUONI_POSTALI: "#FFB300",
+      LIBRETTO_POSTALE: "#FFA726",
+      PENSION_FUND: "#00897B",
+      PIP: "#00ACC1",
       CRYPTO: "#9C27B0",
-      BOND: "#795548",
       REAL_ESTATE: "#607D8B",
-      COMMODITY: "#FFC107",
+      COMMODITIES: "#FFC107",
+      GOLD: "#FFD54F",
       OTHER: "#9E9E9E",
     };
     return colors[assetType] || "#9E9E9E";
@@ -155,7 +173,10 @@ const AssetsList = ({
             </View>
 
             {/* Modal Content - Scrollable */}
-            <ScrollView style={AssetsStyles.filterModalScrollView}>
+            <ScrollView 
+              style={AssetsStyles.filterModalScrollView}
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
               <View style={AssetsStyles.filterModalContent}>
                 {/* Payable Filter */}
                 <View style={AssetsStyles.filterSection}>
