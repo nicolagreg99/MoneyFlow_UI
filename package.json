@@ -10,6 +10,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
+  "overrides": {
+    "expo-font": "$expo-font"
+  },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -21,6 +24,7 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "expo": "~57.0.0",
+    "expo-font": "~57.0.4",
     "expo-linear-gradient": "~57.0.2",
     "expo-localization": "~57.0.2",
     "expo-splash-screen": "~57.0.10",
@@ -57,4 +61,5 @@
     "baseline-browser-mapping": "^2.9.18",
     "typescript": "^5.9.3"
   }
+
 }
