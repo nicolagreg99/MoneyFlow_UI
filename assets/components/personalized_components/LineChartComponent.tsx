@@ -1,62 +1,188 @@
-import React from "react";
-import { View, Text, Dimensions, StyleSheet } from "react-native";
-import {
-  VictoryChart,
-  VictoryLine,
-  VictoryArea,
-  VictoryAxis,
-  VictoryScatter,
-} from "victory-native";
+import React, { useMemo, useState } from "react";
+import { View, Text, StyleSheet, Dimensions, LayoutChangeEvent } from "react-native";
+import { LineChart } from "react-native-gifted-charts";
 import { getCurrencyFlag } from "./CurrencyPicker";
 import { useTranslation } from "react-i18next";
 
-const { width } = Dimensions.get("window");
+const SCREEN_WIDTH = Dimensions.get("window").width;
+
+const COLORS = {
+  income: "#10b981",
+  expense: "#f43f5e",
+  grid: "#eef2f7",
+  axisText: "#94a3b8",
+  title: "#0f172a",
+  subtitle: "#64748b",
+  strip: "#cbd5e1",
+};
+
+const Y_LABEL_WIDTH = 38;
+const SECTIONS = 4;
+
+const MONTH_INDEX: { [key: string]: number } = {
+  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+};
+
+const EN_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 interface Props {
-  labels: string[];
+  labels: string[]; // es. "October 2025"
   entrate: number[];
   spese: number[];
   currency?: string;
 }
 
-const LineChartComponent: React.FC<Props> = ({ 
-  labels, 
-  entrate, 
-  spese, 
-  currency = "EUR" 
+const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+const monthName = (monthIdx: number, locale: string, style: "short" | "long") => {
+  try {
+    const name = new Date(2000, monthIdx, 1).toLocaleDateString(locale, { month: style });
+    return capitalize(name.replace(".", ""));
+  } catch {
+    return style === "short" ? EN_SHORT[monthIdx] : EN_SHORT[monthIdx];
+  }
+};
+
+const parseLabel = (label: string) => {
+  const parts = label.toLowerCase().split(" ");
+  const monthIdx = MONTH_INDEX[parts[0]];
+  const year = parseInt(parts[1], 10);
+  if (monthIdx === undefined || isNaN(year)) return null;
+  return { monthIdx, year };
+};
+
+const formatMoney = (v: number) =>
+  v.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const formatCompact = (v: number) => {
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+  return `${Math.round(v)}`;
+};
+
+// Massimo "pulito" per l'asse Y: step 1, 2, 2.5, 5 o 10 x potenza di 10
+const niceMax = (rawMax: number, sections: number) => {
+  if (rawMax <= 0) return sections * 25;
+  const rawStep = rawMax / sections;
+  const pow = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const n = rawStep / pow;
+  const niceN = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+  return niceN * pow * sections;
+};
+
+const LineChartComponent: React.FC<Props> = ({
+  labels,
+  entrate,
+  spese,
+  currency = "EUR",
 }) => {
-  const { t } = useTranslation();
-  const formatLabel = (label: string) => {
-    const mesi: { [key: string]: string } = {
-      "january": "01", "february": "02", "march": "03", "april": "04",
-      "may": "05", "june": "06", "july": "07", "august": "08",
-      "september": "09", "october": "10", "november": "11", "december": "12"
-    };
-   
-    const parts = label.toLowerCase().split(" ");
-    if (parts.length === 2) {
-      const mese = mesi[parts[0]] || parts[0];
-      const anno = parts[1].slice(-2);
-      return `${mese}/${anno}`;
-    }
-    return label;
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language || "it";
+
+  // Larghezza reale del contenitore (card meno padding)
+  const [innerWidth, setInnerWidth] = useState(SCREEN_WIDTH - 72);
+  const onLayout = (e: LayoutChangeEvent) => {
+    const w = Math.floor(e.nativeEvent.layout.width);
+    if (w > 0 && w !== innerWidth) setInnerWidth(w);
   };
 
-  const dataEntrate = labels.map((l, i) => ({ 
-    x: formatLabel(l), 
-    y: entrate[i] || 0
-  }));
-  
-  const dataSpese = labels.map((l, i) => ({ 
-    x: formatLabel(l), 
-    y: spese[i] || 0
-  }));
+  const { dataIncome, dataExpense, maxValue } = useMemo(() => {
+    const labelStyle = {
+      color: COLORS.axisText,
+      fontSize: 10,
+      fontWeight: "500" as const,
+      textAlign: "center" as const,
+      width: 36,
+    };
+
+    const build = (values: number[]) =>
+      labels.map((l, i) => {
+        const parsed = parseLabel(l);
+        let short = l;
+        let title = l;
+        if (parsed) {
+          short = monthName(parsed.monthIdx, locale, "short");
+          title = `${monthName(parsed.monthIdx, locale, "long")} ${parsed.year}`;
+          // Anno sotto il mese per il primo punto e per gennaio
+          if (i === 0 || parsed.monthIdx === 0) {
+            short = `${short}\n${String(parsed.year).slice(-2)}`;
+          }
+        }
+        return {
+          value: Number(values[i]) || 0,
+          label: short,
+          labelTextStyle: labelStyle,
+          tooltipTitle: title,
+        };
+      });
+
+    const inc = build(entrate);
+    const exp = build(spese);
+
+    const peak = Math.max(0, ...inc.map((d) => d.value), ...exp.map((d) => d.value));
+
+    return {
+      dataIncome: inc,
+      dataExpense: exp,
+      maxValue: niceMax(peak, SECTIONS),
+    };
+  }, [labels, entrate, spese, locale]);
+
+  const plotWidth = innerWidth - Y_LABEL_WIDTH;
+  const initialSpacing = 12;
+  const endSpacing = 12;
+  const spacing = Math.max(
+    16,
+    (plotWidth - initialSpacing - endSpacing) / Math.max(labels.length - 1, 1)
+  );
+
+  const renderTooltip = (items: any[]) => {
+    const inc = items?.[0];
+    const exp = items?.[1];
+    if (!inc) return null;
+    const net = (inc.value || 0) - (exp?.value || 0);
+
+    return (
+      <View style={styles.tooltip}>
+        <Text style={styles.tooltipTitle}>{inc.tooltipTitle}</Text>
+
+        <View style={styles.tooltipRow}>
+          <View style={[styles.tooltipDot, { backgroundColor: COLORS.income }]} />
+          <Text style={styles.tooltipLabel}>{t("incomes")}</Text>
+          <Text style={styles.tooltipValue}>{formatMoney(inc.value || 0)}</Text>
+        </View>
+
+        <View style={styles.tooltipRow}>
+          <View style={[styles.tooltipDot, { backgroundColor: COLORS.expense }]} />
+          <Text style={styles.tooltipLabel}>{t("expenses")}</Text>
+          <Text style={styles.tooltipValue}>{formatMoney(exp?.value || 0)}</Text>
+        </View>
+
+        <View style={styles.tooltipDivider} />
+
+        <View style={styles.tooltipRow}>
+          <Text style={[styles.tooltipLabel, { marginLeft: 0 }]}>{t("net_balance")}</Text>
+          <Text
+            style={[
+              styles.tooltipValue,
+              { color: net >= 0 ? COLORS.income : COLORS.expense },
+            ]}
+          >
+            {net >= 0 ? "+" : ""}
+            {formatMoney(net)}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>📊 {t("financial_trend")}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>{t("financial_trend")}</Text>
           <Text style={styles.subtitle}>{t("last_12_months")}</Text>
         </View>
         <View style={styles.currencyBadge}>
@@ -65,126 +191,81 @@ const LineChartComponent: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Legenda moderna in alto */}
+      {/* Legenda compatta */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: "#10b981" }]} />
+          <View style={[styles.legendDot, { backgroundColor: COLORS.income }]} />
           <Text style={styles.legendText}>{t("incomes")}</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: "#ef4444" }]} />
+          <View style={[styles.legendDot, { backgroundColor: COLORS.expense }]} />
           <Text style={styles.legendText}>{t("expenses")}</Text>
         </View>
       </View>
 
-      <VictoryChart
-        width={width - 48}
-        height={280}
-        domainPadding={{ x: 25, y: 20 }}
-        padding={{ top: 10, bottom: 50, left: 38, right: 20 }}
-      >
-        {/* Asse Y */}
-        <VictoryAxis
-          dependentAxis
-          style={{
-            axis: { stroke: "transparent" },
-            tickLabels: { 
-              fontSize: 9, 
-              fill: "#64748b",
-              fontWeight: "500"
-            },
-            grid: { 
-              stroke: "#e2e8f0", 
-              strokeWidth: 1,
-              strokeDasharray: "3,3"
-            },
+      {/* Grafico */}
+      <View onLayout={onLayout} style={styles.chartWrapper}>
+        <LineChart
+          data={dataIncome}
+          data2={dataExpense}
+          width={plotWidth}
+          height={190}
+          spacing={spacing}
+          initialSpacing={initialSpacing}
+          endSpacing={endSpacing}
+          disableScroll
+          // Linee
+          curved
+          curvature={0.2}
+          thickness={2.5}
+          color1={COLORS.income}
+          color2={COLORS.expense}
+          hideDataPoints
+          // Aree con gradiente
+          areaChart
+          startFillColor={COLORS.income}
+          endFillColor={COLORS.income}
+          startOpacity={0.22}
+          endOpacity={0.01}
+          startFillColor2={COLORS.expense}
+          endFillColor2={COLORS.expense}
+          startOpacity2={0.18}
+          endOpacity2={0.01}
+          // Assi
+          maxValue={maxValue}
+          noOfSections={SECTIONS}
+          yAxisLabelWidth={Y_LABEL_WIDTH}
+          yAxisThickness={0}
+          xAxisThickness={1}
+          xAxisColor={COLORS.grid}
+          yAxisTextStyle={styles.axisText}
+          formatYLabel={(label: string) => formatCompact(Number(label))}
+          xAxisLabelsVerticalShift={4}
+          rulesType="solid"
+          rulesColor={COLORS.grid}
+          // Animazione
+          isAnimated
+          animationDuration={700}
+          // Tooltip interattivo (pressione prolungata per non bloccare lo scroll)
+          pointerConfig={{
+            activatePointersOnLongPress: true,
+            autoAdjustPointerLabelPosition: true,
+            pointerStripUptoDataPoint: true,
+            pointerStripColor: COLORS.strip,
+            pointerStripWidth: 1.5,
+            strokeDashArray: [4, 4],
+            pointerColor: "#334155",
+            radius: 5,
+            pointerLabelWidth: 170,
+            pointerLabelHeight: 110,
+            pointerLabelComponent: renderTooltip,
           }}
-          tickFormat={(t) => `${t}`}
         />
+      </View>
 
-        {/* Asse X */}
-        <VictoryAxis
-          style={{
-            axis: { stroke: "#e2e8f0", strokeWidth: 1 },
-            tickLabels: {
-              fontSize: 9,
-              angle: -45,
-              padding: 10,
-              fill: "#64748b",
-              fontWeight: "500",
-              textAnchor: "end"
-            },
-          }}
-        />
-
-        {/* Area Entrate - verde moderno */}
-        <VictoryArea
-          data={dataEntrate}
-          style={{
-            data: {
-              fill: "rgba(16, 185, 129, 0.15)",
-            },
-          }}
-        />
-
-        {/* Linea Entrate */}
-        <VictoryLine
-          data={dataEntrate}
-          style={{
-            data: {
-              stroke: "#10b981",
-              strokeWidth: 2.5,
-            },
-          }}
-        />
-
-        {/* Punti Entrate */}
-        <VictoryScatter
-          data={dataEntrate}
-          size={3.5}
-          style={{
-            data: {
-              fill: "#10b981",
-              stroke: "#fff",
-              strokeWidth: 2
-            },
-          }}
-        />
-
-        {/* Area Spese - rosso moderno */}
-        <VictoryArea
-          data={dataSpese}
-          style={{
-            data: {
-              fill: "rgba(239, 68, 68, 0.15)",
-            },
-          }}
-        />
-
-        {/* Linea Spese */}
-        <VictoryLine
-          data={dataSpese}
-          style={{
-            data: {
-              stroke: "#ef4444",
-              strokeWidth: 2.5,
-            },
-          }}
-        />
-
-        {/* Punti Spese */}
-        <VictoryScatter
-          data={dataSpese}
-          size={3.5}
-          style={{
-            data: {
-              fill: "#ef4444",
-              stroke: "#fff",
-              strokeWidth: 2
-            },
-          }}
-        />
-      </VictoryChart>
+      <Text style={styles.hint}>
+        {t("hold_for_details", { defaultValue: "Tieni premuto sul grafico per i dettagli" })}
+      </Text>
     </View>
   );
 };
@@ -196,66 +277,122 @@ const styles = StyleSheet.create({
     padding: 20,
     marginHorizontal: 16,
     marginVertical: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowColor: "#0f172a",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 16,
+    marginBottom: 12,
   },
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1e293b",
-    marginBottom: 4,
+    color: COLORS.title,
+    marginBottom: 2,
   },
   subtitle: {
     fontSize: 13,
-    color: "#64748b",
+    color: COLORS.subtitle,
     fontWeight: "500",
   },
   currencyBadge: {
     backgroundColor: "#f1f5f9",
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
-  currencyFlag: {
-    fontSize: 16,
-  },
-  currencyText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#475569",
-  },
+  currencyFlag: { fontSize: 15 },
+  currencyText: { fontSize: 12, fontWeight: "700", color: "#475569" },
+
   legendContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 16,
-    gap: 24,
+    gap: 20,
+    marginBottom: 12,
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   legendText: {
-    fontSize: 13,
-    color: "#475569",
+    fontSize: 12,
+    color: COLORS.subtitle,
     fontWeight: "600",
+  },
+
+  chartWrapper: {
+    width: "100%",
+    overflow: "visible",
+    paddingTop: 8,
+  },
+  axisText: {
+    color: COLORS.axisText,
+    fontSize: 10,
+    fontWeight: "500",
+  },
+  hint: {
+    textAlign: "center",
+    fontSize: 11,
+    color: COLORS.axisText,
+    marginTop: 12,
+  },
+
+  tooltip: {
+    backgroundColor: "#0f172a",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    width: 170,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  tooltipTitle: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  tooltipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 2,
+  },
+  tooltipDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  tooltipLabel: {
+    flex: 1,
+    marginLeft: 6,
+    color: "#cbd5e1",
+    fontSize: 11,
+  },
+  tooltipValue: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  tooltipDivider: {
+    height: 1,
+    backgroundColor: "#334155",
+    marginVertical: 5,
   },
 });
 

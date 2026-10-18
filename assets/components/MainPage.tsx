@@ -130,10 +130,10 @@ const MainPage = () => {
     );
   }
 
-  const totalEntrate = entrate.reduce((a, b) => a + b, 0);
-  const totalSpese = spese.reduce((a, b) => a + b, 0);
+  const totalEntrate = balances.reduce((sum, b) => sum + b.entrate, 0);
+  const totalSpese = balances.reduce((sum, b) => sum + b.spese, 0);
   const bilancioNetto = totalEntrate - totalSpese;
-
+  
   return (
     <ScrollView
       style={MainStyles.container}
