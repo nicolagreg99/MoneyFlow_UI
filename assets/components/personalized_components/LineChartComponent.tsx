@@ -18,19 +18,16 @@ const COLORS = {
 
 const Y_LABEL_WIDTH = 38;
 const SECTIONS = 4;
-
-const MONTH_INDEX: { [key: string]: number } = {
-  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
-  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
-};
+const LABEL_MIN_GAP = 34; // spazio orizzontale minimo tra due etichette (px)
 
 const EN_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 interface Props {
-  labels: string[]; // es. "October 2025"
+  months: string[]; // "YYYY-MM", in ordine cronologico
   entrate: number[];
   spese: number[];
   currency?: string;
+  subtitle?: string;
 }
 
 const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
@@ -40,15 +37,15 @@ const monthName = (monthIdx: number, locale: string, style: "short" | "long") =>
     const name = new Date(2000, monthIdx, 1).toLocaleDateString(locale, { month: style });
     return capitalize(name.replace(".", ""));
   } catch {
-    return style === "short" ? EN_SHORT[monthIdx] : EN_SHORT[monthIdx];
+    return EN_SHORT[monthIdx];
   }
 };
 
-const parseLabel = (label: string) => {
-  const parts = label.toLowerCase().split(" ");
-  const monthIdx = MONTH_INDEX[parts[0]];
-  const year = parseInt(parts[1], 10);
-  if (monthIdx === undefined || isNaN(year)) return null;
+const parseYM = (ym: string) => {
+  const [y, m] = ym.split("-");
+  const year = parseInt(y, 10);
+  const monthIdx = parseInt(m, 10) - 1;
+  if (isNaN(year) || isNaN(monthIdx) || monthIdx < 0 || monthIdx > 11) return null;
   return { monthIdx, year };
 };
 
@@ -61,7 +58,6 @@ const formatCompact = (v: number) => {
   return `${Math.round(v)}`;
 };
 
-// Massimo "pulito" per l'asse Y: step 1, 2, 2.5, 5 o 10 x potenza di 10
 const niceMax = (rawMax: number, sections: number) => {
   if (rawMax <= 0) return sections * 25;
   const rawStep = rawMax / sections;
@@ -72,22 +68,37 @@ const niceMax = (rawMax: number, sections: number) => {
 };
 
 const LineChartComponent: React.FC<Props> = ({
-  labels,
+  months,
   entrate,
   spese,
   currency = "EUR",
+  subtitle,
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language || "it";
 
-  // Larghezza reale del contenitore (card meno padding)
   const [innerWidth, setInnerWidth] = useState(SCREEN_WIDTH - 72);
   const onLayout = (e: LayoutChangeEvent) => {
     const w = Math.floor(e.nativeEvent.layout.width);
     if (w > 0 && w !== innerWidth) setInnerWidth(w);
   };
 
+  const plotWidth = innerWidth - Y_LABEL_WIDTH;
+  const initialSpacing = 12;
+  const endSpacing = 12;
+
+  // Niente minimo fisso: i punti devono sempre stare nel contenitore
+  const spacing = Math.max(
+    4,
+    (plotWidth - initialSpacing - endSpacing) / Math.max(months.length - 1, 1)
+  );
+
   const { dataIncome, dataExpense, maxValue } = useMemo(() => {
+    const n = months.length;
+    // Mostra un'etichetta ogni `step` punti, partendo dall'ultimo mese
+    const step = Math.max(1, Math.ceil(LABEL_MIN_GAP / spacing));
+    const firstShown = (n - 1) % step;
+
     const labelStyle = {
       color: COLORS.axisText,
       fontSize: 10,
@@ -97,21 +108,26 @@ const LineChartComponent: React.FC<Props> = ({
     };
 
     const build = (values: number[]) =>
-      labels.map((l, i) => {
-        const parsed = parseLabel(l);
-        let short = l;
-        let title = l;
+      months.map((ym, i) => {
+        const parsed = parseYM(ym);
+        let label = "";
+        let title = ym;
+
         if (parsed) {
-          short = monthName(parsed.monthIdx, locale, "short");
           title = `${monthName(parsed.monthIdx, locale, "long")} ${parsed.year}`;
-          // Anno sotto il mese per il primo punto e per gennaio
-          if (i === 0 || parsed.monthIdx === 0) {
-            short = `${short}\n${String(parsed.year).slice(-2)}`;
+          const shown = (n - 1 - i) % step === 0;
+          if (shown) {
+            label = monthName(parsed.monthIdx, locale, "short");
+            // Anno sotto il mese per la prima etichetta visibile e per gennaio
+            if (i === firstShown || parsed.monthIdx === 0) {
+              label = `${label}\n${String(parsed.year).slice(-2)}`;
+            }
           }
         }
+
         return {
           value: Number(values[i]) || 0,
-          label: short,
+          label,
           labelTextStyle: labelStyle,
           tooltipTitle: title,
         };
@@ -119,23 +135,10 @@ const LineChartComponent: React.FC<Props> = ({
 
     const inc = build(entrate);
     const exp = build(spese);
-
     const peak = Math.max(0, ...inc.map((d) => d.value), ...exp.map((d) => d.value));
 
-    return {
-      dataIncome: inc,
-      dataExpense: exp,
-      maxValue: niceMax(peak, SECTIONS),
-    };
-  }, [labels, entrate, spese, locale]);
-
-  const plotWidth = innerWidth - Y_LABEL_WIDTH;
-  const initialSpacing = 12;
-  const endSpacing = 12;
-  const spacing = Math.max(
-    16,
-    (plotWidth - initialSpacing - endSpacing) / Math.max(labels.length - 1, 1)
-  );
+    return { dataIncome: inc, dataExpense: exp, maxValue: niceMax(peak, SECTIONS) };
+  }, [months, entrate, spese, locale, spacing]);
 
   const renderTooltip = (items: any[]) => {
     const inc = items?.[0];
@@ -179,11 +182,10 @@ const LineChartComponent: React.FC<Props> = ({
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>{t("financial_trend")}</Text>
-          <Text style={styles.subtitle}>{t("last_12_months")}</Text>
+          {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </View>
         <View style={styles.currencyBadge}>
           <Text style={styles.currencyFlag}>{getCurrencyFlag(currency)}</Text>
@@ -191,7 +193,6 @@ const LineChartComponent: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Legenda compatta */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: COLORS.income }]} />
@@ -203,7 +204,6 @@ const LineChartComponent: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Grafico */}
       <View onLayout={onLayout} style={styles.chartWrapper}>
         <LineChart
           data={dataIncome}
@@ -214,14 +214,12 @@ const LineChartComponent: React.FC<Props> = ({
           initialSpacing={initialSpacing}
           endSpacing={endSpacing}
           disableScroll
-          // Linee
           curved
           curvature={0.2}
           thickness={2.5}
           color1={COLORS.income}
           color2={COLORS.expense}
           hideDataPoints
-          // Aree con gradiente
           areaChart
           startFillColor={COLORS.income}
           endFillColor={COLORS.income}
@@ -231,7 +229,6 @@ const LineChartComponent: React.FC<Props> = ({
           endFillColor2={COLORS.expense}
           startOpacity2={0.18}
           endOpacity2={0.01}
-          // Assi
           maxValue={maxValue}
           noOfSections={SECTIONS}
           yAxisLabelWidth={Y_LABEL_WIDTH}
@@ -243,10 +240,8 @@ const LineChartComponent: React.FC<Props> = ({
           xAxisLabelsVerticalShift={4}
           rulesType="solid"
           rulesColor={COLORS.grid}
-          // Animazione
           isAnimated
           animationDuration={700}
-          // Tooltip interattivo (pressione prolungata per non bloccare lo scroll)
           pointerConfig={{
             activatePointersOnLongPress: true,
             autoAdjustPointerLabelPosition: true,

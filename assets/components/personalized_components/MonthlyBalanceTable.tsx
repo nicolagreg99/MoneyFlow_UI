@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,16 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
+import { formatMonth } from "./formatMonth";
 
-type SortKey = "mese" | "valore" | "entrate" | "spese";
+type SortKey = "month" | "balance" | "income" | "expense";
 
 interface BalanceItem {
-  mese: string; // es: "January 2025"
-  entrate: number;
-  spese: number;
-  valore: number;
+  month: string; // "2025-03"
+  income: number;
+  expense: number;
+  balance: number;
+  cumulative?: number;
 }
 
 interface MonthlyBalanceTableProps {
@@ -22,65 +24,29 @@ interface MonthlyBalanceTableProps {
   currency: string;
 }
 
+const money = (v: number | undefined | null) => (Number(v) || 0).toFixed(2);
+
 const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
   balances,
   currency,
 }) => {
   const { t } = useTranslation();
-  const [sortedData, setSortedData] = useState<BalanceItem[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [sortKey, setSortKey] = useState<SortKey>("mese");
+  const [sortKey, setSortKey] = useState<SortKey>("month");
 
-  useEffect(() => {
-    const sorted = sortBalances(balances, sortKey, sortOrder);
-    setSortedData(sorted);
-  }, [balances, sortKey, sortOrder]);
-
-  // Parsing mese + anno (basato sulle traduzioni correnti)
-  const parseDateKey = (str: string): Date => {
-    const [mese, anno] = str.split(" ");
-
-    const mesi = [
-      t("january"),
-      t("february"),
-      t("march"),
-      t("april"),
-      t("may"),
-      t("june"),
-      t("july"),
-      t("august"),
-      t("september"),
-      t("october"),
-      t("november"),
-      t("december"),
-    ];
-
-    const monthIndex = mesi.indexOf(mese);
-
-    return new Date(
-      parseInt(anno, 10),
-      monthIndex === -1 ? 0 : monthIndex
-    );
-  };
-
-  const sortBalances = (
-    data: BalanceItem[],
-    key: SortKey,
-    order: "asc" | "desc"
-  ) => {
+  const sortedData = useMemo(() => {
+    const data = (balances ?? []).filter((b) => typeof b?.month === "string");
     return [...data].sort((a, b) => {
-      if (key === "mese") {
-        const dateA = parseDateKey(a.mese);
-        const dateB = parseDateKey(b.mese);
-
-        return order === "asc"
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime();
+      let cmp: number;
+      if (sortKey === "month") {
+        // "YYYY-MM" si ordina correttamente come stringa
+        cmp = a.month.localeCompare(b.month);
+      } else {
+        cmp = (Number(a[sortKey]) || 0) - (Number(b[sortKey]) || 0);
       }
-
-      return order === "asc" ? a[key] - b[key] : b[key] - a[key];
+      return sortOrder === "asc" ? cmp : -cmp;
     });
-  };
+  }, [balances, sortKey, sortOrder]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -115,37 +81,37 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
         <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.headerCell}
-            onPress={() => handleSort("mese")}
+            onPress={() => handleSort("month")}
           >
             <Text style={styles.headerText}>
-              {t("month")} {renderSortIcon("mese")}
+              {t("month")} {renderSortIcon("month")}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.headerCell}
-            onPress={() => handleSort("entrate")}
+            onPress={() => handleSort("income")}
           >
             <Text style={styles.headerText}>
-              {t("incomes")} {renderSortIcon("entrate")}
+              {t("incomes")} {renderSortIcon("income")}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.headerCell}
-            onPress={() => handleSort("spese")}
+            onPress={() => handleSort("expense")}
           >
             <Text style={styles.headerText}>
-              {t("expenses")} {renderSortIcon("spese")}
+              {t("expenses")} {renderSortIcon("expense")}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.headerCell}
-            onPress={() => handleSort("valore")}
+            onPress={() => handleSort("balance")}
           >
             <Text style={styles.headerText}>
-              {t("balance")} {renderSortIcon("valore")}
+              {t("balance")} {renderSortIcon("balance")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -153,10 +119,10 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
         {/* Rows */}
         {sortedData.map((item, index) => (
           <View
-            key={`${item.mese}-${index}`}
+            key={`${item.month}-${index}`}
             style={[styles.row, index % 2 === 0 && styles.rowAlternate]}
           >
-            <Text style={styles.cell}>{item.mese}</Text>
+            <Text style={styles.cell}>{formatMonth(item.month, t)}</Text>
 
             <Text
               style={[
@@ -164,7 +130,7 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
                 { color: "#27ae60", textAlign: "right" },
               ]}
             >
-              {currency} {item.entrate.toFixed(2)}
+              {currency} {money(item.income)}
             </Text>
 
             <Text
@@ -173,7 +139,7 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
                 { color: "#c0392b", textAlign: "right" },
               ]}
             >
-              {currency} {item.spese.toFixed(2)}
+              {currency} {money(item.expense)}
             </Text>
 
             <Text
@@ -182,11 +148,11 @@ const MonthlyBalanceTable: React.FC<MonthlyBalanceTableProps> = ({
                 {
                   textAlign: "right",
                   fontWeight: "bold",
-                  color: item.valore >= 0 ? "#27ae60" : "#c0392b",
+                  color: (Number(item.balance) || 0) >= 0 ? "#27ae60" : "#c0392b",
                 },
               ]}
             >
-              {currency} {item.valore.toFixed(2)}
+              {currency} {money(item.balance)}
             </Text>
           </View>
         ))}

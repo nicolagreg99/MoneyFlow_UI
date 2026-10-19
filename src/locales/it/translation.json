@@ -182,7 +182,7 @@
   "currency_SEK": "Corona Svedese",
   "currency_TRY": "Lira Turca",
   "currency_USD": "Dollaro Statunitense",
-  "currency_ZAR": "Rand Sudafricano", 
+  "currency_ZAR": "Rand Sudafricano",
   "select_currency": "Seleziona valuta",
   "search_placeholder": "Cerca...",
   "close": "Chiudi",
@@ -210,7 +210,6 @@
   "delete_confirm_title": "Conferma Eliminazione",
   "delete": "Elimina",
 
-  
   "assets_management": "Gestione Patrimonio",
   "my_assets": "I Miei Conti",
   "total_assets": "Patrimonio Totale",
@@ -220,10 +219,10 @@
   "transfer_assets": "Trasferisci Conto",
   "asset_details": "Dettagli Conto",
   "no_assets": "Nessun conto presente",
-  
+
   "by_type": "Per Tipo",
   "by_bank": "Per Banca",
-  
+
   "bank": "Banca",
   "select_bank": "Seleziona Banca",
   "add_custom_bank": "Aggiungi Banca Personalizzata",
@@ -240,7 +239,7 @@
   "to": "A",
   "last_updated": "Ultimo Aggiornamento",
   "exchange_rate": "Tasso di Cambio",
-  
+
   "LIQUIDITY": "Liquidità",
   "SAVINGS_ACCOUNT": "Conto risparmio",
   "DEPOSIT_ACCOUNT": "Conto deposito",
@@ -259,7 +258,7 @@
   "GOLD": "Oro",
   "LIFE_INSURANCE": "Assicurazione vita",
   "OTHER": "Altro",
-  
+
   "add": "Aggiungi",
   "save": "Salva",
   "edit": "Modifica",
@@ -267,13 +266,13 @@
   "ok": "OK",
   "yes": "Sì",
   "no": "No",
-  
+
   "asset_added_successfully": "Conto aggiunto con successo",
   "asset_updated_successfully": "Conto aggiornato con successo",
   "asset_deleted_successfully": "Conto eliminato con successo",
   "transfer_successful": "Trasferimento completato con successo",
   "asset_already_exists": "Esiste già un conto per questa banca, tipo e valuta",
-  
+
   "error": "Errore",
   "success": "Successo",
   "bank_required": "Seleziona una banca",
@@ -316,5 +315,27 @@
   "loading_transactions": "Caricamento transazioni...",
   "no_transactions_description": "Non ci sono ancora transazioni per questo conto",
   "tap_to_select": "Clicca per selezionare",
-  "no_payable_assets": "Nessun conto disponibile"
+  "no_payable_assets": "Nessun conto disponibile",
+
+  "period_summary": "Riepilogo del periodo",
+  "custom": "Personalizzato",
+  "months": "mesi",
+  "year": "anno",
+  "years": "anni",
+  "invalid_date_range": "L'intervallo di date non è valido",
+  "range_too_long": "L'intervallo selezionato è troppo lungo (massimo 10 anni)",
+  "data_loading_error": "Errore nel caricamento dei dati",
+  "hold_for_details": "Tieni premuto sul grafico per i dettagli",
+  "january": "Gennaio",
+  "february": "Febbraio",
+  "march": "Marzo",
+  "april": "Aprile",
+  "may": "Maggio",
+  "june": "Giugno",
+  "july": "Luglio",
+  "august": "Agosto",
+  "september": "Settembre",
+  "october": "Ottobre",
+  "november": "Novembre",
+  "december": "Dicembre"
 }

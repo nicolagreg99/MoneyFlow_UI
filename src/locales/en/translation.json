@@ -219,10 +219,10 @@
   "transfer_assets": "Transfer Account",
   "asset_details": "Account Details",
   "no_assets": "No accounts available",
-  
+
   "by_type": "By Type",
   "by_bank": "By Bank",
-  
+
   "bank": "Bank",
   "select_bank": "Select Bank",
   "add_custom_bank": "Add Custom Bank",
@@ -239,7 +239,7 @@
   "to": "To",
   "last_updated": "Last Updated",
   "exchange_rate": "Exchange Rate",
-  
+
   "LIQUIDITY": "Liquidity",
   "SAVINGS_ACCOUNT": "Savings Account",
   "DEPOSIT_ACCOUNT": "Deposit Account",
@@ -258,7 +258,7 @@
   "GOLD": "Gold",
   "LIFE_INSURANCE": "Life Insurance",
   "OTHER": "Other",
-  
+
   "add": "Add",
   "save": "Save",
   "edit": "Edit",
@@ -266,13 +266,13 @@
   "ok": "OK",
   "yes": "Yes",
   "no": "No",
-  
+
   "asset_added_successfully": "Account added successfully",
   "asset_updated_successfully": "Account updated successfully",
   "asset_deleted_successfully": "Account deleted successfully",
   "transfer_successful": "Transfer completed successfully",
   "asset_already_exists": "An account already exists for this bank, type and currency",
-  
+
   "error": "Error",
   "success": "Success",
   "bank_required": "Select a bank",
@@ -315,5 +315,27 @@
   "loading_transactions": "Loading transactions...",
   "no_transactions_description": "There are no transactions yet for this account",
   "tap_to_select": "Tap to select",
-  "no_payable_assets": "No payable assets"
+  "no_payable_assets": "No payable assets",
+
+  "period_summary": "Period Summary",
+  "custom": "Custom",
+  "months": "months",
+  "year": "year",
+  "years": "years",
+  "invalid_date_range": "The date range is not valid",
+  "range_too_long": "The selected range is too long (maximum 10 years)",
+  "data_loading_error": "Error loading data",
+  "hold_for_details": "Press and hold the chart for details",
+  "january": "January",
+  "february": "February",
+  "march": "March",
+  "april": "April",
+  "may": "May",
+  "june": "June",
+  "july": "July",
+  "august": "August",
+  "september": "September",
+  "october": "October",
+  "november": "November",
+  "december": "December"
 }
